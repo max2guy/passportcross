@@ -402,6 +402,17 @@ body{display:flex;flex-direction:column}
           <div class="mi-left"><span class="mi-icon">🔄</span><span class="mi-text">데이터 초기화</span></div>
           <span class="mi-arrow">›</span>
         </div>
+        <div class="more-item" onclick="forceRefresh()">
+          <div class="mi-left"><span class="mi-icon">⚡</span><span class="mi-text">강제 새로고침</span></div>
+          <span class="mi-arrow">›</span>
+        </div>
+      </div>
+      <div class="more-section-title">관리자</div>
+      <div class="more-list">
+        <div class="more-item" onclick="goAdmin()">
+          <div class="mi-left"><span class="mi-icon">🔐</span><span class="mi-text" id="adminModeText">관리자 로그인</span></div>
+          <span class="mi-arrow">›</span>
+        </div>
       </div>
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">PASSPORT CROSS</div>
@@ -709,6 +720,7 @@ function switchTab(tabId,btn){
   document.getElementById(tabId).classList.add('active');
   document.querySelectorAll('.tab-bar button').forEach(function(b){b.classList.remove('active')});
   btn.classList.add('active');
+  if(tabId==='tabMore')updateAdminModeText();
 }
 
 function renderStamps(data){
@@ -1086,6 +1098,31 @@ function saveName(){
   data.name=n;saveData(data);refreshUI(data);closeNameEdit();toast('이름이 변경되었습니다');
 }
 function confirmReset(){if(confirm('모든 데이터가 삭제됩니다. 초기화하시겠습니까?')){if(unsubscribeFirestore)unsubscribeFirestore();localStorage.removeItem('passportCross');localStorage.removeItem('passportCrossUID');location.reload()}}
+
+function forceRefresh(){
+  toast('캐시를 지우고 새로고침합니다...');
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister();});});
+  }
+  if('caches' in window){
+    caches.keys().then(function(names){names.forEach(function(n){caches.delete(n);});});
+  }
+  setTimeout(function(){location.reload(true);},800);
+}
+
+function goAdmin(){
+  // 관리자로 로그인되어 있으면 admin.html로, 아니면 로그인 페이지로 (같은 admin.html)
+  window.location.href='admin.html';
+}
+
+// 더보기 탭 열릴 때 관리자 로그인 상태 표시 업데이트
+function updateAdminModeText(){
+  var el=document.getElementById('adminModeText');if(!el)return;
+  // Firebase auth 상태 확인 (admin.html의 세션은 별개이므로 localStorage 힌트 사용)
+  var isAdmin=localStorage.getItem('passportCrossAdmin')==='true';
+  el.textContent=isAdmin?'관리자 페이지로 전환':'관리자 로그인';
+}
+
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
 </script>
 </body>
