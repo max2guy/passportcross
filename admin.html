@@ -2,7 +2,10 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d0f14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>THE CROSS PASSPORT — 관리자</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -13,125 +16,196 @@
   --green:#2a6b3a;--green-light:#3a8a50;
   --text:#e8e4dc;--text-dim:#9a968e;
   --radius:12px;--radius-sm:8px;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
 }
-body{background:var(--bg);color:var(--text);font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:15px;min-height:100vh}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  font-size:15px;
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
+}
 /* LOGIN */
-.login-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px}
-.login-box{width:100%;max-width:360px;background:var(--bg2);border:1px solid rgba(197,165,90,.2);border-radius:var(--radius);padding:36px 28px}
-.login-title{font-size:20px;font-weight:700;color:var(--gold);text-align:center;letter-spacing:2px;margin-bottom:4px}
-.login-sub{font-size:12px;color:var(--text-dim);text-align:center;margin-bottom:28px}
+.login-wrap{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;min-height:-webkit-fill-available;
+  padding:calc(var(--safe-top) + 24px) 20px calc(var(--safe-bottom) + 24px);
+}
+.login-box{width:100%;max-width:380px;background:var(--bg2);border:1px solid rgba(197,165,90,.2);border-radius:var(--radius);padding:36px 28px}
+.login-brand{text-align:center;margin-bottom:24px}
+.login-title{font-size:11px;font-weight:700;color:var(--gold-dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px}
+.login-title-main{font-size:22px;font-weight:700;color:var(--gold);letter-spacing:2px}
+.login-sub{font-size:12px;color:var(--text-dim);margin-top:6px}
 .login-field{margin-bottom:16px}
 .login-field label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px}
-.login-field input{width:100%;padding:12px 14px;background:var(--bg3);border:1px solid rgba(197,165,90,.15);border-radius:var(--radius-sm);color:var(--text);font-size:14px;outline:none}
+.login-field input{
+  width:100%;padding:13px 14px;background:var(--bg3);
+  border:1px solid rgba(197,165,90,.15);border-radius:var(--radius-sm);
+  color:var(--text);font-size:15px;outline:none;
+  -webkit-appearance:none;appearance:none;
+}
 .login-field input:focus{border-color:var(--gold-dim)}
-.login-btn{width:100%;padding:14px;margin-top:8px;background:var(--gold);color:var(--bg);font-size:15px;font-weight:700;border:none;border-radius:var(--radius-sm);cursor:pointer;letter-spacing:1px}
+.login-btn{
+  width:100%;padding:15px;margin-top:8px;
+  background:var(--gold);color:var(--bg);font-size:15px;font-weight:700;
+  border:none;border-radius:var(--radius-sm);cursor:pointer;letter-spacing:1px;
+  -webkit-appearance:none;appearance:none;
+}
 .login-btn:active{background:var(--gold-dim)}
-.login-error{font-size:12px;color:#e05555;text-align:center;margin-top:10px;min-height:18px}
+.login-error{font-size:13px;color:#e05555;text-align:center;margin-top:12px;min-height:18px;word-break:keep-all}
 .login-tabs{display:flex;margin-bottom:24px;border-bottom:1px solid rgba(197,165,90,.15)}
-.login-tab{flex:1;padding:10px;text-align:center;font-size:13px;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.login-tab{flex:1;padding:11px 8px;text-align:center;font-size:14px;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s}
 .login-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
 .login-form{display:none}.login-form.active{display:block}
 /* APP */
 .app-wrap{display:none;flex-direction:column;min-height:100vh}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--bg2);border-bottom:1px solid rgba(197,165,90,.1);position:sticky;top:0;z-index:10}
-.topbar-title{font-size:16px;font-weight:700;color:var(--gold);letter-spacing:2px}
-.topbar-right{display:flex;align-items:center;gap:12px}
-.topbar-email{font-size:11px;color:var(--text-dim)}
-.logout-btn{padding:6px 14px;background:transparent;border:1px solid rgba(197,165,90,.3);border-radius:var(--radius-sm);color:var(--text-dim);font-size:12px;cursor:pointer}
-/* FILTERS */
-.filter-bar{display:flex;gap:8px;padding:16px 20px 8px;flex-wrap:wrap}
-.filter-btn{padding:6px 16px;border-radius:20px;border:1px solid rgba(197,165,90,.2);background:transparent;color:var(--text-dim);font-size:13px;cursor:pointer;transition:all .2s}
-.filter-btn.active{background:rgba(197,165,90,.15);border-color:var(--gold);color:var(--gold)}
+/* TOPBAR */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:calc(var(--safe-top) + 14px) 16px 14px;
+  background:var(--bg2);border-bottom:1px solid rgba(197,165,90,.1);
+  position:sticky;top:0;z-index:100;
+  gap:10px;
+}
+.topbar-left{display:flex;flex-direction:column;gap:2px;min-width:0}
+.topbar-title{font-size:15px;font-weight:700;color:var(--gold);letter-spacing:1px;white-space:nowrap}
+.topbar-email{font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px}
+.topbar-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.topbar-btn{
+  padding:7px 12px;background:transparent;
+  border:1px solid rgba(197,165,90,.25);border-radius:var(--radius-sm);
+  color:var(--text-dim);font-size:12px;cursor:pointer;white-space:nowrap;
+  -webkit-appearance:none;appearance:none;
+  transition:border-color .2s,color .2s;
+}
+.topbar-btn:active,.topbar-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+.topbar-btn.danger{border-color:rgba(255,100,100,.3);color:#e05555}
+/* MAIN CONTENT */
+.main-content{width:100%;max-width:900px;margin:0 auto}
 /* STATS */
-.stats-bar{display:flex;gap:12px;padding:0 20px 16px;flex-wrap:wrap}
-.stat-box{flex:1;min-width:80px;background:var(--bg2);border-radius:var(--radius-sm);padding:12px 14px;text-align:center}
-.stat-num{font-size:22px;font-weight:700;color:var(--gold)}
-.stat-label{font-size:11px;color:var(--text-dim);margin-top:2px}
+.stats-bar{display:flex;gap:10px;padding:16px 16px 0}
+.stat-box{flex:1;background:var(--bg2);border-radius:var(--radius-sm);padding:12px 10px;text-align:center;min-width:0}
+.stat-num{font-size:24px;font-weight:700;color:var(--gold);line-height:1}
+.stat-label{font-size:10px;color:var(--text-dim);margin-top:4px;white-space:nowrap}
+/* FILTERS */
+.filter-bar{
+  display:flex;gap:6px;padding:14px 16px 8px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.filter-bar::-webkit-scrollbar{display:none}
+.filter-btn{
+  padding:7px 16px;border-radius:20px;
+  border:1px solid rgba(197,165,90,.2);background:transparent;
+  color:var(--text-dim);font-size:13px;cursor:pointer;
+  white-space:nowrap;flex-shrink:0;
+  transition:all .2s;-webkit-appearance:none;appearance:none;
+}
+.filter-btn.active{background:rgba(197,165,90,.15);border-color:var(--gold);color:var(--gold)}
+/* SECTION */
+.section-title{font-size:11px;color:var(--text-dim);letter-spacing:1px;padding:4px 16px 10px;text-transform:uppercase}
 /* SUBMISSIONS */
-.section-title{font-size:11px;color:var(--text-dim);letter-spacing:1px;padding:0 20px 10px;text-transform:uppercase}
-.sub-list{padding:0 20px 40px;display:flex;flex-direction:column;gap:12px}
+.sub-list{padding:0 16px calc(var(--safe-bottom) + 40px);display:flex;flex-direction:column;gap:10px}
 .sub-card{background:var(--bg2);border:1px solid rgba(197,165,90,.1);border-radius:var(--radius);padding:16px}
-.sub-card.approved{border-color:rgba(42,107,58,.5);opacity:.7}
-.sub-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sub-card.approved{border-color:rgba(42,107,58,.4);opacity:.75}
+.sub-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px}
 .sub-name{font-size:15px;font-weight:700;color:var(--text)}
 .sub-meta{font-size:11px;color:var(--text-dim);margin-top:2px}
-.sub-badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+.sub-badge{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0}
 .sub-badge.youth{background:rgba(107,29,42,.4);color:var(--gold-bright)}
 .sub-badge.young{background:rgba(197,165,90,.15);color:var(--gold)}
 .sub-mission{font-size:13px;color:var(--gold-dim);margin-bottom:8px;font-weight:600}
-.sub-text{font-size:13px;color:var(--text);line-height:1.6;background:var(--bg3);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;white-space:pre-wrap;word-break:break-all}
-.sub-photo{width:100%;max-height:200px;object-fit:cover;border-radius:var(--radius-sm);margin-bottom:10px;display:block}
-.sub-footer{display:flex;align-items:center;justify-content:space-between}
-.sub-time{font-size:11px;color:var(--text-dim)}
-.sub-actions{display:flex;gap:8px}
-.btn-approve{padding:8px 20px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer}
+.sub-text{font-size:13px;color:var(--text);line-height:1.6;background:var(--bg3);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;white-space:pre-wrap;word-break:break-word}
+.sub-photo{width:100%;max-height:220px;object-fit:cover;border-radius:var(--radius-sm);margin-bottom:10px;display:block}
+.sub-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.sub-time{font-size:11px;color:var(--text-dim);flex-shrink:0}
+.sub-actions{display:flex;gap:6px;flex-wrap:wrap}
+.btn-approve{padding:9px 18px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;-webkit-appearance:none;appearance:none}
 .btn-approve:active{background:var(--green-light)}
-.btn-reject{padding:8px 14px;background:transparent;border:1px solid rgba(255,100,100,.3);color:#e05555;border-radius:var(--radius-sm);font-size:13px;cursor:pointer}
+.btn-reject{padding:9px 14px;background:transparent;border:1px solid rgba(255,100,100,.3);color:#e05555;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;-webkit-appearance:none;appearance:none}
+.btn-reject:active{background:rgba(255,100,100,.1)}
 .status-approved{font-size:12px;color:#3a8a50;font-weight:700}
 .status-rejected{font-size:12px;color:#e05555;font-weight:700}
+.btn-del-sub{padding:7px 10px;background:transparent;border:1px solid rgba(255,100,100,.2);color:#e05555;border-radius:var(--radius-sm);font-size:11px;cursor:pointer;-webkit-appearance:none;appearance:none}
 .empty{text-align:center;color:var(--text-dim);padding:60px 20px;font-size:14px}
 .loading{text-align:center;color:var(--text-dim);padding:60px 20px;font-size:14px}
-/* 마스터 관리자 - 계정 관리 */
-.master-section{padding:20px 20px 24px;display:none}
+/* 마스터 관리자 */
+.master-section{padding:16px 16px 20px;display:none;background:rgba(197,165,90,.04);border-bottom:1px solid rgba(197,165,90,.08)}
 .master-section.show{display:block}
-.master-title{font-size:11px;color:var(--gold-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
-.admin-card{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid rgba(197,165,90,.1);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px}
-.admin-info{font-size:13px;color:var(--text)}
-.admin-info span{display:block;font-size:11px;color:var(--text-dim);margin-top:2px}
-.btn-reset-pw{padding:6px 12px;background:transparent;border:1px solid rgba(197,165,90,.3);color:var(--gold-dim);border-radius:var(--radius-sm);font-size:12px;cursor:pointer}
+.master-title{font-size:10px;color:var(--gold-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.admin-card{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid rgba(197,165,90,.1);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;gap:8px}
+.admin-info{font-size:13px;color:var(--text);min-width:0;flex:1}
+.admin-info span{display:block;font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-reset-pw{padding:6px 10px;background:transparent;border:1px solid rgba(197,165,90,.3);color:var(--gold-dim);border-radius:var(--radius-sm);font-size:11px;cursor:pointer;white-space:nowrap;-webkit-appearance:none;appearance:none}
 .btn-reset-pw:active{border-color:var(--gold);color:var(--gold)}
-.btn-del-admin{padding:6px 12px;background:transparent;border:1px solid rgba(255,100,100,.3);color:#e05555;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;margin-left:6px}
-.admin-actions{display:flex;gap:4px}
-.reset-section{padding:0 20px 20px;display:none}.reset-section.show{display:block}
-.reset-title{font-size:11px;color:var(--gold-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.btn-del-admin{padding:6px 10px;background:transparent;border:1px solid rgba(255,100,100,.3);color:#e05555;border-radius:var(--radius-sm);font-size:11px;cursor:pointer;-webkit-appearance:none;appearance:none}
+.admin-actions{display:flex;gap:4px;flex-shrink:0}
+.reset-section{padding:0 16px 20px;display:none;border-bottom:1px solid rgba(197,165,90,.08)}.reset-section.show{display:block}
+.reset-title{font-size:10px;color:var(--gold-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
 .reset-btns{display:flex;flex-direction:column;gap:8px}
-.btn-danger{padding:12px 16px;background:transparent;border:1px solid rgba(255,100,100,.3);color:#e05555;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;text-align:left}
-.btn-danger:active{background:rgba(255,100,100,.1)}
-.btn-del-sub{padding:6px 10px;background:transparent;border:1px solid rgba(255,100,100,.25);color:#e05555;border-radius:var(--radius-sm);font-size:11px;cursor:pointer;margin-left:6px}
+.btn-danger{padding:13px 16px;background:transparent;border:1px solid rgba(255,100,100,.3);color:#e05555;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;text-align:left;word-break:keep-all;line-height:1.5;-webkit-appearance:none;appearance:none}
+.btn-danger:active{background:rgba(255,100,100,.08)}
 /* 미션 편집 */
-.mission-edit-panel{display:none;padding:0 20px 32px}
+.mission-edit-panel{display:none;padding:0 16px 32px}
 .mission-edit-panel.show{display:block}
-.me-tabs{display:flex;gap:8px;margin-bottom:16px}
-.me-tab{padding:7px 18px;border-radius:20px;border:1px solid rgba(197,165,90,.2);background:transparent;color:var(--text-dim);font-size:13px;cursor:pointer}
+.me-tabs{display:flex;gap:8px;margin-bottom:16px;padding-top:16px}
+.me-tab{padding:7px 18px;border-radius:20px;border:1px solid rgba(197,165,90,.2);background:transparent;color:var(--text-dim);font-size:13px;cursor:pointer;-webkit-appearance:none;appearance:none}
 .me-tab.active{background:rgba(197,165,90,.15);border-color:var(--gold);color:var(--gold)}
 .me-card{background:var(--bg2);border:1px solid rgba(197,165,90,.1);border-radius:var(--radius);margin-bottom:12px;overflow:hidden}
-.me-card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer}
-.me-card-day{font-size:13px;font-weight:700;color:var(--gold-dim)}
-.me-card-name{font-size:13px;color:var(--text);margin-left:10px;flex:1}
-.me-toggle{font-size:18px;color:var(--text-dim)}
+.me-card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;gap:8px}
+.me-card-day{font-size:13px;font-weight:700;color:var(--gold-dim);flex-shrink:0}
+.me-card-name{font-size:13px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.me-toggle{font-size:18px;color:var(--text-dim);flex-shrink:0}
 .me-card-body{display:none;padding:0 16px 16px;border-top:1px solid rgba(197,165,90,.08)}
 .me-card-body.open{display:block}
 .me-field{margin-top:12px}
 .me-field label{display:block;font-size:11px;color:var(--gold-dim);margin-bottom:5px;letter-spacing:.5px}
-.me-field input,.me-field textarea{width:100%;padding:10px 12px;background:var(--bg3);border:1px solid rgba(197,165,90,.15);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none;font-family:inherit}
+.me-field input,.me-field textarea{
+  width:100%;padding:10px 12px;background:var(--bg3);
+  border:1px solid rgba(197,165,90,.15);border-radius:var(--radius-sm);
+  color:var(--text);font-size:13px;outline:none;font-family:inherit;
+  -webkit-appearance:none;appearance:none;
+}
 .me-field textarea{resize:vertical;min-height:70px}
 .me-field input:focus,.me-field textarea:focus{border-color:var(--gold-dim)}
-.btn-save-mission{margin-top:12px;padding:9px 20px;background:var(--gold);color:var(--bg);font-size:13px;font-weight:700;border:none;border-radius:var(--radius-sm);cursor:pointer}
+.btn-save-mission{margin-top:12px;padding:10px 20px;background:var(--gold);color:var(--bg);font-size:13px;font-weight:700;border:none;border-radius:var(--radius-sm);cursor:pointer;-webkit-appearance:none;appearance:none}
 .btn-save-mission:active{background:var(--gold-dim)}
 .me-saved{font-size:12px;color:#3a8a50;margin-left:10px;display:none}
 
 /* ===== 반응형 ===== */
-@media (max-width:375px){
-  body{font-size:13px}
-  .sub-card{padding:14px 12px}
-  .sub-photo{max-height:160px}
+@media (max-width:390px){
+  .topbar-btn{padding:6px 9px;font-size:11px}
+  .topbar-title{font-size:14px}
+  .stat-num{font-size:20px}
+  .btn-approve{padding:9px 14px}
 }
 @media (min-width:768px){
-  body{font-size:16px}
-  .login-box{max-width:440px;padding:44px 36px}
-  .topbar{padding:18px 32px}
-  .filter-bar{padding:20px 32px 12px}
-  .content{padding:20px 32px}
-  .sub-grid{grid-template-columns:repeat(2,1fr)}
+  .topbar{padding:calc(var(--safe-top) + 16px) 32px 16px}
+  .topbar-title{font-size:17px}
+  .topbar-btn{padding:8px 16px;font-size:13px}
+  .stats-bar{padding:20px 32px 0;gap:16px}
+  .stat-num{font-size:28px}
+  .stat-label{font-size:11px}
+  .filter-bar{padding:16px 32px 10px;gap:8px}
+  .section-title{padding:8px 32px 12px}
+  .sub-list{padding:0 32px calc(var(--safe-bottom) + 40px);gap:14px}
   .sub-card{padding:20px}
-  .sub-photo{max-height:280px}
-  .mission-edit-panel{padding:20px 32px}
-  .me-grid{grid-template-columns:repeat(2,1fr)}
+  .sub-photo{max-height:300px}
+  .master-section{padding:20px 32px 24px}
+  .reset-section{padding:0 32px 24px}
+  .mission-edit-panel{padding:0 32px 40px}
+  .login-box{max-width:440px;padding:44px 40px}
 }
 @media (min-width:1024px){
-  .sub-grid{grid-template-columns:repeat(3,1fr)}
-  .me-grid{grid-template-columns:repeat(3,1fr)}
-  .content{max-width:1200px;margin:0 auto}
+  .main-content{max-width:1100px}
+  .sub-list{display:grid;grid-template-columns:repeat(2,1fr)}
+  .sub-photo{max-height:260px}
+  .filter-bar{padding:16px 40px 10px}
+  .sub-list{padding:0 40px calc(var(--safe-bottom) + 40px)}
+  .stats-bar{padding:20px 40px 0}
+  .section-title{padding:8px 40px 12px}
 }
 </style>
 </head>
@@ -140,7 +214,11 @@ body{background:var(--bg);color:var(--text);font-family:'Apple SD Gothic Neo','M
 <!-- 로그인 화면 -->
 <div class="login-wrap" id="loginWrap">
   <div class="login-box">
-    <div class="login-title">THE CROSS PASSPORT</div>
+    <div class="login-brand">
+      <div class="login-title">THE CROSS PASSPORT</div>
+      <div class="login-title-main">관리자</div>
+      <div class="login-sub">ADMIN PANEL</div>
+    </div>
     <div class="login-tabs">
       <div class="login-tab active" onclick="switchTab('login')">로그인</div>
       <div class="login-tab" onclick="switchTab('signup')">계정 만들기</div>
@@ -187,54 +265,56 @@ body{background:var(--bg);color:var(--text);font-family:'Apple SD Gothic Neo','M
 <!-- 관리자 앱 -->
 <div class="app-wrap" id="appWrap">
   <div class="topbar">
-    <div class="topbar-title">관리자 패널</div>
+    <div class="topbar-left">
+      <div class="topbar-title">관리자 패널</div>
+      <div class="topbar-email" id="adminEmail"></div>
+    </div>
     <div class="topbar-right">
-      <span class="topbar-email" id="adminEmail"></span>
-      <button class="logout-btn" onclick="toggleMissionEdit()">미션 편집</button>
-      <button class="logout-btn" onclick="location.href='index.html'">앱 전환</button>
-      <button class="logout-btn" onclick="doLogout()">로그아웃</button>
+      <button class="topbar-btn" onclick="toggleMissionEdit()" id="missionEditBtn">미션 편집</button>
+      <button class="topbar-btn" onclick="location.href='index.html'">앱 전환</button>
+      <button class="topbar-btn danger" onclick="doLogout()">로그아웃</button>
     </div>
   </div>
 
-  <!-- 마스터 관리자 전용 -->
-  <div class="master-section" id="masterSection">
-    <div class="master-title">계정 관리</div>
-    <div id="adminList"><div class="loading">불러오는 중...</div></div>
-  </div>
-  <div class="reset-section" id="resetSection">
-    <div class="reset-title">데이터 관리</div>
-    <div class="reset-btns">
-      <button class="btn-danger" onclick="resetApproved()">승인 내역 일괄 삭제 — 승인된 제출만 삭제하고 미션 상태 초기화</button>
-      <button class="btn-danger" onclick="resetAll()">전체 미션 리셋 — 모든 제출 삭제 + 전 학생 미션 초기화</button>
+  <div class="main-content">
+    <!-- 마스터 관리자 전용 -->
+    <div class="master-section" id="masterSection">
+      <div class="master-title">계정 관리</div>
+      <div id="adminList"><div class="loading">불러오는 중...</div></div>
     </div>
-  </div>
+    <div class="reset-section" id="resetSection">
+      <div class="reset-title">데이터 관리</div>
+      <div class="reset-btns">
+        <button class="btn-danger" onclick="resetApproved()">승인 내역 일괄 삭제<br><small style="opacity:.7;font-size:11px">승인된 제출만 삭제하고 미션 상태 초기화</small></button>
+        <button class="btn-danger" onclick="resetAll()">전체 미션 리셋<br><small style="opacity:.7;font-size:11px">모든 제출 삭제 + 전 학생 미션 초기화</small></button>
+      </div>
+    </div>
 
-  <div style="padding:16px 20px 0">
     <div class="stats-bar" id="statsBar">
       <div class="stat-box"><div class="stat-num" id="statTotal">-</div><div class="stat-label">전체 제출</div></div>
       <div class="stat-box"><div class="stat-num" id="statPending">-</div><div class="stat-label">대기중</div></div>
       <div class="stat-box"><div class="stat-num" id="statApproved">-</div><div class="stat-label">승인완료</div></div>
     </div>
-  </div>
 
-  <div class="filter-bar">
-    <button class="filter-btn active" data-filter="pending" onclick="setFilter('pending',this)">대기중</button>
-    <button class="filter-btn" data-filter="all" onclick="setFilter('all',this)">전체</button>
-    <button class="filter-btn" data-filter="youth" onclick="setFilter('youth',this)">중고등부</button>
-    <button class="filter-btn" data-filter="young" onclick="setFilter('young',this)">청년부</button>
-    <button class="filter-btn" data-filter="approved" onclick="setFilter('approved',this)">승인완료</button>
-  </div>
-
-  <div class="section-title" id="sectionLabel">대기중인 제출</div>
-  <div class="sub-list" id="subList"><div class="loading">불러오는 중...</div></div>
-
-  <!-- 미션 편집 패널 -->
-  <div class="mission-edit-panel" id="missionEditPanel">
-    <div class="me-tabs">
-      <button class="me-tab active" onclick="switchMissionGroup('youth',this)">중고등부</button>
-      <button class="me-tab" onclick="switchMissionGroup('young',this)">청년부</button>
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="pending" onclick="setFilter('pending',this)">대기중</button>
+      <button class="filter-btn" data-filter="all" onclick="setFilter('all',this)">전체</button>
+      <button class="filter-btn" data-filter="youth" onclick="setFilter('youth',this)">중고등부</button>
+      <button class="filter-btn" data-filter="young" onclick="setFilter('young',this)">청년부</button>
+      <button class="filter-btn" data-filter="approved" onclick="setFilter('approved',this)">승인완료</button>
     </div>
-    <div id="missionEditList"></div>
+
+    <div class="section-title" id="sectionLabel">대기중인 제출</div>
+    <div class="sub-list" id="subList"><div class="loading">불러오는 중...</div></div>
+
+    <!-- 미션 편집 패널 -->
+    <div class="mission-edit-panel" id="missionEditPanel">
+      <div class="me-tabs">
+        <button class="me-tab active" onclick="switchMissionGroup('youth',this)">중고등부</button>
+        <button class="me-tab" onclick="switchMissionGroup('young',this)">청년부</button>
+      </div>
+      <div id="missionEditList"></div>
+    </div>
   </div>
 </div>
 
@@ -254,9 +334,9 @@ var allSubmissions=[];
 var currentFilter='pending';
 var unsubscribe=null;
 
-// 로그인 상태 감지
+// 로그인 상태 감지 — 익명 사용자는 관리자 패널 접근 불가
 auth.onAuthStateChanged(function(user){
-  if(user){
+  if(user && !user.isAnonymous && user.email){
     localStorage.setItem('passportCrossAdmin','true');
     document.getElementById('loginWrap').style.display='none';
     document.getElementById('appWrap').style.display='flex';
@@ -272,7 +352,10 @@ auth.onAuthStateChanged(function(user){
     document.getElementById('loginWrap').style.display='flex';
     document.getElementById('appWrap').style.display='none';
     document.getElementById('masterSection').classList.remove('show');
+    document.getElementById('resetSection').classList.remove('show');
     if(unsubscribe)unsubscribe();
+    // 익명 사용자라면 로그아웃 처리
+    if(user && user.isAnonymous){auth.signOut();}
   }
 });
 
@@ -511,8 +594,9 @@ var editableMissions={youth:[],young:[]};
 function toggleMissionEdit(){
   missionEditVisible=!missionEditVisible;
   document.getElementById('missionEditPanel').classList.toggle('show',missionEditVisible);
-  document.querySelector('.sub-list').style.display=missionEditVisible?'none':'flex';
-  document.querySelector('.filter-bar').style.display=missionEditVisible?'none':'flex';
+  document.getElementById('missionEditBtn').textContent=missionEditVisible?'제출 목록':'미션 편집';
+  document.querySelector('.sub-list').style.display=missionEditVisible?'none':'';
+  document.querySelector('.filter-bar').style.display=missionEditVisible?'none':'';
   document.querySelector('.section-title').style.display=missionEditVisible?'none':'';
   if(missionEditVisible)loadMissionEditor();
 }

@@ -150,7 +150,12 @@ html,body{
 .header-name{font-size:13px;color:var(--text-dim)}
 .tab-content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 20px 20px}
 .tab-page{display:none}
-.tab-page.active{display:block}
+.tab-page.active{display:block;animation:tabIn .22s ease}
+.tab-content.dir-next .tab-page.active{animation:tabFromRight .22s ease}
+.tab-content.dir-prev .tab-page.active{animation:tabFromLeft .22s ease}
+@keyframes tabFromRight{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes tabFromLeft{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes tabIn{from{opacity:0}to{opacity:1}}
 .tab-bar{display:flex;flex-shrink:0;background:var(--bg2);border-top:1px solid rgba(197,165,90,.1);padding-bottom:var(--safe-bottom)}
 .tab-bar button{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;gap:3px;background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:10px;font-family:var(--font-body);transition:color .2s}
 .tab-bar button.active{color:var(--gold)}
@@ -304,11 +309,11 @@ html,body{
 /* TOAST */
 .toast{
   position:fixed;
-  bottom:calc(env(safe-area-inset-bottom,0px) + 76px);
+  top:calc(env(safe-area-inset-top,0px) + 62px);
   left:50%;
-  transform:translateX(-50%) translateY(12px);
+  transform:translateX(-50%) translateY(-10px);
   z-index:9990;
-  background:rgba(28,31,42,.92);
+  background:rgba(28,31,42,.93);
   border:1px solid rgba(197,165,90,.28);
   color:var(--text);
   padding:11px 22px;
@@ -322,7 +327,7 @@ html,body{
   opacity:0;
   transition:opacity .25s,transform .25s;
   pointer-events:none;
-  box-shadow:0 4px 24px rgba(0,0,0,.45);
+  box-shadow:0 4px 24px rgba(0,0,0,.5);
   -webkit-backdrop-filter:blur(12px);
   backdrop-filter:blur(12px);
 }
@@ -836,7 +841,11 @@ function showApp(data){
   document.getElementById('app').classList.add('show');
 }
 
-function switchTab(tabId,btn){
+function switchTab(tabId,btn,dir){
+  var tc=document.querySelector('.tab-content');
+  tc.classList.remove('dir-next','dir-prev');
+  if(dir===1)tc.classList.add('dir-next');
+  else if(dir===-1)tc.classList.add('dir-prev');
   document.querySelectorAll('.tab-page').forEach(function(p){p.classList.remove('active')});
   document.getElementById(tabId).classList.add('active');
   document.querySelectorAll('.tab-bar button').forEach(function(b){b.classList.remove('active')});
@@ -852,9 +861,9 @@ function getCurTabIdx(){
   for(var i=0;i<TABS.length;i++){if(document.getElementById(TABS[i]).classList.contains('active'))return i;}
   return 0;
 }
-function goTabByIdx(i){
+function goTabByIdx(i,dir){
   if(i<0||i>=TABS.length)return;
-  switchTab(TABS[i],document.querySelectorAll('.tab-bar button')[i]);
+  switchTab(TABS[i],document.querySelectorAll('.tab-bar button')[i],dir);
 }
 
 var _swipeEl=document.querySelector('.tab-content');
@@ -870,7 +879,7 @@ _swipeEl.addEventListener('touchend',function(e){
   var dy=e.changedTouches[0].clientY-_sy;
   var dt=Date.now()-_st;
   if(dt>450||Math.abs(dx)<55||Math.abs(dx)<Math.abs(dy)*1.3)return;
-  goTabByIdx(getCurTabIdx()+(dx<0?1:-1));
+  var dir=dx<0?1:-1;goTabByIdx(getCurTabIdx()+dir,dir);
 },{passive:true});
 
 function renderStamps(data){
