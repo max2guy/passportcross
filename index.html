@@ -728,9 +728,19 @@ function openMissionModal(idx){
   else{btn.textContent='실천 완료 제출하기';btn.className='btn-submit-mission';btn.disabled=false;textArea.disabled=false}
   if(data.photos[idx]){preview.src=data.photos[idx];preview.style.display='block'}
   document.getElementById('missionModal').classList.add('show');
+  pushOverlay();
 }
 
-function closeMissionModal(){document.getElementById('missionModal').classList.remove('show')}
+// 뒤로가기 처리
+var _overlayDepth=0;
+function pushOverlay(){_overlayDepth++;history.pushState({overlay:_overlayDepth},'')}
+function popOverlay(){if(_overlayDepth>0){_overlayDepth--;history.back()}}
+window.addEventListener('popstate',function(){
+  if(_overlayDepth>0){_overlayDepth--;}
+  ['missionModal','certOverlay','nameEditOverlay'].forEach(function(id){document.getElementById(id).classList.remove('show');});
+});
+
+function closeMissionModal(){document.getElementById('missionModal').classList.remove('show');popOverlay();}
 document.getElementById('missionModal').addEventListener('click',function(e){if(e.target===document.getElementById('missionModal'))closeMissionModal()});
 document.getElementById('modalSheet').addEventListener('click',function(e){e.stopPropagation()});
 
@@ -994,8 +1004,9 @@ function showCertificate(){
   document.getElementById('certGrade').textContent=getGroupLabel(data.group);
   document.getElementById('certChurch').textContent='연천장로교회 '+getGroupLabel(data.group);
   document.getElementById('certOverlay').classList.add('show');
+  pushOverlay();
 }
-function closeCert(){document.getElementById('certOverlay').classList.remove('show')}
+function closeCert(){document.getElementById('certOverlay').classList.remove('show');popOverlay();}
 
 function saveCert(){
   var data=getData();if(!data)return;
@@ -1027,9 +1038,10 @@ function openNameEdit(){
   var data=getData();if(!data)return;
   document.getElementById('nameEditInput').value=data.name;
   document.getElementById('nameEditOverlay').classList.add('show');
+  pushOverlay();
   setTimeout(function(){document.getElementById('nameEditInput').focus()},300);
 }
-function closeNameEdit(){document.getElementById('nameEditOverlay').classList.remove('show')}
+function closeNameEdit(){document.getElementById('nameEditOverlay').classList.remove('show');popOverlay();}
 function saveName(){
   var n=document.getElementById('nameEditInput').value.trim();
   if(!n){toast('이름을 입력하세요');return}
