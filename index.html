@@ -140,7 +140,8 @@ body{display:flex;flex-direction:column}
 .hg-tag.young{background:rgba(197,165,90,.15);color:var(--gold)}
 .header-cross{font-family:'Cinzel',var(--font-display);font-size:40px;font-weight:900;color:var(--gold);letter-spacing:8px;line-height:1;margin-bottom:3px}
 .header-brand-sub{font-family:var(--font-body);font-size:10px;color:var(--text-dim);letter-spacing:4px;opacity:.65}
-.header-user{position:absolute;top:50%;right:18px;transform:translateY(-50%);display:flex;align-items:center}
+.header-user{position:absolute;top:50%;right:18px;transform:translateY(-50%);display:flex;align-items:center;gap:6px}
+.header-name{font-size:13px;color:var(--text-dim)}
 .tab-content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 20px 20px}
 .tab-page{display:none}
 .tab-page.active{display:block}
@@ -340,7 +341,7 @@ body{display:flex;flex-direction:column}
   <div class="header">
     <div class="header-cross">CROSS</div>
     <div class="header-brand-sub">PASSPORT  ×  고난주간</div>
-    <div class="header-user"><span class="hg-tag" id="headerGroup"></span></div>
+    <div class="header-user"><span id="headerName" class="header-name"></span><span class="hg-tag" id="headerGroup"></span></div>
   </div>
   <div class="tab-content">
     <div class="tab-page active" id="tabPassport">
@@ -694,7 +695,7 @@ function startFirestoreListener(uid){
 }
 
 function showApp(data){
-  // headerName removed
+  document.getElementById('headerName').textContent=data.name;
   startFirestoreListener(getUID());
   var hg=document.getElementById('headerGroup');
   hg.textContent=getGroupLabel(data.group);
@@ -864,7 +865,7 @@ function verifyPin(){
 function checkComplete(data){if(data.missions.every(function(s){return s===2})){setTimeout(function(){toast('🎉 모든 미션 완료! 수료증을 확인하세요')},1000)}}
 
 function refreshUI(data){
-  // headerName removed
+  document.getElementById('headerName').textContent=data.name;
   var hg=document.getElementById('headerGroup');
   hg.textContent=getGroupLabel(data.group);hg.className='hg-tag '+getGroupTagClass(data.group);
   renderStamps(data);renderMissionList(data);
