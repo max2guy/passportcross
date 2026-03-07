@@ -1,7 +1,7 @@
 {
-  "name": "PASSPORT CROSS",
-  "short_name": "PASSPORT✝",
-  "description": "연천장로교회 중고등부 고난주간 6일 미션 챌린지",
+  "name": "THE CROSS PASSPORT",
+  "short_name": "THE CROSS",
+  "description": "연천장로교회 중고등부/청년부 고난주간 6일 미션 챌린지",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0d0f14",
