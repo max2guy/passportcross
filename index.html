@@ -26,10 +26,7 @@
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
 }
-html{height:100%;height:-webkit-fill-available}
-body{
-  height:100%;min-height:-webkit-fill-available;
-  width:100%;overflow:hidden;
+html,body{
   background:var(--bg);color:var(--text);
   font-family:var(--font-body);font-size:15px;line-height:1.6;
   -webkit-font-smoothing:antialiased;
@@ -37,7 +34,6 @@ body{
   -webkit-text-size-adjust:100%;
   text-size-adjust:100%;
 }
-body{display:flex;flex-direction:column}
 
 /* SPLASH */
 #splash{
@@ -134,7 +130,13 @@ body{display:flex;flex-direction:column}
 .ob-btn:disabled{opacity:.4;pointer-events:none}
 
 /* APP SHELL */
-#app{display:flex;flex-direction:column;height:100%;padding-top:var(--safe-top);opacity:0;transition:opacity .5s ease}
+#app{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);
+  opacity:0;transition:opacity .5s ease;
+  overflow:hidden;
+}
 #app.show{opacity:1}
 .header{padding:22px 20px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;border-bottom:1px solid rgba(197,165,90,0.08);position:relative}
 .header-left .h-name{font-size:13px;color:var(--text-dim)}
@@ -300,10 +302,10 @@ body{display:flex;flex-direction:column}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .fade-up{animation:fadeUp .5s ease forwards}
 
-/* ===== 반응형 (태블릿/대형 화면) ===== */
+/* ===== 반응형 ===== */
 
-/* 소형 폰 (iPhone SE, Galaxy A 등 ~375px) */
-@media (max-width:375px){
+/* 소형 폰 (≤390px) */
+@media (max-width:390px){
   html,body{font-size:13px}
   .header-cross{font-size:18px}
   .stamp-cell .stamp-icon{font-size:24px}
@@ -313,62 +315,65 @@ body{display:flex;flex-direction:column}
   .tab-bar button .tab-icon{font-size:18px}
 }
 
-/* 태블릿 세로 768px+ (iPad, Galaxy Tab) */
+/* 태블릿 / 데스크탑 (768px+) */
 @media (min-width:768px){
   html,body{font-size:16px}
-  #app{max-width:680px;margin:0 auto;height:100%}
-  #onboarding{padding:max(env(safe-area-inset-top,40px),40px) 40px max(env(safe-area-inset-bottom,40px),40px)}
+
+  /* 앱을 중앙에 고정 폭으로 */
+  #app{
+    left:50%;right:auto;top:0;bottom:0;
+    width:680px;
+    transform:translateX(-50%);
+    border-left:1px solid rgba(197,165,90,.12);
+    border-right:1px solid rgba(197,165,90,.12);
+    box-shadow:0 0 80px rgba(0,0,0,.7);
+  }
+  #onboarding{
+    left:50%;right:auto;
+    width:680px;
+    transform:translateX(-50%);
+  }
+  #splash{background:var(--bg)}
+
   .ob-brand{margin-bottom:40px}
-  .ob-title,.ob-title-cross{font-size:44px}
-  .ob-cross-mark{width:44px;height:44px}
-  .ob-cross-mark::before{width:7px;height:44px;left:18px;top:0}
-  .ob-cross-mark::after{width:44px;height:7px;top:18px;left:0}
-  .ob-group-wrap,.ob-field,.ob-btn{max-width:440px}
-  .ob-group-btn{padding:22px 16px}
-  .ob-group-btn .ogb-icon{font-size:34px}
+  .ob-title,.ob-title-cross{font-size:42px}
+  .ob-cross-mark{width:42px;height:42px}
+  .ob-cross-mark::before{width:7px;height:42px;left:17px;top:0}
+  .ob-cross-mark::after{width:42px;height:7px;top:17px;left:0}
+  .ob-group-wrap,.ob-field,.ob-btn{max-width:420px}
+  .ob-group-btn{padding:20px 16px}
+  .ob-group-btn .ogb-icon{font-size:32px}
   .ob-group-btn .ogb-name{font-size:16px}
-  .header{padding:28px 32px 20px}
+  .header{padding:26px 28px 18px}
   .header-cross{font-size:26px}
   .header-brand-sub{font-size:10px;letter-spacing:5px}
   .header-name{font-size:14px}
-  .tab-content{padding:0 32px 28px}
+  .tab-content{padding:0 28px 24px}
   .stamp-grid{gap:16px}
-  .stamp-cell .stamp-icon{font-size:36px}
-  .stamp-cell .stamp-day{font-size:11px}
-  .mission-card{padding:20px 22px}
-  .mc-emoji{font-size:38px}
+  .stamp-cell .stamp-icon{font-size:34px}
+  .mission-card{padding:18px 20px}
+  .mc-emoji{font-size:36px}
   .mc-info .mc-title{font-size:16px}
-  .mc-info .mc-theme{font-size:13px}
-  .screen-grid{grid-template-columns:repeat(3,1fr);gap:16px}
-  .si-footer span{font-size:12px}
-  .modal-sheet{max-width:600px;padding:32px 36px 40px}
-  .modal-header h3{font-size:28px}
-  .modal-section .ms-verse{font-size:15px}
-  .modal-section p{font-size:15px}
+  .screen-grid{grid-template-columns:repeat(3,1fr);gap:14px}
+  .modal-sheet{max-width:580px;padding:28px 32px 36px}
+  .modal-header h3{font-size:26px}
+  .modal-section p,.modal-section .ms-verse{font-size:15px}
   .verify-area textarea{min-height:100px;font-size:15px}
   .btn-submit-mission{font-size:16px;padding:16px}
-  .more-item{padding:18px 22px}
+  .more-item{padding:18px 20px}
   .more-item .mi-text{font-size:15px}
-  .more-item .mi-icon{font-size:22px}
-  .cert-card{max-width:440px;padding:40px 32px}
-  .cert-cross{font-size:56px}
-  .cert-card h2{font-size:28px}
-  .cert-card .cert-name{font-size:24px}
-  .tab-bar button{padding:14px 0 10px;font-size:11px}
-  .tab-bar button .tab-icon{font-size:26px}
+  .tab-bar button{padding:13px 0 9px;font-size:11px}
+  .tab-bar button .tab-icon{font-size:24px}
   .pastoral p{font-size:13px}
-  .pastoral h4{font-size:14px}
 }
 
-/* 태블릿 가로 / iPad Pro (1024px+) */
+/* 대형 태블릿 / 데스크탑 (1024px+) */
 @media (min-width:1024px){
-  #app{max-width:780px}
-  .screen-grid{grid-template-columns:repeat(4,1fr)}
-  .modal-sheet{max-width:700px}
-  .stamp-grid{grid-template-columns:repeat(3,1fr);gap:20px}
-  .stamp-cell .stamp-icon{font-size:42px}
-  .header-cross{font-size:30px}
-  .tab-content{padding:0 40px 32px}
+  #app{width:760px}
+  #onboarding{width:760px}
+  .screen-grid{grid-template-columns:repeat(3,1fr)}
+  .tab-content{padding:0 36px 28px}
+  .header-cross{font-size:28px}
 }
 </style>
 </head>
