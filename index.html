@@ -27,12 +27,13 @@
   --safe-bottom:env(safe-area-inset-bottom,0px);
 }
 html,body{
-  height:100%;width:100%;overflow:hidden;
+  height:100%;height:100dvh;width:100%;overflow:hidden;
   background:var(--bg);color:var(--text);
   font-family:var(--font-body);font-size:15px;line-height:1.6;
   -webkit-font-smoothing:antialiased;
   -webkit-tap-highlight-color:transparent;
   -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
 }
 body{display:flex;flex-direction:column}
 
@@ -295,6 +296,77 @@ body{display:flex;flex-direction:column}
 ::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:2px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .fade-up{animation:fadeUp .5s ease forwards}
+
+/* ===== 반응형 (태블릿/대형 화면) ===== */
+
+/* 소형 폰 (iPhone SE, Galaxy A 등 ~375px) */
+@media (max-width:375px){
+  html,body{font-size:13px}
+  .header-cross{font-size:22px}
+  .stamp-cell .stamp-icon{font-size:24px}
+  .mc-emoji{font-size:26px}
+  .ob-group-btn{padding:14px 8px}
+  .tab-bar button{font-size:9px}
+  .tab-bar button .tab-icon{font-size:18px}
+}
+
+/* 태블릿 세로 768px+ (iPad, Galaxy Tab) */
+@media (min-width:768px){
+  html,body{font-size:16px}
+  #app{max-width:680px;margin:0 auto}
+  #onboarding{padding:40px 32px}
+  .ob-brand{margin-bottom:40px}
+  .ob-title,.ob-title-cross{font-size:44px}
+  .ob-cross-mark{width:44px;height:44px}
+  .ob-cross-mark::before{width:7px;height:44px;left:18px;top:0}
+  .ob-cross-mark::after{width:44px;height:7px;top:18px;left:0}
+  .ob-group-wrap,.ob-field,.ob-btn{max-width:440px}
+  .ob-group-btn{padding:22px 16px}
+  .ob-group-btn .ogb-icon{font-size:34px}
+  .ob-group-btn .ogb-name{font-size:16px}
+  .header{padding:28px 32px 20px}
+  .header-cross{font-size:30px}
+  .header-brand-sub{font-size:10px;letter-spacing:5px}
+  .header-name{font-size:14px}
+  .tab-content{padding:0 32px 28px}
+  .stamp-grid{gap:16px}
+  .stamp-cell .stamp-icon{font-size:36px}
+  .stamp-cell .stamp-day{font-size:11px}
+  .mission-card{padding:20px 22px}
+  .mc-emoji{font-size:38px}
+  .mc-info .mc-title{font-size:16px}
+  .mc-info .mc-theme{font-size:13px}
+  .screen-grid{grid-template-columns:repeat(3,1fr);gap:16px}
+  .si-footer span{font-size:12px}
+  .modal-sheet{max-width:600px;padding:32px 36px 40px}
+  .modal-header h3{font-size:28px}
+  .modal-section .ms-verse{font-size:15px}
+  .modal-section p{font-size:15px}
+  .verify-area textarea{min-height:100px;font-size:15px}
+  .btn-submit-mission{font-size:16px;padding:16px}
+  .more-item{padding:18px 22px}
+  .more-item .mi-text{font-size:15px}
+  .more-item .mi-icon{font-size:22px}
+  .cert-card{max-width:440px;padding:40px 32px}
+  .cert-cross{font-size:56px}
+  .cert-card h2{font-size:28px}
+  .cert-card .cert-name{font-size:24px}
+  .tab-bar button{padding:14px 0 10px;font-size:11px}
+  .tab-bar button .tab-icon{font-size:26px}
+  .pastoral p{font-size:13px}
+  .pastoral h4{font-size:14px}
+}
+
+/* 태블릿 가로 / iPad Pro (1024px+) */
+@media (min-width:1024px){
+  #app{max-width:780px}
+  .screen-grid{grid-template-columns:repeat(4,1fr)}
+  .modal-sheet{max-width:700px}
+  .stamp-grid{grid-template-columns:repeat(3,1fr);gap:20px}
+  .stamp-cell .stamp-icon{font-size:42px}
+  .header-cross{font-size:34px}
+  .tab-content{padding:0 40px 32px}
+}
 </style>
 </head>
 <body>
