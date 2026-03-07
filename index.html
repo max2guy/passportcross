@@ -844,6 +844,35 @@ function switchTab(tabId,btn){
   if(tabId==='tabMore')updateAdminModeText();
 }
 
+// ===== 스와이프 탭 이동 =====
+var TABS=['tabPassport','tabMission','tabScreen','tabMore'];
+var _sx=0,_sy=0,_st=0;
+
+function getCurTabIdx(){
+  for(var i=0;i<TABS.length;i++){if(document.getElementById(TABS[i]).classList.contains('active'))return i;}
+  return 0;
+}
+function goTabByIdx(i){
+  if(i<0||i>=TABS.length)return;
+  switchTab(TABS[i],document.querySelectorAll('.tab-bar button')[i]);
+}
+
+var _swipeEl=document.querySelector('.tab-content');
+_swipeEl.addEventListener('touchstart',function(e){
+  _sx=e.touches[0].clientX;_sy=e.touches[0].clientY;_st=Date.now();
+},{passive:true});
+_swipeEl.addEventListener('touchend',function(e){
+  var overlayOpen=['missionModal','certOverlay','nameEditOverlay'].some(function(id){
+    return document.getElementById(id).classList.contains('show');
+  });
+  if(overlayOpen)return;
+  var dx=e.changedTouches[0].clientX-_sx;
+  var dy=e.changedTouches[0].clientY-_sy;
+  var dt=Date.now()-_st;
+  if(dt>450||Math.abs(dx)<55||Math.abs(dx)<Math.abs(dy)*1.3)return;
+  goTabByIdx(getCurTabIdx()+(dx<0?1:-1));
+},{passive:true});
+
 function renderStamps(data){
   var missions=getMissions(data.group);
   var grid=document.getElementById('stampGrid');grid.innerHTML='';
