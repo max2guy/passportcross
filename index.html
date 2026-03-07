@@ -269,20 +269,37 @@ html,body{
 /* CERT */
 .cert-overlay{position:fixed;inset:0;z-index:8800;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
 .cert-overlay.show{opacity:1;visibility:visible}
-.cert-card{width:100%;max-width:360px;background:linear-gradient(135deg,var(--bg2),var(--bg3));border:2px solid var(--gold);border-radius:var(--radius);padding:32px 24px;text-align:center;position:relative;overflow:hidden}
-.cert-card::before{content:'';position:absolute;inset:8px;border:1px solid rgba(197,165,90,.2);border-radius:10px;pointer-events:none}
-.cert-cross{font-size:48px;margin-bottom:16px;display:block;color:var(--gold)}
-.cert-card h2{font-family:var(--font-display);font-size:24px;color:var(--gold);letter-spacing:3px;margin-bottom:4px}
-.cert-card .cert-sub{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);letter-spacing:1px;margin-bottom:24px}
-.cert-card .cert-name{font-family:var(--font-serif);font-size:20px;color:var(--text);margin-bottom:4px}
-.cert-card .cert-grade{font-size:13px;color:var(--text-dim);margin-bottom:20px}
-.cert-card .cert-msg{font-family:var(--font-serif);font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:20px}
-.cert-card .cert-date{font-family:var(--font-mono);font-size:11px;color:var(--gold-dim)}
-.cert-card .cert-church{font-size:12px;color:var(--text-dim);margin-top:8px}
-.cert-btns{display:flex;gap:8px;margin-top:20px}
-.cert-btns button{flex:1;padding:12px;border:none;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:13px;cursor:pointer}
-.cert-close{background:var(--bg3);color:var(--text-dim)}
-.cert-save{background:var(--gold);color:var(--bg);font-weight:700}
+.cert-card{
+  width:100%;max-width:360px;
+  background:linear-gradient(160deg,var(--bg2),var(--bg3));
+  border:1px solid rgba(197,165,90,.5);
+  border-radius:var(--radius);padding:36px 28px 28px;
+  text-align:center;position:relative;overflow:hidden;
+}
+.cert-card::before{content:'';position:absolute;inset:7px;border:1px solid rgba(197,165,90,.15);border-radius:10px;pointer-events:none}
+.cert-cross{font-size:38px;margin-bottom:12px;display:block;color:var(--gold);opacity:.85}
+.cert-card h2{
+  font-family:'Cinzel',var(--font-display);font-size:20px;
+  font-weight:900;color:var(--gold);
+  letter-spacing:3px;margin-bottom:6px;
+  line-height:1.3;word-break:keep-all;
+}
+.cert-card .cert-sub{font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:3px;margin-bottom:20px;opacity:.7}
+.cert-divider{width:40px;height:1px;background:rgba(197,165,90,.3);margin:0 auto 20px}
+.cert-card .cert-name{font-family:var(--font-serif);font-size:22px;font-weight:700;color:var(--text);margin-bottom:3px}
+.cert-card .cert-grade{font-size:12px;color:var(--text-dim);margin-bottom:16px;letter-spacing:.5px}
+.cert-card .cert-msg{
+  font-family:var(--font-serif);font-size:12px;color:var(--text-dim);
+  line-height:1.9;margin-bottom:18px;
+  word-break:keep-all;word-wrap:break-word;
+}
+.cert-card .cert-date{font-family:var(--font-mono);font-size:11px;color:rgba(197,165,90,.7);margin-bottom:4px}
+.cert-card .cert-church{font-size:11px;color:var(--text-dim);opacity:.6}
+.cert-btns{display:flex;gap:10px;margin-top:22px}
+.cert-close{flex:0 0 72px;padding:12px 8px;border:1px solid rgba(197,165,90,.2);border-radius:var(--radius-sm);background:transparent;color:var(--text-dim);font-family:var(--font-body);font-size:13px;cursor:pointer;transition:border-color .2s}
+.cert-close:active{border-color:var(--gold-dim)}
+.cert-save{flex:1;padding:12px;border:none;border-radius:var(--radius-sm);background:var(--gold);color:var(--bg);font-family:var(--font-body);font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.5px}
+.cert-save:active{background:var(--gold-dim)}
 
 /* TOAST */
 .toast{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-20px);z-index:9990;background:var(--bg3);border:1px solid rgba(197,165,90,.2);color:var(--text);padding:12px 24px;border-radius:var(--radius);font-size:13px;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none}
@@ -564,9 +581,10 @@ html,body{
     <span class="cert-cross">✝</span>
     <h2>THE CROSS PASSPORT</h2>
     <div class="cert-sub">CERTIFICATE OF COMPLETION</div>
+    <div class="cert-divider"></div>
     <div class="cert-name" id="certName"></div>
     <div class="cert-grade" id="certGrade"></div>
-    <div class="cert-msg">고난주간 6일 미션을 모두 완수하였음을 증명합니다.<br>그리스도의 고난에 동참하고 부활의 소망을 고백합니다.</div>
+    <div class="cert-msg">고난주간 6일 미션을 모두 완수하였음을 증명합니다. 그리스도의 고난에 동참하고 부활의 소망을 고백합니다.</div>
     <div class="cert-date">2026. 4. 5. 부활주일</div>
     <div class="cert-church" id="certChurch">연천장로교회</div>
     <div class="cert-btns">

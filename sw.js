@@ -1,4 +1,4 @@
-const CACHE_NAME = 'passport-cross-v35';
+const CACHE_NAME = 'passport-cross-v36';
 const ASSETS = [
   './',
   './index.html',
