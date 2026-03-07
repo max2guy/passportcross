@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d0f14">
+<title>PASSPORT CROSS</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--bg2:#151820;--bg3:#1c1f2a;
+  --gold:#c5a55a;--gold-dim:#9a8245;--gold-bright:#e0c780;
+  --wine:#6b1d2a;--wine-light:#8a2e3d;
+  --text:#e8e4dc;--text-dim:#9a968e;--text-bright:#fff;
+  --radius:14px;--radius-sm:8px;
+  --font-display:'Playfair Display',Georgia,'Times New Roman',serif;
+  --font-body:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --font-serif:'Noto Serif KR',Georgia,serif;
+  --font-mono:'DM Mono','Courier New',monospace;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+html,body{
+  height:100%;width:100%;overflow:hidden;
+  background:var(--bg);color:var(--text);
+  font-family:var(--font-body);font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-text-size-adjust:100%;
+}
+body{display:flex;flex-direction:column}
+
+/* SPLASH */
+#splash{
+  position:fixed;inset:0;z-index:9999;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .6s ease,visibility .6s ease;
+}
+#splash.hide{opacity:0;visibility:hidden;pointer-events:none}
+#splash .sp-cross{
+  width:60px;height:60px;position:relative;margin-bottom:32px;
+  animation:spinCross 2s ease-in-out infinite;
+}
+#splash .sp-cross::before,#splash .sp-cross::after{
+  content:'';position:absolute;background:var(--gold);border-radius:2px;
+}
+#splash .sp-cross::before{width:8px;height:60px;left:26px;top:0}
+#splash .sp-cross::after{width:60px;height:8px;top:22px;left:0}
+@keyframes spinCross{0%,100%{transform:rotate(0deg);opacity:1}50%{transform:rotate(180deg);opacity:.6}}
+#splash h1{font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--gold);letter-spacing:6px;margin-bottom:8px}
+#splash p{font-size:12px;color:var(--text-dim);letter-spacing:2px}
+
+/* ONBOARDING */
+#onboarding{
+  position:fixed;inset:0;z-index:8888;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px;transition:opacity .5s ease,visibility .5s ease;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+#onboarding.hide{opacity:0;visibility:hidden;pointer-events:none}
+.ob-title{font-family:var(--font-display);font-size:32px;font-weight:700;color:var(--gold);letter-spacing:4px;margin-bottom:8px}
+.ob-sub{font-size:13px;color:var(--text-dim);margin-bottom:36px;letter-spacing:1px}
+.ob-field{width:100%;max-width:320px;margin-bottom:20px}
+.ob-field label{display:block;font-size:12px;color:var(--gold-dim);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase}
+.ob-field input,.ob-field select{
+  width:100%;padding:14px 16px;background:var(--bg2);border:1px solid var(--bg3);
+  border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:16px;
+  outline:none;-webkit-appearance:none;appearance:none;
+}
+.ob-field input:focus,.ob-field select:focus{border-color:var(--gold-dim)}
+.ob-field select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239a968e' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 16px center;padding-right:40px;
+}
+.ob-group-wrap{width:100%;max-width:320px;margin-bottom:28px}
+.ob-group-label{font-size:12px;color:var(--gold-dim);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase}
+.ob-group-btns{display:flex;gap:10px}
+.ob-group-btn{
+  flex:1;padding:18px 12px;background:var(--bg2);border:2px solid var(--bg3);
+  border-radius:var(--radius);cursor:pointer;text-align:center;transition:all .25s ease;
+}
+.ob-group-btn:active{transform:scale(.97)}
+.ob-group-btn.selected{border-color:var(--gold);background:rgba(197,165,90,.08)}
+.ob-group-btn .ogb-icon{font-size:28px;margin-bottom:6px}
+.ob-group-btn .ogb-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
+.ob-group-btn .ogb-desc{font-size:11px;color:var(--text-dim)}
+.ob-group-btn.selected .ogb-name{color:var(--gold)}
+.ob-btn{
+  width:100%;max-width:320px;padding:16px;margin-top:12px;
+  background:var(--gold);color:var(--bg);font-family:var(--font-body);font-size:15px;font-weight:700;
+  border:none;border-radius:var(--radius-sm);cursor:pointer;letter-spacing:1px;transition:background .2s;
+}
+.ob-btn:active{background:var(--gold-dim)}
+.ob-admin-link{display:block;text-align:center;margin-top:16px;font-size:12px;color:var(--text-dim);text-decoration:none;letter-spacing:.5px;opacity:.6}
+.ob-admin-link:hover{opacity:1;color:var(--gold)}
+.ob-btn:disabled{opacity:.4;pointer-events:none}
+
+/* APP SHELL */
+#app{display:flex;flex-direction:column;height:100%;padding-top:var(--safe-top);opacity:0;transition:opacity .5s ease}
+#app.show{opacity:1}
+.header{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.header-left .h-name{font-size:13px;color:var(--text-dim)}
+.header-left .h-name span{color:var(--gold);font-weight:700}
+.hg-tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;letter-spacing:.5px;font-family:var(--font-mono);font-weight:400}
+.hg-tag.youth{background:rgba(107,29,42,.4);color:var(--gold-bright)}
+.hg-tag.young{background:rgba(197,165,90,.15);color:var(--gold)}
+.header-title{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--gold);letter-spacing:3px}
+.tab-content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 20px 20px}
+.tab-page{display:none}
+.tab-page.active{display:block}
+.tab-bar{display:flex;flex-shrink:0;background:var(--bg2);border-top:1px solid rgba(197,165,90,.1);padding-bottom:var(--safe-bottom)}
+.tab-bar button{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;gap:3px;background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:10px;font-family:var(--font-body);transition:color .2s}
+.tab-bar button.active{color:var(--gold)}
+.tab-bar button .tab-icon{font-size:20px}
+
+/* PASSPORT */
+.passport-card{background:var(--bg2);border:1px solid rgba(197,165,90,.15);border-radius:var(--radius);padding:24px 20px;margin-bottom:16px;position:relative;overflow:hidden}
+.passport-card::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(197,165,90,.08),transparent 70%)}
+.pc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.pc-header h2{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--gold);letter-spacing:2px}
+.pc-header .pc-badge{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);background:var(--bg3);padding:4px 10px;border-radius:20px}
+.progress-wrap{margin-bottom:24px}
+.progress-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:6px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--wine),var(--gold));border-radius:3px;transition:width .6s ease}
+.progress-text{font-size:11px;color:var(--text-dim);text-align:right}
+.stamp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stamp-cell{aspect-ratio:1;background:var(--bg3);border:2px dashed rgba(197,165,90,.2);border-radius:var(--radius-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .3s ease;position:relative;overflow:hidden}
+.stamp-cell .stamp-day{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-bottom:4px;letter-spacing:1px}
+.stamp-cell .stamp-icon{font-size:28px;opacity:.3;transition:opacity .3s}
+.stamp-cell.pending{border-color:var(--gold-dim);border-style:solid}
+.stamp-cell.pending .stamp-icon{opacity:.6}
+.stamp-cell.done{border-color:var(--gold);border-style:solid;background:rgba(197,165,90,.08)}
+.stamp-cell.done .stamp-icon{opacity:1}
+.stamp-cell.done::after{content:'✓';position:absolute;top:6px;right:8px;font-size:14px;color:var(--gold);font-weight:700}
+.pastoral{background:var(--bg2);border-left:3px solid var(--wine);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:16px 18px;margin-top:8px}
+.pastoral h4{font-family:var(--font-serif);font-size:13px;color:var(--gold);margin-bottom:8px;font-weight:400}
+.pastoral p{font-size:12px;color:var(--text-dim);line-height:1.8}
+
+/* MISSION */
+.mission-list{display:flex;flex-direction:column;gap:12px}
+.mission-card{background:var(--bg2);border:1px solid rgba(197,165,90,.1);border-radius:var(--radius);padding:16px 18px;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;gap:14px}
+.mission-card:active{transform:scale(.98)}
+.mc-emoji{font-size:32px;flex-shrink:0}
+.mc-info{flex:1;min-width:0}
+.mc-info .mc-day{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-bottom:2px}
+.mc-info .mc-title{font-size:14px;font-weight:700;color:var(--text)}
+.mc-info .mc-theme{font-size:12px;color:var(--text-dim);margin-top:2px}
+.mc-status{flex-shrink:0;font-size:11px;padding:4px 10px;border-radius:20px;font-family:var(--font-mono);white-space:nowrap}
+.mc-status.undone{background:var(--bg3);color:var(--text-dim)}
+.mc-status.pending{background:rgba(197,165,90,.15);color:var(--gold)}
+.mc-status.done{background:rgba(107,29,42,.3);color:var(--gold-bright)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:7777;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.modal-overlay.show{opacity:1;visibility:visible}
+.modal-sheet{width:100%;max-width:480px;max-height:85vh;background:var(--bg2);border-radius:var(--radius) var(--radius) 0 0;padding:24px 20px 32px;transform:translateY(100%);transition:transform .35s cubic-bezier(.22,.61,.36,1);overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(32px + var(--safe-bottom))}
+.modal-overlay.show .modal-sheet{transform:translateY(0)}
+.modal-handle{width:40px;height:4px;background:var(--bg3);border-radius:2px;margin:0 auto 20px}
+.modal-header{margin-bottom:20px}
+.modal-header .mh-day{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px}
+.modal-header h3{font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--gold)}
+.modal-section{margin-bottom:20px}
+.modal-section .ms-label{font-size:11px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.modal-section .ms-verse{font-family:var(--font-serif);font-size:14px;color:var(--text);line-height:1.7;padding:12px 16px;background:var(--bg3);border-radius:var(--radius-sm);border-left:3px solid var(--wine)}
+.modal-section p{font-size:14px;color:var(--text);line-height:1.7}
+.modal-section .ms-howto{font-size:13px;color:var(--text-dim);padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm)}
+.verify-area{margin-top:16px}
+.verify-area textarea{width:100%;min-height:80px;padding:12px 14px;background:var(--bg);border:1px solid var(--bg3);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:14px;resize:vertical;outline:none}
+.verify-area textarea:focus{border-color:var(--gold-dim)}
+.verify-area .file-upload{display:flex;align-items:center;gap:10px;margin-top:10px}
+.verify-area .file-upload label{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;background:var(--bg3);border-radius:var(--radius-sm);font-size:13px;color:var(--text-dim);cursor:pointer;border:1px dashed rgba(197,165,90,.2);transition:border-color .2s}
+.verify-area .file-upload label:active{border-color:var(--gold-dim)}
+.verify-area .file-upload input[type=file]{display:none}
+.verify-area .file-name{font-size:12px;color:var(--text-dim);margin-top:6px}
+.img-preview{max-width:100%;max-height:200px;border-radius:var(--radius-sm);margin-top:10px;display:none}
+.btn-submit-mission{width:100%;padding:14px;margin-top:16px;background:var(--gold);color:var(--bg);font-family:var(--font-body);font-size:15px;font-weight:700;border:none;border-radius:var(--radius-sm);cursor:pointer;letter-spacing:1px}
+.btn-submit-mission:active{background:var(--gold-dim)}
+.btn-submit-mission:disabled{opacity:.4;pointer-events:none}
+.btn-submit-mission.done-btn{background:var(--bg3);color:var(--text-dim);pointer-events:none}
+
+/* PIN */
+.pin-overlay{position:fixed;inset:0;z-index:8800;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+.pin-overlay.show{opacity:1;visibility:visible}
+.pin-box{background:var(--bg2);border-radius:var(--radius);padding:28px 24px;width:90%;max-width:320px;text-align:center}
+.pin-box h3{font-family:var(--font-display);font-size:20px;color:var(--gold);margin-bottom:6px}
+.pin-box .pin-desc{font-size:12px;color:var(--text-dim);margin-bottom:20px}
+.pin-inputs{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
+.pin-inputs input{width:48px;height:56px;text-align:center;background:var(--bg);border:1px solid var(--bg3);border-radius:var(--radius-sm);color:var(--gold);font-family:var(--font-mono);font-size:24px;outline:none;-webkit-appearance:none}
+.pin-inputs input:focus{border-color:var(--gold-dim)}
+.pin-error{font-size:12px;color:#e05555;margin-bottom:12px;min-height:16px}
+.pin-btns{display:flex;gap:8px}
+.pin-btns button{flex:1;padding:12px;border:none;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:14px;font-weight:500;cursor:pointer}
+.pin-cancel{background:var(--bg3);color:var(--text-dim)}
+.pin-confirm{background:var(--gold);color:var(--bg);font-weight:700}
+
+/* SCREEN */
+.screen-section{margin-bottom:28px}
+.screen-section h3{font-family:var(--font-display);font-size:18px;color:var(--gold);margin-bottom:14px;letter-spacing:1px}
+.screen-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.screen-item{background:var(--bg2);border:1px solid rgba(197,165,90,.1);border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;transition:transform .2s}
+.screen-item:active{transform:scale(.96)}
+.screen-item canvas{width:100%;display:block;border-radius:var(--radius-sm) var(--radius-sm) 0 0}
+.si-footer{padding:8px 12px;display:flex;align-items:center;justify-content:space-between}
+.si-footer span{font-size:11px;color:var(--text-dim)}
+.si-footer .si-dl{font-size:11px;color:var(--gold);font-weight:500}
+.badge-section{margin-top:24px}
+.badge-card{background:var(--bg2);border:1px solid rgba(197,165,90,.1);border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:16px;cursor:pointer}
+.badge-card:active{transform:scale(.98);transition:transform .2s}
+.badge-preview{width:64px;height:64px;border-radius:50%;flex-shrink:0;background:var(--wine);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text);text-align:center;font-family:var(--font-body);font-weight:700;line-height:1.3}
+.badge-info h4{font-size:14px;color:var(--text);font-weight:700;margin-bottom:4px}
+.badge-info p{font-size:12px;color:var(--text-dim)}
+
+/* MORE */
+.more-list{display:flex;flex-direction:column;gap:2px}
+.more-item{background:var(--bg2);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background .2s}
+.more-item:first-child{border-radius:var(--radius) var(--radius) 0 0}
+.more-item:last-child{border-radius:0 0 var(--radius) var(--radius)}
+.more-item:only-child{border-radius:var(--radius)}
+.more-item:active{background:var(--bg3)}
+.more-item .mi-left{display:flex;align-items:center;gap:12px}
+.more-item .mi-icon{font-size:20px}
+.more-item .mi-text{font-size:14px;color:var(--text)}
+.more-item .mi-arrow{font-size:14px;color:var(--text-dim)}
+.more-section-title{font-size:11px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin:24px 0 10px}
+
+/* CERT */
+.cert-overlay{position:fixed;inset:0;z-index:8800;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+.cert-overlay.show{opacity:1;visibility:visible}
+.cert-card{width:100%;max-width:360px;background:linear-gradient(135deg,var(--bg2),var(--bg3));border:2px solid var(--gold);border-radius:var(--radius);padding:32px 24px;text-align:center;position:relative;overflow:hidden}
+.cert-card::before{content:'';position:absolute;inset:8px;border:1px solid rgba(197,165,90,.2);border-radius:10px;pointer-events:none}
+.cert-cross{font-size:48px;margin-bottom:16px;display:block;color:var(--gold)}
+.cert-card h2{font-family:var(--font-display);font-size:24px;color:var(--gold);letter-spacing:3px;margin-bottom:4px}
+.cert-card .cert-sub{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);letter-spacing:1px;margin-bottom:24px}
+.cert-card .cert-name{font-family:var(--font-serif);font-size:20px;color:var(--text);margin-bottom:4px}
+.cert-card .cert-grade{font-size:13px;color:var(--text-dim);margin-bottom:20px}
+.cert-card .cert-msg{font-family:var(--font-serif);font-size:13px;color:var(--text-dim);line-height:1.7;margin-bottom:20px}
+.cert-card .cert-date{font-family:var(--font-mono);font-size:11px;color:var(--gold-dim)}
+.cert-card .cert-church{font-size:12px;color:var(--text-dim);margin-top:8px}
+.cert-btns{display:flex;gap:8px;margin-top:20px}
+.cert-btns button{flex:1;padding:12px;border:none;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:13px;cursor:pointer}
+.cert-close{background:var(--bg3);color:var(--text-dim)}
+.cert-save{background:var(--gold);color:var(--bg);font-weight:700}
+
+/* TOAST */
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-20px);z-index:9990;background:var(--bg3);border:1px solid rgba(197,165,90,.2);color:var(--text);padding:12px 24px;border-radius:var(--radius);font-size:13px;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* NAME EDIT */
+.name-edit-overlay{position:fixed;inset:0;z-index:8800;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+.name-edit-overlay.show{opacity:1;visibility:visible}
+.name-edit-box{background:var(--bg2);border-radius:var(--radius);padding:28px 24px;width:90%;max-width:320px}
+.name-edit-box h3{font-size:16px;color:var(--gold);margin-bottom:16px;text-align:center}
+.name-edit-box input{width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--bg3);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:15px;outline:none;margin-bottom:16px}
+.name-edit-box .ne-btns{display:flex;gap:8px}
+.name-edit-box .ne-btns button{flex:1;padding:12px;border:none;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:14px;cursor:pointer}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .5s ease forwards}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="sp-cross"></div>
+  <h1>PASSPORT CROSS</h1>
+  <p>고난주간 6일 미션</p>
+</div>
+
+<div id="onboarding" class="hide">
+  <div class="ob-title">PASSPORT</div>
+  <div class="ob-sub">여권 발급을 위해 정보를 입력하세요</div>
+  <div class="ob-group-wrap">
+    <div class="ob-group-label">소속 부서</div>
+    <div class="ob-group-btns">
+      <div class="ob-group-btn" data-group="youth" onclick="selectGroup('youth')">
+        <div class="ogb-icon">📖</div>
+        <div class="ogb-name">중고등부</div>
+      </div>
+      <div class="ob-group-btn" data-group="young" onclick="selectGroup('young')">
+        <div class="ogb-icon">✝️</div>
+        <div class="ogb-name">청년부</div>
+      </div>
+    </div>
+  </div>
+  <div class="ob-field">
+    <label>이름</label>
+    <input type="text" id="obName" placeholder="이름을 입력하세요" maxlength="10" autocomplete="off">
+  </div>
+  <button class="ob-btn" id="obSubmit" disabled>여권 발급받기</button>
+  <a href="admin.html" class="ob-admin-link">관리자 로그인</a>
+  <select id="obGrade" style="display:none"></select>
+</div>
+
+<div id="app">
+  <div class="header">
+    <div class="header-left">
+      <div class="h-name"><span id="headerName"></span> <span class="hg-tag" id="headerGroup"></span></div>
+    </div>
+    <div class="header-title">PASSPORT ✝</div>
+  </div>
+  <div class="tab-content">
+    <div class="tab-page active" id="tabPassport">
+      <div class="passport-card">
+        <div class="pc-header">
+          <h2>VISA STAMPS</h2>
+          <span class="pc-badge" id="stampCount">0/6</span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+          <div class="progress-text" id="progressText">0% 완료</div>
+        </div>
+        <div class="stamp-grid" id="stampGrid"></div>
+      </div>
+      <div class="pastoral">
+        <h4>✝ 목회적 안내</h4>
+        <p><strong>"PASSPORT CROSS는 자격증이 아닙니다."</strong><br>
+        우리가 미션을 수행하는 이유는 하나님께 점수를 따기 위함이 아닙니다.
+        우리를 위해 모든 물과 피를 쏟으신 그리스도의 은혜에 감사하여,
+        우리 삶의 주인이 누구인지 고백하는 작은 응답입니다.
+        실패해도 괜찮습니다. 다시 십자가 앞으로 나아오십시오.</p>
+      </div>
+    </div>
+    <div class="tab-page" id="tabMission">
+      <div class="mission-list" id="missionList"></div>
+    </div>
+    <div class="tab-page" id="tabScreen">
+      <div class="screen-section">
+        <h3>Lockscreen Wallpapers</h3>
+        <div class="screen-grid" id="screenGrid"></div>
+      </div>
+      <div class="screen-section badge-section">
+        <h3>Profile Badge</h3>
+        <div class="badge-card" id="badgeCard">
+          <div class="badge-preview">미디어<br>금식 중</div>
+          <div class="badge-info">
+            <h4>미디어 금식 배지</h4>
+            <p>프로필 이미지로 사용하세요</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-page" id="tabMore">
+      <div class="more-section-title">나의 기록</div>
+      <div class="more-list">
+        <div class="more-item" onclick="showCertificate()">
+          <div class="mi-left"><span class="mi-icon">🏅</span><span class="mi-text">수료증 보기</span></div>
+          <span class="mi-arrow">›</span>
+        </div>
+      </div>
+      <div class="more-section-title">설정</div>
+      <div class="more-list">
+        <div class="more-item" onclick="openNameEdit()">
+          <div class="mi-left"><span class="mi-icon">✏️</span><span class="mi-text">이름 변경</span></div>
+          <span class="mi-arrow">›</span>
+        </div>
+        <div class="more-item" onclick="confirmReset()">
+          <div class="mi-left"><span class="mi-icon">🔄</span><span class="mi-text">데이터 초기화</span></div>
+          <span class="mi-arrow">›</span>
+        </div>
+      </div>
+      <div style="text-align:center;padding:32px 0 16px">
+        <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">PASSPORT CROSS</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.0</div>
+      </div>
+    </div>
+  </div>
+  <nav class="tab-bar">
+    <button class="active" onclick="switchTab('tabPassport',this)"><span class="tab-icon">📕</span>여권</button>
+    <button onclick="switchTab('tabMission',this)"><span class="tab-icon">📋</span>미션</button>
+    <button onclick="switchTab('tabScreen',this)"><span class="tab-icon">🖼️</span>배경화면</button>
+    <button onclick="switchTab('tabMore',this)"><span class="tab-icon">⚙️</span>더보기</button>
+  </nav>
+</div>
+
+<div class="modal-overlay" id="missionModal">
+  <div class="modal-sheet" id="modalSheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="mh-day" id="mmDay"></div>
+      <h3 id="mmTitle"></h3>
+    </div>
+    <div class="modal-section">
+      <div class="ms-label">📖 성구</div>
+      <div class="ms-verse" id="mmVerse"></div>
+    </div>
+    <div class="modal-section">
+      <div class="ms-label">📌 미션 내용</div>
+      <p id="mmContent"></p>
+    </div>
+    <div class="modal-section">
+      <div class="ms-label">✅ 인증 방법</div>
+      <div class="ms-howto" id="mmHowto"></div>
+    </div>
+    <div class="verify-area" id="verifyArea">
+      <div class="ms-label" style="font-size:11px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:8px">실천 기록</div>
+      <textarea id="verifyText" placeholder="간단한 소감이나 기록을 남겨주세요..."></textarea>
+      <div class="file-upload">
+        <label>📷 사진 첨부<input type="file" accept="image/*" id="verifyFile" onchange="handleFilePreview(this)"></label>
+      </div>
+      <div class="file-name" id="fileName"></div>
+      <img class="img-preview" id="imgPreview" alt="">
+      <button class="btn-submit-mission" id="btnSubmitMission" onclick="submitMission()">실천 완료 제출하기</button>
+    </div>
+  </div>
+</div>
+
+<div class="pin-overlay" id="pinOverlay">
+  <div class="pin-box">
+    <h3>인증</h3>
+    <div class="pin-desc" id="pinDesc">관리자 PIN을 입력하세요</div>
+    <div class="pin-inputs">
+      <input type="tel" maxlength="1" class="pin-digit" data-idx="0" inputmode="numeric">
+      <input type="tel" maxlength="1" class="pin-digit" data-idx="1" inputmode="numeric">
+      <input type="tel" maxlength="1" class="pin-digit" data-idx="2" inputmode="numeric">
+      <input type="tel" maxlength="1" class="pin-digit" data-idx="3" inputmode="numeric">
+    </div>
+    <div class="pin-error" id="pinError"></div>
+    <div class="pin-btns">
+      <button class="pin-cancel" onclick="closePinModal()">취소</button>
+      <button class="pin-confirm" onclick="verifyPin()">확인</button>
+    </div>
+  </div>
+</div>
+
+<div class="cert-overlay" id="certOverlay">
+  <div class="cert-card" id="certCard">
+    <span class="cert-cross">✝</span>
+    <h2>PASSPORT CROSS</h2>
+    <div class="cert-sub">CERTIFICATE OF COMPLETION</div>
+    <div class="cert-name" id="certName"></div>
+    <div class="cert-grade" id="certGrade"></div>
+    <div class="cert-msg">고난주간 6일 미션을 모두 완수하였음을 증명합니다.<br>그리스도의 고난에 동참하고 부활의 소망을 고백합니다.</div>
+    <div class="cert-date">2026. 4. 5. 부활주일</div>
+    <div class="cert-church" id="certChurch">연천장로교회</div>
+    <div class="cert-btns">
+      <button class="cert-close" onclick="closeCert()">닫기</button>
+      <button class="cert-save" onclick="saveCert()">이미지 저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="name-edit-overlay" id="nameEditOverlay">
+  <div class="name-edit-box">
+    <h3>이름 변경</h3>
+    <input type="text" id="nameEditInput" placeholder="새 이름 입력" maxlength="10">
+    <div class="ne-btns">
+      <button style="background:var(--bg3);color:var(--text-dim)" onclick="closeNameEdit()">취소</button>
+      <button style="background:var(--gold);color:var(--bg);font-weight:700" onclick="saveName()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+/* ===== MISSIONS — 중고등부 ===== */
+var MISSIONS_YOUTH = [
+  {day:'월',date:'3/30',theme:'성전 청결',verse:'마태복음 21:12-13',
+   verseText:'예수께서 성전에 들어가사 성전 안에서 매매하는 모든 자를 내쫓으시며 돈 바꾸는 자들의 상과 비둘기 파는 자들의 의자를 둘러엎으시고 그들에게 이르시되 기록된 바 내 집은 기도하는 집이라 일컬음을 받으리라 하였거늘 너희는 강도의 소굴을 만드는도다 하시니라',
+   name:'🧹 클린 마이 룸',emoji:'🧹',
+   content:'신앙 성장에 방해되는 물건 치우기 및 책상 정리',
+   howto:'📸 정리 전/후 사진을 업로드하세요',verifyType:'photo'},
+  {day:'화',date:'3/31',theme:'가장 큰 계명',verse:'마태복음 22:37-39',
+   verseText:'예수께서 이르시되 네 마음을 다하고 목숨을 다하고 뜻을 다하여 주 너의 하나님을 사랑하라 하셨으니 이것이 크고 첫째 되는 계명이요 둘째도 그와 같으니 네 이웃을 네 자신 같이 사랑하라 하셨으니',
+   name:'📱 디지털 효도',emoji:'📱',
+   content:'폰 내려놓고 부모님과 10분 대화 및 포옹',
+   howto:'👨‍👩‍👧 부모님 확인 체크 (교사/부모 PIN 승인)',verifyType:'parent'},
+  {day:'수',date:'4/1',theme:'향유 옥합',verse:'마태복음 26:6-13',
+   verseText:'예수께서 베다니 나병환자 시몬의 집에 계실 때에 한 여자가 매우 귀한 향유 한 옥합을 가지고 나아와서 식사하시는 예수의 머리에 부으니',
+   name:'💰 옥합 저금',emoji:'💰',
+   content:'편의점/카페 비용 아껴서 별도 저금',
+   howto:'💰 저금한 금액과 소감을 기록하세요',verifyType:'text'},
+  {day:'목',date:'4/2',theme:'섬김의 본',verse:'요한복음 13:14-15',
+   verseText:'내가 주와 또는 선생이 되어 너희 발을 씻었으니 너희도 서로 발을 씻어 주는 것이 옳으니라 내가 너희에게 행한 것 같이 너희도 행하게 하려 하여 본을 보였노라',
+   name:'🙇 낮은 자리',emoji:'🙇',
+   content:'식사 후 뒷정리나 선생님께 감사 문자',
+   howto:'📱 문자 캡처본을 업로드하세요',verifyType:'photo'},
+  {day:'금',date:'4/3',theme:'다 이루었다',verse:'요한복음 19:30',
+   verseText:'예수께서 신 포도주를 받으신 후에 이르시되 다 이루었다 하시고 머리를 숙이니 영혼이 떠나가시니라',
+   name:'📴 No Data Day',emoji:'📴',
+   content:'데이터 끄고 요한복음 18~19장 완독',
+   howto:'✍️ 읽은 구절 중 인상 깊은 부분을 타이핑하세요',verifyType:'text'},
+  {day:'토',date:'4/4',theme:'부활의 소망',verse:'마태복음 27:62-66',
+   verseText:'그 이튿날은 준비일 다음 날인데 대제사장들과 바리새인들이 빌라도에게 모여 이르되 주여 저 속이던 자가 살아 있을 때에 삼 일 후에 다시 살아나리라 한 것을 우리가 기억하노니',
+   name:'💌 소망의 편지',emoji:'💌',
+   content:'친구에게 부활절 초청 메시지/손편지',
+   howto:'📸 편지 봉투 사진을 업로드하세요',verifyType:'photo'}
+];
+
+/* ===== MISSIONS — 청년부 ===== */
+var MISSIONS_YOUNG = [
+  {day:'월',date:'3/30',theme:'성전 청결',verse:'마태복음 21:12-13',
+   verseText:'예수께서 성전에 들어가사 성전 안에서 매매하는 모든 자를 내쫓으시며 돈 바꾸는 자들의 상과 비둘기 파는 자들의 의자를 둘러엎으시고 그들에게 이르시되 기록된 바 내 집은 기도하는 집이라 일컬음을 받으리라 하였거늘 너희는 강도의 소굴을 만드는도다 하시니라',
+   name:'🧹 내면의 성전',emoji:'🧹',
+   content:'SNS 앱 알림 끄기 & 불필요한 구독/팔로우 정리하기. 내 마음의 성전에서 하나님보다 앞선 것들을 정리합니다.',
+   howto:'📸 정리 전/후 스크린샷 업로드 또는 정리한 내용 기록',verifyType:'photo'},
+  {day:'화',date:'3/31',theme:'가장 큰 계명',verse:'마태복음 22:37-39',
+   verseText:'예수께서 이르시되 네 마음을 다하고 목숨을 다하고 뜻을 다하여 주 너의 하나님을 사랑하라 하셨으니 이것이 크고 첫째 되는 계명이요 둘째도 그와 같으니 네 이웃을 네 자신 같이 사랑하라 하셨으니',
+   name:'📞 먼저 연락하기',emoji:'📞',
+   content:'소원해진 지체(교회 형제·자매)에게 먼저 안부 연락하기. 문자, 전화, 카페 약속 등 방법은 자유.',
+   howto:'📱 연락한 메시지 캡처 또는 만남 후기 기록',verifyType:'photo'},
+  {day:'수',date:'4/1',theme:'향유 옥합',verse:'마태복음 26:6-13',
+   verseText:'예수께서 베다니 나병환자 시몬의 집에 계실 때에 한 여자가 매우 귀한 향유 한 옥합을 가지고 나아와서 식사하시는 예수의 머리에 부으니',
+   name:'💰 옥합 헌금',emoji:'💰',
+   content:'이번 주 커피/외식/취미 비용 중 하나를 절제하고 그 금액을 구제헌금으로 구별합니다.',
+   howto:'💰 절제한 항목과 금액, 소감을 기록하세요',verifyType:'text'},
+  {day:'목',date:'4/2',theme:'섬김의 본',verse:'요한복음 13:14-15',
+   verseText:'내가 주와 또는 선생이 되어 너희 발을 씻었으니 너희도 서로 발을 씻어 주는 것이 옳으니라 내가 너희에게 행한 것 같이 너희도 행하게 하려 하여 본을 보였노라',
+   name:'🙇 낮은 섬김',emoji:'🙇',
+   content:'직장·학교·가정에서 남이 하기 싫어하는 일 하나를 자발적으로 맡아 하기 (설거지, 청소, 후배 도움 등)',
+   howto:'📸 섬긴 모습 사진 또는 구체적 내용 기록',verifyType:'photo'},
+  {day:'금',date:'4/3',theme:'다 이루었다',verse:'요한복음 19:30',
+   verseText:'예수께서 신 포도주를 받으신 후에 이르시되 다 이루었다 하시고 머리를 숙이니 영혼이 떠나가시니라',
+   name:'📴 미디어 금식',emoji:'📴',
+   content:'유튜브·넷플릭스·SNS 하루 금식. 대신 요한복음 18~19장 통독 후, 십자가 묵상 기도문 작성.',
+   howto:'✍️ 묵상 기도문을 작성해 주세요 (최소 5줄)',verifyType:'text'},
+  {day:'토',date:'4/4',theme:'부활의 소망',verse:'마태복음 27:62-66',
+   verseText:'그 이튿날은 준비일 다음 날인데 대제사장들과 바리새인들이 빌라도에게 모여 이르되 주여 저 속이던 자가 살아 있을 때에 삼 일 후에 다시 살아나리라 한 것을 우리가 기억하노니',
+   name:'💌 부활 초청장',emoji:'💌',
+   content:'교회에 오지 않는 친구·동료에게 부활주일 예배 초청 메시지 보내기. 진심을 담아 복음을 전합니다.',
+   howto:'📸 보낸 초청 메시지 캡처 업로드',verifyType:'photo'}
+];
+
+var WALLPAPERS = [
+  {day:'월',theme:'성전 청결',verse:'마 21:13',text:'내 집은\n기도하는 집이라',colors:['#130608','#261018','#0d0f14']},
+  {day:'화',theme:'가장 큰 계명',verse:'마 22:37',text:'네 마음을 다하고\n목숨을 다하여',colors:['#060814','#10142e','#0d0f14']},
+  {day:'수',theme:'향유 옥합',verse:'마 26:7',text:'매우 귀한 향유\n한 옥합을',colors:['#140e06','#28200a','#0d0f14']},
+  {day:'목',theme:'섬김의 본',verse:'요 13:15',text:'본을\n보였노라',colors:['#060c14','#0e1828','#0d0f14']},
+  {day:'금',theme:'다 이루었다',verse:'요 19:30',text:'다\n이루었다',colors:['#1a0404','#2e0808','#120808']},
+  {day:'토',theme:'부활의 소망',verse:'마 27:63',text:'삼 일 후에\n다시 살아나리라',colors:['#060e08','#0e1e10','#0d0f14']}
+];
+
+var firebaseConfig={apiKey:"AIzaSyCxCyx8-wtwVNmDzOUuVKdJ4kfFcw2VBpY",authDomain:"passport-cross.firebaseapp.com",projectId:"passport-cross",storageBucket:"passport-cross.firebasestorage.app",messagingSenderId:"68059868627",appId:"1:68059868627:web:9191ca01a05edaf055d326"};
+firebase.initializeApp(firebaseConfig);
+var db=firebase.firestore();
+var auth=firebase.auth();
+
+// 익명 로그인 후 앱 초기화
+var appReady=false;
+auth.signInAnonymously().then(function(){
+  if(!appReady){appReady=true;bootApp();}
+}).catch(function(e){
+  // 익명 로그인 실패해도 앱은 실행
+  if(!appReady){appReady=true;bootApp();}
+});
+// 3초 안에 auth 안 되면 강제 실행
+setTimeout(function(){if(!appReady){appReady=true;bootApp();}},3000);
+
+function getUID(){
+  var user=auth.currentUser;
+  if(user)return user.uid;
+  var uid=localStorage.getItem('passportCrossUID');
+  if(!uid){uid='pc_'+Date.now()+'_'+Math.random().toString(36).substr(2,9);localStorage.setItem('passportCrossUID',uid)}
+  return uid;
+}
+
+var unsubscribeFirestore=null;
+var currentMissionIdx=-1;
+var selectedGroup='';
+
+function getMissions(g){return g==='young'?MISSIONS_YOUNG:MISSIONS_YOUTH}
+function getGroupLabel(g){return g==='young'?'청년부':'중고등부'}
+function getGroupTagClass(g){return g==='young'?'young':'youth'}
+
+function getData(){
+  try{var d=JSON.parse(localStorage.getItem('passportCross')||'null');if(d&&d.name)return d}catch(e){}
+  return null;
+}
+function saveData(d){try{localStorage.setItem('passportCross',JSON.stringify(d))}catch(e){}}
+function initData(name,grade,group){
+  var uid=getUID();
+  var d={name:name,grade:grade,group:group,missions:[0,0,0,0,0,0],records:['','','','','',''],photos:['','','','','',''],createdAt:Date.now(),uid:uid};
+  saveData(d);
+  db.collection('users').doc(uid).set({name:name,grade:grade,group:group,missions:[0,0,0,0,0,0],createdAt:firebase.firestore.FieldValue.serverTimestamp(),uid:uid});
+  return d;
+}
+
+function bootApp(){
+  // Firestore에서 수정된 미션 불러오기 (name/content/howto만 덮어씀)
+  db.collection('missionData').get().then(function(snap){
+    snap.forEach(function(doc){
+      var fm=doc.data().missions;if(!fm)return;
+      var target=doc.id==='youth'?MISSIONS_YOUTH:doc.id==='young'?MISSIONS_YOUNG:null;
+      if(!target)return;
+      fm.forEach(function(item,i){
+        if(target[i]){
+          if(item.name)target[i].name=item.name;
+          if(item.content)target[i].content=item.content;
+          if(item.howto)target[i].howto=item.howto;
+        }
+      });
+    });
+  }).catch(function(){}).finally(function(){startBoot()});
+  setTimeout(startBoot,3000); // 3초 안에 안 되면 기본값으로 실행
+  var booted=false;
+  function startBoot(){
+    if(booted)return;booted=true;
+    setTimeout(function(){
+      document.getElementById('splash').classList.add('hide');
+      var data=getData();
+      if(data){showApp(data)}else{document.getElementById('onboarding').classList.remove('hide')}
+    },1800);
+  }
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}
+}
+
+var obName=document.getElementById('obName');
+var obGrade=document.getElementById('obGrade');
+var obSubmit=document.getElementById('obSubmit');
+
+function selectGroup(group){
+  selectedGroup=group;
+  document.querySelectorAll('.ob-group-btn').forEach(function(b){b.classList.remove('selected')});
+  document.querySelector('.ob-group-btn[data-group="'+group+'"]').classList.add('selected');
+  var sel=document.getElementById('obGrade');
+  sel.innerHTML='<option value="'+group+'">'+group+'</option>';
+  sel.value=group;
+  checkOb();
+}
+
+function checkOb(){obSubmit.disabled=!(obName.value.trim()&&obGrade.value&&selectedGroup)}
+obName.addEventListener('input',checkOb);
+obGrade.addEventListener('change',checkOb);
+
+obSubmit.addEventListener('click',function(){
+  var name=obName.value.trim();var grade=obGrade.value;
+  if(!name||!grade||!selectedGroup)return;
+  var data=initData(name,grade,selectedGroup);
+  document.getElementById('onboarding').classList.add('hide');
+  showApp(data);
+});
+
+function startFirestoreListener(uid){
+  if(unsubscribeFirestore)unsubscribeFirestore();
+  unsubscribeFirestore=db.collection('users').doc(uid).onSnapshot(function(doc){
+    if(!doc.exists)return;
+    var remote=doc.data();
+    var local=getData();if(!local)return;
+    var updated=false;
+    remote.missions.forEach(function(status,i){
+      if(status===2&&local.missions[i]!==2){local.missions[i]=2;updated=true}
+    });
+    if(updated){saveData(local);refreshUI(local);toast('✝ 미션이 승인되었습니다!');checkComplete(local)}
+  });
+}
+
+function showApp(data){
+  document.getElementById('headerName').textContent=data.name;
+  startFirestoreListener(getUID());
+  var hg=document.getElementById('headerGroup');
+  hg.textContent=getGroupLabel(data.group);
+  hg.className='hg-tag '+getGroupTagClass(data.group);
+  renderStamps(data);renderMissionList(data);renderScreenGrid();
+  document.getElementById('app').classList.add('show');
+}
+
+function switchTab(tabId,btn){
+  document.querySelectorAll('.tab-page').forEach(function(p){p.classList.remove('active')});
+  document.getElementById(tabId).classList.add('active');
+  document.querySelectorAll('.tab-bar button').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+}
+
+function renderStamps(data){
+  var missions=getMissions(data.group);
+  var grid=document.getElementById('stampGrid');grid.innerHTML='';
+  var doneCount=0;
+  missions.forEach(function(m,i){
+    var st=data.missions[i];if(st===2)doneCount++;
+    var cls=st===2?'done':st===1?'pending':'';
+    var cell=document.createElement('div');
+    cell.className='stamp-cell '+cls;
+    cell.innerHTML='<span class="stamp-day">'+m.day+' '+m.date+'</span><span class="stamp-icon">'+m.emoji+'</span>';
+    cell.addEventListener('click',function(){openMissionModal(i)});
+    grid.appendChild(cell);
+  });
+  var pct=Math.round((doneCount/6)*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressText').textContent=pct+'% 완료';
+  document.getElementById('stampCount').textContent=doneCount+'/6';
+}
+
+function renderMissionList(data){
+  var missions=getMissions(data.group);
+  var list=document.getElementById('missionList');list.innerHTML='';
+  missions.forEach(function(m,i){
+    var st=data.missions[i];
+    var statusCls=st===2?'done':st===1?'pending':'undone';
+    var statusTxt=st===2?'완료':st===1?'대기중':'미완료';
+    var card=document.createElement('div');card.className='mission-card';
+    card.innerHTML='<span class="mc-emoji">'+m.emoji+'</span><div class="mc-info"><div class="mc-day">'+m.day+'요일 · '+m.date+'</div><div class="mc-title">'+m.name+'</div><div class="mc-theme">'+m.theme+' — '+m.verse+'</div></div><span class="mc-status '+statusCls+'">'+statusTxt+'</span>';
+    card.addEventListener('click',function(){openMissionModal(i)});
+    list.appendChild(card);
+  });
+}
+
+function openMissionModal(idx){
+  currentMissionIdx=idx;
+  var data=getData();if(!data)return;
+  var missions=getMissions(data.group);var m=missions[idx];
+  document.getElementById('mmDay').textContent=m.day+'요일 · '+m.date+' · '+m.theme;
+  document.getElementById('mmTitle').textContent=m.name;
+  document.getElementById('mmVerse').innerHTML='<strong>'+m.verse+'</strong><br>'+m.verseText;
+  document.getElementById('mmContent').textContent=m.content;
+  document.getElementById('mmHowto').textContent=m.howto;
+  var btn=document.getElementById('btnSubmitMission');
+  var textArea=document.getElementById('verifyText');
+  var fileInput=document.getElementById('verifyFile');
+  var preview=document.getElementById('imgPreview');
+  var fn=document.getElementById('fileName');
+  textArea.value=data.records[idx]||'';
+  preview.style.display='none';preview.src='';fn.textContent='';fileInput.value='';
+  if(data.missions[idx]===2){btn.textContent='✓ 승인 완료';btn.className='btn-submit-mission done-btn';textArea.disabled=true}
+  else if(data.missions[idx]===1){btn.textContent='승인 대기중...';btn.className='btn-submit-mission done-btn';textArea.disabled=true}
+  else{btn.textContent='실천 완료 제출하기';btn.className='btn-submit-mission';btn.disabled=false;textArea.disabled=false}
+  if(data.photos[idx]){preview.src=data.photos[idx];preview.style.display='block'}
+  document.getElementById('missionModal').classList.add('show');
+}
+
+function closeMissionModal(){document.getElementById('missionModal').classList.remove('show')}
+document.getElementById('missionModal').addEventListener('click',function(e){if(e.target===document.getElementById('missionModal'))closeMissionModal()});
+document.getElementById('modalSheet').addEventListener('click',function(e){e.stopPropagation()});
+
+function handleFilePreview(input){
+  var file=input.files[0];if(!file)return;
+  document.getElementById('fileName').textContent=file.name;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var original=new Image();
+    original.onload=function(){
+      var MAX=800;
+      var w=original.width,h=original.height;
+      if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+      if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}
+      var canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(original,0,0,w,h);
+      var compressed=canvas.toDataURL('image/jpeg',0.7);
+      var img=document.getElementById('imgPreview');
+      img.src=compressed;img.style.display='block';
+    };
+    original.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function submitMission(){
+  var idx=currentMissionIdx;if(idx<0)return;
+  var data=getData();if(!data)return;
+  var text=document.getElementById('verifyText').value.trim();
+  var preview=document.getElementById('imgPreview');
+  data.records[idx]=text;
+  if(preview.src&&preview.src.indexOf('data:')===0){try{data.photos[idx]=preview.src}catch(e){data.photos[idx]=''}}
+  var missions=getMissions(data.group);var m=missions[idx];
+  data.missions[idx]=1;saveData(data);closeMissionModal();refreshUI(data);
+  var uid=getUID();
+  var photo=(preview.src&&preview.src.indexOf('data:')===0)?preview.src:'';
+  db.collection('users').doc(uid).set({name:data.name,grade:data.grade,group:data.group,missions:data.missions,uid:uid},{merge:true}).catch(function(e){console.error('users set 실패:',e)});
+  db.collection('submissions').add({uid:uid,userName:data.name,grade:data.grade,group:data.group,missionIdx:idx,missionName:m.name,missionDay:m.day,missionTheme:m.theme,text:text,photo:photo,status:'pending',submittedAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){
+    var msg=data.group==='young'?'제출 완료! 임원 승인을 기다리세요':'제출 완료! 교사 승인을 기다리세요';
+    toast(msg);
+  }).catch(function(e){
+    console.error('submission 저장 실패:',e);
+    toast('제출 실패: '+e.message);
+  });
+}
+
+function openPinModal(idx){
+  pinTargetIdx=idx;
+  var data=getData();
+  var desc=data&&data.group==='young'?'리더/임원 PIN을 입력하세요':'교사/부모 PIN을 입력하세요';
+  document.getElementById('pinDesc').textContent=desc;
+  document.getElementById('pinError').textContent='';
+  document.querySelectorAll('.pin-digit').forEach(function(d){d.value=''});
+  document.getElementById('pinOverlay').classList.add('show');
+  setTimeout(function(){document.querySelector('.pin-digit[data-idx="0"]').focus()},300);
+}
+
+function closePinModal(){document.getElementById('pinOverlay').classList.remove('show');pinTargetIdx=-1}
+
+document.querySelectorAll('.pin-digit').forEach(function(input,i,all){
+  input.addEventListener('input',function(e){if(e.target.value&&i<3)all[i+1].focus()});
+  input.addEventListener('keydown',function(e){if(e.key==='Backspace'&&!input.value&&i>0)all[i-1].focus()});
+});
+
+function verifyPin(){
+  var digits=Array.from(document.querySelectorAll('.pin-digit')).map(function(d){return d.value}).join('');
+  if(digits.length<4){document.getElementById('pinError').textContent='4자리를 모두 입력해주세요';return}
+  if(digits!==PIN_CODE){
+    document.getElementById('pinError').textContent='PIN이 올바르지 않습니다';
+    document.querySelectorAll('.pin-digit').forEach(function(d){d.value=''});
+    document.querySelector('.pin-digit[data-idx="0"]').focus();return;
+  }
+  var data=getData();if(!data)return;
+  if(pinTargetIdx===-1){
+    var count=0;data.missions.forEach(function(s,i){if(s===1){data.missions[i]=2;count++}});
+    saveData(data);closePinModal();refreshUI(data);
+    toast(count>0?count+'개 미션 승인 완료!':'승인할 미션이 없습니다');checkComplete(data);
+  }else{
+    data.missions[pinTargetIdx]=2;saveData(data);closePinModal();refreshUI(data);
+    toast('스탬프가 찍혔습니다! ✝');checkComplete(data);
+  }
+}
+
+function checkComplete(data){if(data.missions.every(function(s){return s===2})){setTimeout(function(){toast('🎉 모든 미션 완료! 수료증을 확인하세요')},1000)}}
+
+function refreshUI(data){
+  document.getElementById('headerName').textContent=data.name;
+  var hg=document.getElementById('headerGroup');
+  hg.textContent=getGroupLabel(data.group);hg.className='hg-tag '+getGroupTagClass(data.group);
+  renderStamps(data);renderMissionList(data);
+}
+
+function wpSymbol(ctx,idx,s){
+  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+  if(idx===0){
+    // 성전 청결 - 성전 아치 3개
+    ctx.strokeStyle='rgba(197,165,90,0.22)';ctx.lineWidth=7*s;
+    [-220,0,220].forEach(function(ox){var x=ox*s,aw=120*s,sy=170*s,ey=-70*s;
+      ctx.beginPath();ctx.moveTo(x-aw,sy);ctx.lineTo(x-aw,ey);ctx.arc(x,ey,aw,Math.PI,0,false);ctx.lineTo(x+aw,sy);ctx.stroke();
+      ctx.fillStyle='rgba(197,165,90,0.06)';ctx.beginPath();ctx.moveTo(x-aw,sy);ctx.lineTo(x-aw,ey);ctx.arc(x,ey,aw,Math.PI,0,false);ctx.lineTo(x+aw,sy);ctx.closePath();ctx.fill();
+    });
+    ctx.strokeStyle='rgba(197,165,90,0.2)';ctx.lineWidth=5*s;
+    ctx.beginPath();ctx.moveTo(-370*s,170*s);ctx.lineTo(370*s,170*s);ctx.stroke();
+  } else if(idx===1){
+    // 가장 큰 계명 - 하트
+    var hg=ctx.createRadialGradient(0,-80*s,0,0,-80*s,270*s);
+    hg.addColorStop(0,'rgba(197,165,90,0.12)');hg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.beginPath();ctx.moveTo(0,90*s);
+    ctx.bezierCurveTo(-185*s,-50*s,-275*s,-200*s,-130*s,-278*s);
+    ctx.bezierCurveTo(-55*s,-318*s,0,-240*s,0,-175*s);
+    ctx.bezierCurveTo(0,-240*s,55*s,-318*s,130*s,-278*s);
+    ctx.bezierCurveTo(275*s,-200*s,185*s,-50*s,0,90*s);
+    ctx.fillStyle=hg;ctx.fill();
+    ctx.strokeStyle='rgba(197,165,90,0.24)';ctx.lineWidth=7*s;ctx.stroke();
+  } else if(idx===2){
+    // 향유 옥합 - 항아리
+    ctx.strokeStyle='rgba(197,165,90,0.22)';ctx.lineWidth=6*s;
+    ctx.beginPath();ctx.moveTo(-22*s,-268*s);ctx.lineTo(22*s,-268*s);ctx.lineTo(52*s,-218*s);
+    ctx.bezierCurveTo(158*s,-158*s,168*s,82*s,108*s,182*s);
+    ctx.lineTo(-108*s,182*s);ctx.bezierCurveTo(-168*s,82*s,-158*s,-158*s,-52*s,-218*s);ctx.closePath();
+    ctx.fillStyle='rgba(197,165,90,0.06)';ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.ellipse(0,-268*s,38*s,11*s,0,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle='rgba(197,165,90,0.15)';ctx.lineWidth=3*s;
+    ctx.beginPath();ctx.ellipse(0,-15*s,145*s,18*s,0,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.ellipse(0,85*s,152*s,20*s,0,0,Math.PI*2);ctx.stroke();
+    // 향유 흘러내리는 선
+    ctx.strokeStyle='rgba(197,165,90,0.18)';ctx.lineWidth=4*s;
+    ctx.beginPath();ctx.moveTo(-15*s,-268*s);ctx.quadraticCurveTo(-18*s,-240*s,-10*s,-218*s);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(15*s,-268*s);ctx.quadraticCurveTo(18*s,-240*s,10*s,-218*s);ctx.stroke();
+  } else if(idx===3){
+    // 섬김의 본 - 대야와 수건
+    ctx.strokeStyle='rgba(197,165,90,0.22)';ctx.lineWidth=6*s;
+    ctx.beginPath();ctx.ellipse(0,65*s,225*s,72*s,0,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle='rgba(197,165,90,0.05)';ctx.fill();
+    ctx.beginPath();ctx.ellipse(0,22*s,225*s,40*s,0,Math.PI,0,false);ctx.stroke();
+    ctx.strokeStyle='rgba(197,165,90,0.16)';ctx.lineWidth=4*s;
+    [-85,0,85].forEach(function(ox){var x=ox*s;
+      ctx.beginPath();ctx.moveTo(x-58*s,58*s);ctx.quadraticCurveTo(x-29*s,40*s,x,58*s);ctx.quadraticCurveTo(x+29*s,76*s,x+58*s,58*s);ctx.stroke();
+    });
+    // 수건
+    ctx.strokeStyle='rgba(197,165,90,0.2)';ctx.lineWidth=7*s;
+    ctx.beginPath();ctx.moveTo(158*s,-195*s);ctx.lineTo(158*s,42*s);
+    ctx.bezierCurveTo(158*s,88*s,208*s,88*s,208*s,42*s);ctx.lineTo(208*s,-178*s);ctx.stroke();
+    ctx.strokeStyle='rgba(197,165,90,0.12)';ctx.lineWidth=13*s;
+    ctx.beginPath();ctx.moveTo(158*s,-48*s);ctx.lineTo(208*s,-48*s);ctx.stroke();
+    ctx.strokeStyle='rgba(197,165,90,0.1)';ctx.lineWidth=13*s;
+    ctx.beginPath();ctx.moveTo(158*s,-72*s);ctx.lineTo(208*s,-72*s);ctx.stroke();
+  } else if(idx===4){
+    // 다 이루었다 - 골고다 세 십자가
+    ctx.strokeStyle='rgba(197,165,90,0.14)';ctx.lineWidth=4*s;
+    ctx.beginPath();ctx.moveTo(-400*s,200*s);ctx.quadraticCurveTo(-130*s,60*s,0,82*s);ctx.quadraticCurveTo(130*s,104*s,400*s,200*s);ctx.stroke();
+    [{x:-230,y:52,h:255,w:26,a:0.18},{x:0,y:-92,h:370,w:36,a:0.35},{x:230,y:52,h:255,w:26,a:0.18}].forEach(function(cr){
+      ctx.strokeStyle='rgba(197,165,90,'+cr.a+')';ctx.lineWidth=cr.w*s;
+      ctx.beginPath();ctx.moveTo(cr.x*s,cr.y*s);ctx.lineTo(cr.x*s,(cr.y+cr.h)*s);ctx.stroke();
+      ctx.beginPath();ctx.moveTo((cr.x-cr.h*.30)*s,(cr.y+cr.h*.27)*s);ctx.lineTo((cr.x+cr.h*.30)*s,(cr.y+cr.h*.27)*s);ctx.stroke();
+    });
+    var cg=ctx.createRadialGradient(0,-90*s,0,0,-90*s,230*s);
+    cg.addColorStop(0,'rgba(197,165,90,0.18)');cg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=cg;ctx.fillRect(-320*s,-360*s,640*s,600*s);
+  } else {
+    // 부활의 소망 - 여명 빛 광선
+    var ro=240*s;
+    for(var r=0;r<13;r++){
+      var ang=-Math.PI/2+(r-6)*0.22;
+      var d=Math.abs(r-6);var a=0.03+0.055*(1-d/6.5);var lw=Math.max((48-d*7)*s,8*s);
+      ctx.strokeStyle='rgba(197,165,90,'+a.toFixed(3)+')';ctx.lineWidth=lw;
+      ctx.beginPath();ctx.moveTo(Math.cos(ang)*75*s,ro+Math.sin(ang)*75*s);ctx.lineTo(Math.cos(ang)*720*s,ro+Math.sin(ang)*720*s);ctx.stroke();
+    }
+    var sg=ctx.createRadialGradient(0,ro,0,0,ro,300*s);
+    sg.addColorStop(0,'rgba(197,165,90,0.25)');sg.addColorStop(0.35,'rgba(197,165,90,0.07)');sg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=sg;ctx.beginPath();ctx.arc(0,ro,300*s,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(197,165,90,0.38)';ctx.lineWidth=2*s;
+    ctx.beginPath();ctx.moveTo(-360*s,ro);ctx.lineTo(360*s,ro);ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawWallpaper(c,w,idx){
+  var ctx=c.getContext('2d');var W=c.width,H=c.height;var s=W/1080;
+  // 배경
+  var bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,w.colors[0]);bg.addColorStop(0.55,w.colors[1]);bg.addColorStop(1,w.colors[2]);
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  // 중앙 글로우
+  var ag=ctx.createRadialGradient(W*.5,H*.38,0,W*.5,H*.38,W*.68);
+  ag.addColorStop(0,'rgba(197,165,90,0.09)');ag.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=ag;ctx.fillRect(0,0,W,H);
+  // 배경 십자가
+  var vw=52*s,vh=480*s,hw=300*s,cx=W*.5,cy=H*.38;
+  ctx.save();ctx.globalAlpha=0.07;ctx.fillStyle='#c5a55a';
+  ctx.fillRect(cx-vw/2,cy-vh/2,vw,vh);ctx.fillRect(cx-hw/2,cy-vh/2+vh*.25,hw,vw);
+  ctx.restore();
+  // 일러스트 심볼
+  ctx.save();ctx.translate(W*.5,H*.38);wpSymbol(ctx,idx,s);ctx.restore();
+  // 테두리
+  ctx.strokeStyle='rgba(197,165,90,0.52)';ctx.lineWidth=3*s;ctx.strokeRect(36*s,36*s,W-72*s,H-72*s);
+  ctx.strokeStyle='rgba(197,165,90,0.18)';ctx.lineWidth=1*s;ctx.strokeRect(58*s,58*s,W-116*s,H-116*s);
+  // 코너 장식
+  var cm=44*s,co=58*s;ctx.strokeStyle='rgba(197,165,90,0.55)';ctx.lineWidth=2*s;
+  [[co,co,1,1],[W-co,co,-1,1],[co,H-co,1,-1],[W-co,H-co,-1,-1]].forEach(function(p){
+    ctx.beginPath();ctx.moveTo(p[0]+p[2]*cm,p[1]);ctx.lineTo(p[0],p[1]);ctx.lineTo(p[0],p[1]+p[3]*cm);ctx.stroke();
+  });
+  // 헤더
+  ctx.textAlign='center';ctx.textBaseline='alphabetic';
+  ctx.fillStyle='rgba(197,165,90,0.72)';ctx.font='bold '+(21*s)+'px monospace';
+  ctx.fillText('✝  PASSPORT  CROSS',W*.5,140*s);
+  ctx.strokeStyle='rgba(197,165,90,0.22)';ctx.lineWidth=1*s;
+  ctx.beginPath();ctx.moveTo(155*s,182*s);ctx.lineTo(925*s,182*s);ctx.stroke();
+  ctx.fillStyle='rgba(154,150,142,0.72)';ctx.font=(26*s)+'px sans-serif';
+  ctx.fillText(w.day+'요일  ·  '+w.theme,W*.5,238*s);
+  // 본문 성경 구절
+  ctx.fillStyle='#ede9e0';ctx.font='bold '+(80*s)+'px serif';
+  var lines=w.text.split('\n');var ty=H*.615;
+  lines.forEach(function(line,i){ctx.fillText(line,W*.5,ty+i*100*s)});
+  ctx.fillStyle='rgba(197,165,90,0.88)';ctx.font=(37*s)+'px monospace';
+  ctx.fillText(w.verse,W*.5,ty+lines.length*100*s+70*s);
+  // 하단
+  ctx.strokeStyle='rgba(197,165,90,0.22)';ctx.lineWidth=1*s;
+  ctx.beginPath();ctx.moveTo(155*s,H-192*s);ctx.lineTo(925*s,H-192*s);ctx.stroke();
+  ctx.fillStyle='rgba(154,150,142,0.38)';ctx.font=(25*s)+'px sans-serif';
+  ctx.fillText('연천장로교회  ·  2026 고난주간',W*.5,H-145*s);
+}
+
+function renderScreenGrid(){
+  var grid=document.getElementById('screenGrid');grid.innerHTML='';
+  WALLPAPERS.forEach(function(w,i){
+    var item=document.createElement('div');item.className='screen-item';
+    var pc=document.createElement('canvas');pc.width=270;pc.height=480;
+    drawWallpaper(pc,w,i);
+    var footer=document.createElement('div');footer.className='si-footer';
+    footer.innerHTML='<span>'+w.day+'요일 · '+w.theme+'</span><span class="si-dl">저장</span>';
+    item.appendChild(pc);item.appendChild(footer);
+    item.addEventListener('click',function(){downloadWallpaper(i)});
+    grid.appendChild(item);
+  });
+}
+
+function downloadWallpaper(idx){
+  var w=WALLPAPERS[idx];var c=document.createElement('canvas');c.width=1080;c.height=1920;
+  drawWallpaper(c,w,idx);
+  try{var link=document.createElement('a');link.download='passport_cross_'+w.day+'.png';link.href=c.toDataURL('image/png');document.body.appendChild(link);link.click();document.body.removeChild(link);toast('배경화면이 저장되었습니다')}
+  catch(e){toast('이미지를 길게 눌러 저장하세요')}
+}
+
+document.getElementById('badgeCard').addEventListener('click',function(){
+  var c=document.createElement('canvas');c.width=512;c.height=512;var ctx=c.getContext('2d');
+  ctx.fillStyle='#6b1d2a';ctx.beginPath();ctx.arc(256,256,256,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(197,165,90,0.15)';ctx.fillRect(236,80,40,352);ctx.fillRect(136,200,240,40);
+  ctx.fillStyle='#e8e4dc';ctx.font='bold 48px sans-serif';ctx.textAlign='center';ctx.fillText('미디어',256,220);ctx.fillText('금식 중',256,280);
+  ctx.fillStyle='rgba(197,165,90,0.7)';ctx.font='24px sans-serif';ctx.fillText('PASSPORT CROSS',256,380);
+  try{var link=document.createElement('a');link.download='media_fast_badge.png';link.href=c.toDataURL('image/png');document.body.appendChild(link);link.click();document.body.removeChild(link);toast('배지가 저장되었습니다')}
+  catch(e){toast('이미지를 길게 눌러 저장하세요')}
+});
+
+function showCertificate(){
+  var data=getData();if(!data)return;
+  var done=data.missions.filter(function(s){return s===2}).length;
+  if(done<6){toast('아직 '+(6-done)+'개 미션이 남았습니다');return}
+  document.getElementById('certName').textContent=data.name;
+  document.getElementById('certGrade').textContent=getGroupLabel(data.group);
+  document.getElementById('certChurch').textContent='연천장로교회 '+getGroupLabel(data.group);
+  document.getElementById('certOverlay').classList.add('show');
+}
+function closeCert(){document.getElementById('certOverlay').classList.remove('show')}
+
+function saveCert(){
+  var data=getData();if(!data)return;
+  var missions=getMissions(data.group);
+  var c=document.createElement('canvas');c.width=1080;c.height=1440;var ctx=c.getContext('2d');
+  var grad=ctx.createLinearGradient(0,0,1080,1440);grad.addColorStop(0,'#151820');grad.addColorStop(1,'#1c1f2a');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,1080,1440);
+  ctx.strokeStyle='#c5a55a';ctx.lineWidth=4;ctx.strokeRect(40,40,1000,1360);
+  ctx.strokeStyle='rgba(197,165,90,0.3)';ctx.lineWidth=1;ctx.strokeRect(60,60,960,1320);
+  ctx.fillStyle='rgba(197,165,90,0.08)';ctx.fillRect(510,120,60,400);ctx.fillRect(380,250,320,60);
+  ctx.fillStyle='#c5a55a';ctx.font='bold 64px serif';ctx.textAlign='center';ctx.fillText('✝',540,200);
+  ctx.font='bold 56px serif';ctx.fillText('PASSPORT CROSS',540,340);
+  ctx.font='28px monospace';ctx.fillStyle='rgba(154,150,142,0.6)';ctx.fillText('CERTIFICATE OF COMPLETION',540,400);
+  ctx.fillStyle='#e8e4dc';ctx.font='bold 52px serif';ctx.fillText(data.name,540,560);
+  ctx.fillStyle='rgba(154,150,142,0.6)';ctx.font='32px sans-serif';
+  ctx.fillText(getGroupLabel(data.group),540,620);
+  ctx.fillStyle='rgba(154,150,142,0.7)';ctx.font='30px serif';
+  ctx.fillText('고난주간 6일 미션을 모두 완수하였음을',540,760);ctx.fillText('증명합니다.',540,810);
+  ctx.fillText('그리스도의 고난에 동참하고',540,880);ctx.fillText('부활의 소망을 고백합니다.',540,930);
+  missions.forEach(function(m,i){ctx.font='48px sans-serif';ctx.fillText(m.emoji,280+i*100,1060)});
+  ctx.fillStyle='rgba(197,165,90,0.6)';ctx.font='28px monospace';ctx.fillText('2026. 4. 5. 부활주일',540,1180);
+  ctx.fillStyle='rgba(154,150,142,0.5)';ctx.font='28px sans-serif';
+  ctx.fillText('연천장로교회 '+getGroupLabel(data.group),540,1240);
+  try{var link=document.createElement('a');link.download='passport_cross_cert_'+data.name+'.png';link.href=c.toDataURL('image/png');document.body.appendChild(link);link.click();document.body.removeChild(link);toast('수료증이 저장되었습니다')}
+  catch(e){toast('이미지를 길게 눌러 저장하세요')}
+}
+
+function openNameEdit(){
+  var data=getData();if(!data)return;
+  document.getElementById('nameEditInput').value=data.name;
+  document.getElementById('nameEditOverlay').classList.add('show');
+  setTimeout(function(){document.getElementById('nameEditInput').focus()},300);
+}
+function closeNameEdit(){document.getElementById('nameEditOverlay').classList.remove('show')}
+function saveName(){
+  var n=document.getElementById('nameEditInput').value.trim();
+  if(!n){toast('이름을 입력하세요');return}
+  var data=getData();if(!data)return;
+  data.name=n;saveData(data);refreshUI(data);closeNameEdit();toast('이름이 변경되었습니다');
+}
+function confirmReset(){if(confirm('모든 데이터가 삭제됩니다. 초기화하시겠습니까?')){if(unsubscribeFirestore)unsubscribeFirestore();localStorage.removeItem('passportCross');localStorage.removeItem('passportCrossUID');location.reload()}}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
+</script>
+</body>
+</html>
