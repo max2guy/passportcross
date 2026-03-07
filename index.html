@@ -302,7 +302,30 @@ html,body{
 .cert-save:active{background:var(--gold-dim)}
 
 /* TOAST */
-.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-20px);z-index:9990;background:var(--bg3);border:1px solid rgba(197,165,90,.2);color:var(--text);padding:12px 24px;border-radius:var(--radius);font-size:13px;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none}
+.toast{
+  position:fixed;
+  bottom:calc(env(safe-area-inset-bottom,0px) + 76px);
+  left:50%;
+  transform:translateX(-50%) translateY(12px);
+  z-index:9990;
+  background:rgba(28,31,42,.92);
+  border:1px solid rgba(197,165,90,.28);
+  color:var(--text);
+  padding:11px 22px;
+  border-radius:100px;
+  font-size:13px;
+  line-height:1.5;
+  text-align:center;
+  word-break:keep-all;
+  white-space:nowrap;
+  max-width:calc(100% - 48px);
+  opacity:0;
+  transition:opacity .25s,transform .25s;
+  pointer-events:none;
+  box-shadow:0 4px 24px rgba(0,0,0,.45);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* NAME EDIT */
