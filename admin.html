@@ -131,6 +131,19 @@ body{
 .btn-del-sub{padding:7px 10px;background:transparent;border:1px solid rgba(255,100,100,.2);color:#e05555;border-radius:var(--radius-sm);font-size:11px;cursor:pointer;-webkit-appearance:none;appearance:none}
 .empty{text-align:center;color:var(--text-dim);padding:60px 20px;font-size:14px}
 .loading{text-align:center;color:var(--text-dim);padding:60px 20px;font-size:14px}
+/* QR 코드 */
+.qr-section{padding:20px 16px 24px;border-bottom:1px solid rgba(197,165,90,.08)}
+.qr-inner{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.qr-box{
+  background:#fff;border-radius:var(--radius-sm);
+  padding:12px;display:inline-flex;flex-shrink:0;
+  box-shadow:0 2px 16px rgba(0,0,0,.4);
+}
+.qr-info{flex:1;min-width:180px}
+.qr-url{font-family:monospace;font-size:11px;color:var(--gold-dim);margin-bottom:14px;word-break:break-all;line-height:1.6}
+.qr-os{display:flex;flex-direction:column;gap:8px}
+.qr-os-item{font-size:12px;color:var(--text-dim);line-height:1.6;padding:10px 12px;background:var(--bg3);border-radius:var(--radius-sm);border-left:3px solid rgba(197,165,90,.3)}
+.qr-os-item strong{display:block;color:var(--gold-dim);font-size:11px;margin-bottom:2px}
 /* 마스터 관리자 */
 .master-section{padding:16px 16px 20px;display:none;background:rgba(197,165,90,.04);border-bottom:1px solid rgba(197,165,90,.08)}
 .master-section.show{display:block}
@@ -290,6 +303,27 @@ body{
       </div>
     </div>
 
+    <!-- QR 코드 -->
+    <div class="qr-section">
+      <div class="master-title">앱 설치 QR 코드</div>
+      <div class="qr-inner">
+        <div class="qr-box" id="qrCanvas"></div>
+        <div class="qr-info">
+          <div class="qr-url" id="qrUrlText"></div>
+          <div class="qr-os">
+            <div class="qr-os-item">
+              <strong>📱 Android (Chrome)</strong>
+              QR 스캔 → Chrome으로 열기 → 하단 "앱 설치" 배너를 탭합니다
+            </div>
+            <div class="qr-os-item">
+              <strong>🍎 iPhone (Safari)</strong>
+              QR 스캔 → Safari로 열기 → 하단 공유 버튼 → "홈 화면에 추가" 탭
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="stats-bar" id="statsBar">
       <div class="stat-box"><div class="stat-num" id="statTotal">-</div><div class="stat-label">전체 제출</div></div>
       <div class="stat-box"><div class="stat-num" id="statPending">-</div><div class="stat-label">대기중</div></div>
@@ -318,12 +352,28 @@ body{
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
 var INVITE_CODE='cross2026'; // 초대 코드 (변경 가능)
 var MASTER_EMAIL='max2guy@gmail.com';
+var APP_URL='https://max2guy.github.io/passportcross/';
+
+// QR 코드 생성
+(function(){
+  var el=document.getElementById('qrCanvas');
+  if(!el||typeof QRCode==='undefined')return;
+  new QRCode(el,{
+    text:APP_URL,
+    width:160,height:160,
+    colorDark:'#17192e',
+    colorLight:'#ffffff',
+    correctLevel:QRCode.CorrectLevel.M
+  });
+  document.getElementById('qrUrlText').textContent=APP_URL;
+})();
 
 var firebaseConfig={apiKey:"AIzaSyCxCyx8-wtwVNmDzOUuVKdJ4kfFcw2VBpY",authDomain:"passport-cross.firebaseapp.com",projectId:"passport-cross",storageBucket:"passport-cross.firebasestorage.app",messagingSenderId:"68059868627",appId:"1:68059868627:web:9191ca01a05edaf055d326"};
 firebase.initializeApp(firebaseConfig);
