@@ -185,8 +185,31 @@ html,body{
 .stamp-cell.pending{border-color:var(--gold-dim);border-style:solid}
 .stamp-cell.pending .stamp-icon{opacity:.6}
 .stamp-cell.done{border-color:var(--gold);border-style:solid;background:rgba(197,165,90,.08)}
-.stamp-cell.done .stamp-icon{opacity:1}
-.stamp-cell.done::after{content:'✓';position:absolute;top:6px;right:8px;font-size:14px;color:var(--gold);font-weight:700}
+.stamp-cell.done .stamp-icon{opacity:.35}
+/* 빨간 도장 */
+.stamp-seal{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;z-index:2;
+  transform:rotate(-14deg);
+}
+.stamp-ring{
+  width:66px;height:66px;border-radius:50%;
+  border:5px solid rgba(172,18,32,.9);
+  background:rgba(172,18,32,.04);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.stamp-ring::before{
+  content:'';position:absolute;inset:5px;
+  border-radius:50%;
+  border:1.5px solid rgba(172,18,32,.4);
+}
+.stamp-ring span{
+  font-family:var(--font-mono);font-size:11px;font-weight:700;
+  color:rgba(172,18,32,.9);letter-spacing:2px;
+  text-transform:uppercase;position:relative;z-index:1;
+}
 .pastoral{background:var(--bg2);border-left:3px solid var(--wine);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:16px 18px;margin-top:8px}
 .pastoral h4{font-family:var(--font-serif);font-size:13px;color:var(--gold);margin-bottom:8px;font-weight:400}
 .pastoral p{font-size:12px;color:var(--text-dim);line-height:1.8}
@@ -970,6 +993,12 @@ function renderStamps(data){
     var cell=document.createElement('div');
     cell.className='stamp-cell '+cls;
     cell.innerHTML='<span class="stamp-day">'+m.day+' '+m.date+'</span><span class="stamp-icon">'+m.emoji+'</span>';
+    if(st===2){
+      var seal=document.createElement('div');
+      seal.className='stamp-seal';
+      seal.innerHTML='<div class="stamp-ring"><span>Clear</span></div>';
+      cell.appendChild(seal);
+    }
     cell.addEventListener('click',function(){openMissionModal(i)});
     grid.appendChild(cell);
   });
