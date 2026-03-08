@@ -232,6 +232,7 @@ html,body{
 .mc-status.pending{background:rgba(197,165,90,.15);color:var(--gold)}
 .mc-status.done{background:rgba(107,29,42,.3);color:var(--gold-bright)}
 .mc-status.rejected{background:rgba(224,85,85,.15);color:#e05555}
+.mc-status.locked{background:var(--bg3);color:var(--text-dim);opacity:.6}
 
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;z-index:7777;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
@@ -860,6 +861,18 @@ function getMissions(g){return g==='young'?MISSIONS_YOUNG:MISSIONS_YOUTH}
 function getGroupLabel(g){return g==='young'?'청년부':'중고등부'}
 function getGroupTagClass(g){return g==='young'?'young':'youth'}
 
+function isMissionAvailable(dateStr){
+  // dateStr 형식: '3/30', '4/1' (월/일, 2026년 기준)
+  var parts=dateStr.split('/');
+  var month=parseInt(parts[0],10)-1;
+  var day=parseInt(parts[1],10);
+  var missionDate=new Date(2026,month,day);
+  missionDate.setHours(0,0,0,0);
+  var today=new Date();
+  today.setHours(0,0,0,0);
+  return today>=missionDate;
+}
+
 function getData(){
   try{var d=JSON.parse(localStorage.getItem('passportCross')||'null');if(d&&d.name)return d}catch(e){}
   return null;
@@ -1062,8 +1075,9 @@ function renderMissionList(data){
   var list=document.getElementById('missionList');list.innerHTML='';
   missions.forEach(function(m,i){
     var st=data.missions[i];
-    var statusCls=st===2?'done':st===1?'pending':st===3?'rejected':'undone';
-    var statusTxt=st===2?'완료':st===1?'대기중':st===3?'반려됨':'미완료';
+    var locked=(st===0&&!isMissionAvailable(m.date));
+    var statusCls=st===2?'done':st===1?'pending':st===3?'rejected':locked?'locked':'undone';
+    var statusTxt=st===2?'완료':st===1?'대기중':st===3?'반려됨':locked?'🔒 잠금':'미완료';
     var card=document.createElement('div');card.className='mission-card';
     card.innerHTML='<span class="mc-emoji">'+m.emoji+'</span><div class="mc-info"><div class="mc-day">'+m.day+'요일 · '+m.date+'</div><div class="mc-title">'+m.name+'</div><div class="mc-theme">'+m.theme+' — '+m.verse+'</div></div><span class="mc-status '+statusCls+'">'+statusTxt+'</span>';
     card.addEventListener('click',function(){openMissionModal(i)});
@@ -1097,7 +1111,13 @@ function openMissionModal(idx){
     rejectTxt.textContent=reason;rejectBox.style.display='block';
     btn.textContent='다시 제출하기';btn.className='btn-submit-mission';btn.disabled=false;textArea.disabled=false;
   }
-  else{btn.textContent='실천 완료 제출하기';btn.className='btn-submit-mission';btn.disabled=false;textArea.disabled=false}
+  else if(!isMissionAvailable(m.date)){
+    var dp=m.date.split('/');
+    btn.textContent='🔒 '+dp[0]+'월 '+dp[1]+'일에 열립니다';
+    btn.className='btn-submit-mission done-btn';btn.disabled=true;
+    textArea.disabled=true;document.getElementById('verifyFile').disabled=true;
+  }
+  else{btn.textContent='실천 완료 제출하기';btn.className='btn-submit-mission';btn.disabled=false;textArea.disabled=false;document.getElementById('verifyFile').disabled=false}
   if(data.photos[idx]){preview.src=data.photos[idx];preview.style.display='block'}
   document.getElementById('missionModal').classList.add('show');
   pushOverlay();
@@ -1142,11 +1162,16 @@ function handleFilePreview(input){
 function submitMission(){
   var idx=currentMissionIdx;if(idx<0)return;
   var data=getData();if(!data)return;
+  var missions=getMissions(data.group);var m=missions[idx];
+  if(!isMissionAvailable(m.date)){
+    var dp=m.date.split('/');
+    toast('이 미션은 '+dp[0]+'월 '+dp[1]+'일에 열립니다');
+    return;
+  }
   var text=document.getElementById('verifyText').value.trim();
   var preview=document.getElementById('imgPreview');
   data.records[idx]=text;
   if(preview.src&&preview.src.indexOf('data:')===0){try{data.photos[idx]=preview.src}catch(e){data.photos[idx]=''}}
-  var missions=getMissions(data.group);var m=missions[idx];
   data.missions[idx]=1;
   if(data.rejectReasons)data.rejectReasons[idx]='';
   saveData(data);closeMissionModal();refreshUI(data);
