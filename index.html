@@ -923,12 +923,14 @@ function startFirestoreListener(uid){
     if(!doc.exists)return;
     var remote=doc.data();
     var local=getData();if(!local)return;
+    // remote.missions가 없으면 무시
+    if(!remote.missions||!Array.isArray(remote.missions))return;
     var updated=false;var anyApproved=false;var anyReset=false;
     remote.missions.forEach(function(status,i){
       if(status===2&&local.missions[i]!==2){
         // 관리자 승인
         local.missions[i]=2;updated=true;anyApproved=true;
-      } else if(status===0&&local.missions[i]!==0){
+      } else if((status===0||status===undefined)&&local.missions[i]!==0){
         // 관리자 리셋: 로컬 상태·기록·사진 모두 초기화
         local.missions[i]=0;
         if(local.records)local.records[i]='';
@@ -939,8 +941,21 @@ function startFirestoreListener(uid){
     if(updated){saveData(local);refreshUI(local);}
     if(anyApproved){toast('✝ 미션이 승인되었습니다!');checkComplete(local);}
     if(anyReset){toast('관리자가 미션을 초기화했습니다');}
+  },function(err){
+    console.error('Firestore listener error:',err);
   });
 }
+
+// 앱이 백그라운드에서 포그라운드로 돌아올 때 Firestore 재연결
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible'){
+    var data=getData();
+    if(data){
+      // 리스너 재시작으로 최신 상태 즉시 동기화
+      startFirestoreListener(getUID());
+    }
+  }
+});
 
 function showApp(data){
   document.getElementById('headerName').textContent=data.name;
