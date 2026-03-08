@@ -471,13 +471,18 @@ function resetAll(){
   if(!confirm('정말로 전체 초기화 하시겠습니까?'))return;
   // 모든 제출 삭제
   var subPromises=allSubmissions.map(function(s){return db.collection('submissions').doc(s.id).delete()});
+  // 모든 완료자 삭제
+  var compPromise=db.collection('completions').get().then(function(snap){
+    var dels=[];snap.forEach(function(doc){dels.push(db.collection('completions').doc(doc.id).delete())});
+    return Promise.all(dels);
+  });
   // 모든 유저 미션 초기화
   var userPromise=db.collection('users').get().then(function(snap){
     var ups=[];
-    snap.forEach(function(doc){ups.push(db.collection('users').doc(doc.id).update({missions:[0,0,0,0,0,0],records:['','','','','',''],photos:['','','','','',''],rejectReasons:['','','','','','']}))});
+    snap.forEach(function(doc){ups.push(db.collection('users').doc(doc.id).update({missions:[0,0,0,0,0,0],records:['','','','','',''],photos:['','','','','',''],rejectReasons:['','','','','',''],giftRequested:false}))});
     return Promise.all(ups);
   });
-  Promise.all(subPromises.concat([userPromise]))
+  Promise.all(subPromises.concat([compPromise,userPromise]))
     .then(function(){alert('전체 초기화 완료')})
     .catch(function(e){alert('오류: '+e.message)});
 }
