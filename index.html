@@ -188,6 +188,8 @@ html,body{
 .stamp-cell.pending .stamp-icon{opacity:.6}
 .stamp-cell.done{border-color:var(--gold);border-style:solid;background:rgba(197,165,90,.08)}
 .stamp-cell.done .stamp-icon{opacity:.35}
+.stamp-cell.rejected{border-color:rgba(224,85,85,.5);border-style:solid;background:rgba(224,85,85,.06)}
+.stamp-cell.rejected .stamp-icon{opacity:.4}
 /* 빨간 도장 */
 .stamp-seal{
   position:absolute;inset:0;
@@ -229,6 +231,7 @@ html,body{
 .mc-status.undone{background:var(--bg3);color:var(--text-dim)}
 .mc-status.pending{background:rgba(197,165,90,.15);color:var(--gold)}
 .mc-status.done{background:rgba(107,29,42,.3);color:var(--gold-bright)}
+.mc-status.rejected{background:rgba(224,85,85,.15);color:#e05555}
 
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;z-index:7777;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
@@ -666,6 +669,10 @@ html,body{
       <div class="ms-label">✅ 인증 방법</div>
       <div class="ms-howto" id="mmHowto"></div>
     </div>
+    <div id="rejectReasonBox" style="display:none;margin:0 0 14px;padding:12px 14px;background:rgba(224,85,85,.1);border:1px solid rgba(224,85,85,.3);border-radius:var(--radius-sm)">
+      <div style="font-size:11px;font-weight:700;color:#e05555;letter-spacing:1px;margin-bottom:5px">✗ 반려됨</div>
+      <div id="rejectReasonText" style="font-size:13px;color:var(--text);line-height:1.6"></div>
+    </div>
     <div class="verify-area" id="verifyArea">
       <div class="ms-label" style="font-size:11px;color:var(--gold-dim);letter-spacing:1px;margin-bottom:8px">실천 기록</div>
       <textarea id="verifyText" placeholder="간단한 소감이나 기록을 남겨주세요..."></textarea>
@@ -925,21 +932,29 @@ function startFirestoreListener(uid){
     var local=getData();if(!local)return;
     // remote.missions가 없으면 무시
     if(!remote.missions||!Array.isArray(remote.missions))return;
-    var updated=false;var anyApproved=false;var anyReset=false;
+    var updated=false;var anyApproved=false;var anyReset=false;var anyRejected=false;
     remote.missions.forEach(function(status,i){
       if(status===2&&local.missions[i]!==2){
         // 관리자 승인
         local.missions[i]=2;updated=true;anyApproved=true;
-      } else if((status===0||status===undefined)&&local.missions[i]!==0){
+      } else if(status===3&&local.missions[i]!==3){
+        // 관리자 반려
+        local.missions[i]=3;
+        if(!local.rejectReasons)local.rejectReasons=['','','','','',''];
+        local.rejectReasons[i]=remote.rejectReasons&&remote.rejectReasons[i]?remote.rejectReasons[i]:'';
+        updated=true;anyRejected=true;
+      } else if((status===0||status===undefined)&&(local.missions[i]===1||local.missions[i]===3)){
         // 관리자 리셋: 로컬 상태·기록·사진 모두 초기화
         local.missions[i]=0;
         if(local.records)local.records[i]='';
         if(local.photos)local.photos[i]='';
+        if(local.rejectReasons)local.rejectReasons[i]='';
         updated=true;anyReset=true;
       }
     });
     if(updated){saveData(local);refreshUI(local);}
     if(anyApproved){toast('✝ 미션이 승인되었습니다!');checkComplete(local);}
+    if(anyRejected){toast('미션이 반려되었습니다. 사유를 확인하세요.');}
     if(anyReset){toast('관리자가 미션을 초기화했습니다');}
   },function(err){
     console.error('Firestore listener error:',err);
@@ -1017,7 +1032,7 @@ function renderStamps(data){
   var doneCount=0;
   missions.forEach(function(m,i){
     var st=data.missions[i];if(st===2)doneCount++;
-    var cls=st===2?'done':st===1?'pending':'';
+    var cls=st===2?'done':st===1?'pending':st===3?'rejected':'';
     var cell=document.createElement('div');
     cell.className='stamp-cell '+cls;
     cell.innerHTML='<span class="stamp-day">'+m.day+' '+m.date+'</span><span class="stamp-icon">'+m.emoji+'</span>';
@@ -1041,8 +1056,8 @@ function renderMissionList(data){
   var list=document.getElementById('missionList');list.innerHTML='';
   missions.forEach(function(m,i){
     var st=data.missions[i];
-    var statusCls=st===2?'done':st===1?'pending':'undone';
-    var statusTxt=st===2?'완료':st===1?'대기중':'미완료';
+    var statusCls=st===2?'done':st===1?'pending':st===3?'rejected':'undone';
+    var statusTxt=st===2?'완료':st===1?'대기중':st===3?'반려됨':'미완료';
     var card=document.createElement('div');card.className='mission-card';
     card.innerHTML='<span class="mc-emoji">'+m.emoji+'</span><div class="mc-info"><div class="mc-day">'+m.day+'요일 · '+m.date+'</div><div class="mc-title">'+m.name+'</div><div class="mc-theme">'+m.theme+' — '+m.verse+'</div></div><span class="mc-status '+statusCls+'">'+statusTxt+'</span>';
     card.addEventListener('click',function(){openMissionModal(i)});
@@ -1066,8 +1081,16 @@ function openMissionModal(idx){
   var fn=document.getElementById('fileName');
   textArea.value=data.records[idx]||'';
   preview.style.display='none';preview.src='';fn.textContent='';fileInput.value='';
+  var rejectBox=document.getElementById('rejectReasonBox');
+  var rejectTxt=document.getElementById('rejectReasonText');
+  rejectBox.style.display='none';
   if(data.missions[idx]===2){btn.textContent='✓ 승인 완료';btn.className='btn-submit-mission done-btn';textArea.disabled=true}
   else if(data.missions[idx]===1){btn.textContent='승인 대기중...';btn.className='btn-submit-mission done-btn';textArea.disabled=true}
+  else if(data.missions[idx]===3){
+    var reason=data.rejectReasons&&data.rejectReasons[idx]?data.rejectReasons[idx]:'사유 없음';
+    rejectTxt.textContent=reason;rejectBox.style.display='block';
+    btn.textContent='다시 제출하기';btn.className='btn-submit-mission';btn.disabled=false;textArea.disabled=false;
+  }
   else{btn.textContent='실천 완료 제출하기';btn.className='btn-submit-mission';btn.disabled=false;textArea.disabled=false}
   if(data.photos[idx]){preview.src=data.photos[idx];preview.style.display='block'}
   document.getElementById('missionModal').classList.add('show');
@@ -1118,7 +1141,9 @@ function submitMission(){
   data.records[idx]=text;
   if(preview.src&&preview.src.indexOf('data:')===0){try{data.photos[idx]=preview.src}catch(e){data.photos[idx]=''}}
   var missions=getMissions(data.group);var m=missions[idx];
-  data.missions[idx]=1;saveData(data);closeMissionModal();refreshUI(data);
+  data.missions[idx]=1;
+  if(data.rejectReasons)data.rejectReasons[idx]='';
+  saveData(data);closeMissionModal();refreshUI(data);
   var uid=getUID();
   var photo=(preview.src&&preview.src.indexOf('data:')===0)?preview.src:'';
   db.collection('users').doc(uid).set({name:data.name,grade:data.grade,group:data.group,missions:data.missions,uid:uid},{merge:true}).catch(function(e){console.error('users set 실패:',e)});

@@ -131,6 +131,18 @@ body{
 .btn-del-sub{padding:7px 10px;background:transparent;border:1px solid rgba(255,100,100,.2);color:#e05555;border-radius:var(--radius-sm);font-size:11px;cursor:pointer;-webkit-appearance:none;appearance:none}
 .empty{text-align:center;color:var(--text-dim);padding:60px 20px;font-size:14px}
 .loading{text-align:center;color:var(--text-dim);padding:60px 20px;font-size:14px}
+/* 반려 이유 모달 */
+.reject-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px}
+.reject-overlay.show{display:flex}
+.reject-box{width:100%;max-width:380px;background:var(--bg2);border:1px solid rgba(197,165,90,.2);border-radius:var(--radius);padding:24px}
+.reject-box h4{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.reject-box p{font-size:13px;color:var(--text-dim);margin-bottom:14px}
+.reject-box textarea{width:100%;padding:10px 12px;background:var(--bg3);border:1px solid rgba(197,165,90,.15);border-radius:var(--radius-sm);color:var(--text);font-size:14px;outline:none;font-family:inherit;resize:none;min-height:80px;-webkit-appearance:none;appearance:none}
+.reject-box textarea:focus{border-color:rgba(224,85,85,.4)}
+.reject-btns{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
+.reject-cancel{padding:9px 16px;background:transparent;border:1px solid rgba(197,165,90,.2);border-radius:var(--radius-sm);color:var(--text-dim);font-size:13px;cursor:pointer;-webkit-appearance:none;appearance:none}
+.reject-confirm{padding:9px 18px;background:transparent;border:1px solid rgba(255,100,100,.4);border-radius:var(--radius-sm);color:#e05555;font-size:13px;font-weight:700;cursor:pointer;-webkit-appearance:none;appearance:none}
+.reject-confirm:active{background:rgba(255,100,100,.08)}
 /* 마스터 관리자 */
 .master-section{padding:16px 16px 20px;display:none;background:rgba(197,165,90,.04);border-bottom:1px solid rgba(197,165,90,.08)}
 .master-section.show{display:block}
@@ -319,6 +331,18 @@ body{
   </div>
 </div>
 
+<div class="reject-overlay" id="rejectOverlay">
+  <div class="reject-box">
+    <h4>미션 반려</h4>
+    <p>반려 사유를 입력하세요 (학생에게 표시됩니다)</p>
+    <textarea id="rejectReasonInput" placeholder="예: 사진이 미션 내용과 맞지 않습니다. 다시 시도해 주세요."></textarea>
+    <div class="reject-btns">
+      <button class="reject-cancel" onclick="closeRejectModal()">취소</button>
+      <button class="reject-confirm" onclick="confirmReject()">반려 확정</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -428,7 +452,7 @@ function resetAll(){
   // 모든 유저 미션 초기화
   var userPromise=db.collection('users').get().then(function(snap){
     var ups=[];
-    snap.forEach(function(doc){ups.push(db.collection('users').doc(doc.id).update({missions:[0,0,0,0,0,0],records:['','','','','',''],photos:['','','','','','']}))});
+    snap.forEach(function(doc){ups.push(db.collection('users').doc(doc.id).update({missions:[0,0,0,0,0,0],records:['','','','','',''],photos:['','','','','',''],rejectReasons:['','','','','','']}))});
     return Promise.all(ups);
   });
   Promise.all(subPromises.concat([userPromise]))
@@ -693,17 +717,34 @@ function approveSubmission(subId,uid,missionIdx){
   }).catch(function(err){alert('오류: '+err.message)});
 }
 
+var rejectTarget={subId:null,uid:null,missionIdx:null};
+
 function rejectSubmission(subId,uid,missionIdx){
-  if(!confirm('이 제출을 반려하시겠습니까?'))return;
+  rejectTarget={subId:subId,uid:uid,missionIdx:missionIdx};
+  document.getElementById('rejectReasonInput').value='';
+  document.getElementById('rejectOverlay').classList.add('show');
+}
+
+function closeRejectModal(){
+  document.getElementById('rejectOverlay').classList.remove('show');
+  rejectTarget={subId:null,uid:null,missionIdx:null};
+}
+
+function confirmReject(){
+  var reason=document.getElementById('rejectReasonInput').value.trim();
+  var subId=rejectTarget.subId;var uid=rejectTarget.uid;var missionIdx=rejectTarget.missionIdx;
+  closeRejectModal();
   var adminEmail=auth.currentUser?auth.currentUser.email:'';
   var batch=db.batch();
   var subRef=db.collection('submissions').doc(subId);
-  batch.update(subRef,{status:'rejected',approvedBy:adminEmail,approvedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  batch.update(subRef,{status:'rejected',rejectReason:reason,approvedBy:adminEmail,approvedAt:firebase.firestore.FieldValue.serverTimestamp()});
   db.collection('users').doc(uid).get().then(function(doc){
     if(!doc.exists)return;
     var missions=doc.data().missions||[0,0,0,0,0,0];
-    missions[missionIdx]=0;
-    batch.update(db.collection('users').doc(uid),{missions:missions});
+    var rejectReasons=doc.data().rejectReasons||['','','','','',''];
+    missions[missionIdx]=3;
+    rejectReasons[missionIdx]=reason;
+    batch.update(db.collection('users').doc(uid),{missions:missions,rejectReasons:rejectReasons});
     return batch.commit();
   }).catch(function(err){alert('오류: '+err.message)});
 }
