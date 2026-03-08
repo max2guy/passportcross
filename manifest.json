@@ -4,8 +4,8 @@
   "description": "연천장로교회 중고등부/청년부 고난주간 6일 미션 챌린지",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0d0f14",
-  "theme_color": "#0d0f14",
+  "background_color": "#17192e",
+  "theme_color": "#17192e",
   "orientation": "portrait",
   "icons": [
     {

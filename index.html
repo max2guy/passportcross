@@ -14,10 +14,10 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0d0f14;--bg2:#151820;--bg3:#1c1f2a;
-  --gold:#c5a55a;--gold-dim:#9a8245;--gold-bright:#e0c780;
-  --wine:#6b1d2a;--wine-light:#8a2e3d;
-  --text:#e8e4dc;--text-dim:#9a968e;--text-bright:#fff;
+  --bg:#17192e;--bg2:#21243e;--bg3:#2a2f4a;
+  --gold:#c9a84c;--gold-dim:#9e8038;--gold-bright:#e8d282;
+  --wine:#7e2038;--wine-light:#9e3048;
+  --text:#ede9de;--text-dim:#8e98b8;--text-bright:#fff;
   --radius:14px;--radius-sm:8px;
   --font-display:'Playfair Display',Georgia,'Times New Roman',serif;
   --font-body:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
@@ -290,9 +290,11 @@ html,body{
   line-height:1.3;word-break:keep-all;
 }
 .cert-card .cert-sub{font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:3px;margin-bottom:20px;opacity:.7}
-.cert-divider{width:40px;height:1px;background:rgba(197,165,90,.3);margin:0 auto 20px}
-.cert-card .cert-name{font-family:var(--font-serif);font-size:22px;font-weight:700;color:var(--text);margin-bottom:3px}
-.cert-card .cert-grade{font-size:12px;color:var(--text-dim);margin-bottom:16px;letter-spacing:.5px}
+.cert-divider{width:40px;height:1px;background:rgba(197,165,90,.3);margin:0 auto 16px}
+.cert-identity{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px}
+.cert-identity-left{flex:1;text-align:left;min-width:0}
+.cert-card .cert-name{font-family:var(--font-serif);font-size:21px;font-weight:700;color:var(--text);margin-bottom:4px}
+.cert-card .cert-grade{font-size:12px;color:var(--text-dim);letter-spacing:.5px}
 .cert-card .cert-msg{
   font-family:var(--font-serif);font-size:12px;color:var(--text-dim);
   line-height:1.9;margin-bottom:18px;
@@ -364,9 +366,9 @@ html,body{
 .profile-hero-name{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
 .profile-hero-group{font-size:12px;color:var(--text-dim);letter-spacing:1px}
 .cert-photo-wrap{
-  width:84px;height:84px;border-radius:50%;overflow:hidden;
+  width:80px;height:80px;border-radius:50%;overflow:hidden;
   border:2.5px solid rgba(197,165,90,.55);
-  margin:0 auto 14px;background:var(--bg3);
+  flex-shrink:0;background:var(--bg3);
   display:none;
 }
 .cert-photo-img{width:100%;height:100%;object-fit:cover}
@@ -664,11 +666,15 @@ html,body{
     <h2>THE CROSS PASSPORT</h2>
     <div class="cert-sub">CERTIFICATE OF COMPLETION</div>
     <div class="cert-divider"></div>
-    <div class="cert-photo-wrap" id="certPhotoWrap">
-      <img id="certPhotoImg" class="cert-photo-img">
+    <div class="cert-identity">
+      <div class="cert-identity-left">
+        <div class="cert-name" id="certName"></div>
+        <div class="cert-grade" id="certGrade"></div>
+      </div>
+      <div class="cert-photo-wrap" id="certPhotoWrap">
+        <img id="certPhotoImg" class="cert-photo-img">
+      </div>
     </div>
-    <div class="cert-name" id="certName"></div>
-    <div class="cert-grade" id="certGrade"></div>
     <div class="cert-msg">고난주간 6일 미션을 모두 완수하였음을 증명합니다. 그리스도의 고난에 동참하고 부활의 소망을 고백합니다.</div>
     <div class="cert-date">2026. 4. 5. 부활주일</div>
     <div class="cert-church" id="certChurch">연천장로교회</div>
@@ -1288,41 +1294,62 @@ function saveCert(){
   var missions=getMissions(data.group);
   function doSave(profileImg){
     var c=document.createElement('canvas');c.width=1080;c.height=1500;var ctx=c.getContext('2d');
-    var grad=ctx.createLinearGradient(0,0,1080,1500);grad.addColorStop(0,'#151820');grad.addColorStop(1,'#1c1f2a');
+    // 배경 — 새 색상 팔레트
+    var grad=ctx.createLinearGradient(0,0,1080,1500);grad.addColorStop(0,'#17192e');grad.addColorStop(1,'#21243e');
     ctx.fillStyle=grad;ctx.fillRect(0,0,1080,1500);
-    ctx.strokeStyle='#c5a55a';ctx.lineWidth=4;ctx.strokeRect(40,40,1000,1420);
-    ctx.strokeStyle='rgba(197,165,90,0.3)';ctx.lineWidth=1;ctx.strokeRect(60,60,960,1380);
-    ctx.fillStyle='rgba(197,165,90,0.08)';ctx.fillRect(510,120,60,380);ctx.fillRect(380,240,320,60);
-    ctx.fillStyle='#c5a55a';ctx.font='bold 64px serif';ctx.textAlign='center';ctx.fillText('✝',540,200);
-    ctx.font='bold 56px serif';ctx.fillText('THE CROSS PASSPORT',540,330);
-    ctx.font='28px monospace';ctx.fillStyle='rgba(154,150,142,0.6)';ctx.fillText('CERTIFICATE OF COMPLETION',540,390);
-    // 프로필 사진 (있으면)
+    // 테두리
+    ctx.strokeStyle='#c9a84c';ctx.lineWidth=4;ctx.strokeRect(40,40,1000,1420);
+    ctx.strokeStyle='rgba(201,168,76,0.28)';ctx.lineWidth=1;ctx.strokeRect(62,62,956,1376);
+    // 배경 십자가 장식
+    ctx.fillStyle='rgba(201,168,76,0.07)';ctx.fillRect(510,110,60,380);ctx.fillRect(380,238,320,60);
+    // 헤더
+    ctx.textAlign='center';ctx.textBaseline='alphabetic';
+    ctx.fillStyle='#c9a84c';ctx.font='bold 64px serif';ctx.fillText('✝',540,198);
+    ctx.font='bold 56px serif';ctx.fillText('THE CROSS PASSPORT',540,328);
+    ctx.font='26px monospace';ctx.fillStyle='rgba(142,152,184,0.8)';ctx.fillText('CERTIFICATE OF COMPLETION',540,384);
+    // 구분선
+    ctx.strokeStyle='rgba(201,168,76,0.3)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(220,418);ctx.lineTo(860,418);ctx.stroke();
+    // ── 이름(좌) + 프로필 사진(우) ─────────────────────
+    var identityY=430; // identity 영역 상단
     if(profileImg){
-      var pr=110,px=540,py=560;
+      // 이름 — 좌측 정렬
+      ctx.textAlign='left';
+      ctx.fillStyle='#ede9de';ctx.font='bold 52px serif';ctx.fillText(data.name,110,identityY+86);
+      ctx.fillStyle='rgba(142,152,184,0.8)';ctx.font='30px sans-serif';ctx.fillText(getGroupLabel(data.group),110,identityY+136);
+      // 프로필 사진 — 우측 원형
+      var pr=100,px=898,py=identityY+100;
       ctx.save();
-      ctx.beginPath();ctx.arc(px,py,pr,0,Math.PI*2);
-      ctx.clip();
-      // 이미지를 정방형으로 크롭해 원 안에 그리기
-      var iw=profileImg.naturalWidth||profileImg.width||pr*2;
-      var ih=profileImg.naturalHeight||profileImg.height||pr*2;
-      var sw=Math.min(iw,ih);var sx=(iw-sw)/2;var sy=(ih-sw)/2;
-      ctx.drawImage(profileImg,sx,sy,sw,sw,px-pr,py-pr,pr*2,pr*2);
+      ctx.beginPath();ctx.arc(px,py,pr,0,Math.PI*2);ctx.clip();
+      var iw=profileImg.naturalWidth||pr*2,ih=profileImg.naturalHeight||pr*2;
+      var csw=Math.min(iw,ih),csx=(iw-csw)/2,csy=(ih-csw)/2;
+      ctx.drawImage(profileImg,csx,csy,csw,csw,px-pr,py-pr,pr*2,pr*2);
       ctx.restore();
-      ctx.strokeStyle='#c5a55a';ctx.lineWidth=7;
+      ctx.strokeStyle='#c9a84c';ctx.lineWidth=6;
       ctx.beginPath();ctx.arc(px,py,pr,0,Math.PI*2);ctx.stroke();
+    } else {
+      // 사진 없으면 중앙 정렬
+      ctx.textAlign='center';
+      ctx.fillStyle='#ede9de';ctx.font='bold 52px serif';ctx.fillText(data.name,540,identityY+86);
+      ctx.fillStyle='rgba(142,152,184,0.8)';ctx.font='30px sans-serif';ctx.fillText(getGroupLabel(data.group),540,identityY+136);
     }
-    var nameY=profileImg?730:580;
-    ctx.fillStyle='#e8e4dc';ctx.font='bold 52px serif';ctx.fillText(data.name,540,nameY);
-    ctx.fillStyle='rgba(154,150,142,0.6)';ctx.font='32px sans-serif';
-    ctx.fillText(getGroupLabel(data.group),540,nameY+60);
-    var textY=nameY+200;
-    ctx.fillStyle='rgba(154,150,142,0.7)';ctx.font='30px serif';
-    ctx.fillText('고난주간 6일 미션을 모두 완수하였음을',540,textY);ctx.fillText('증명합니다.',540,textY+50);
-    ctx.fillText('그리스도의 고난에 동참하고',540,textY+120);ctx.fillText('부활의 소망을 고백합니다.',540,textY+170);
-    missions.forEach(function(m,i){ctx.font='48px sans-serif';ctx.fillText(m.emoji,280+i*100,textY+320)});
-    ctx.fillStyle='rgba(197,165,90,0.6)';ctx.font='28px monospace';ctx.fillText('2026. 4. 5. 부활주일',540,textY+450);
-    ctx.fillStyle='rgba(154,150,142,0.5)';ctx.font='28px sans-serif';
-    ctx.fillText('연천장로교회 '+getGroupLabel(data.group),540,textY+510);
+    // ── 본문 ────────────────────────────────────────────
+    ctx.textAlign='center';
+    var textY=identityY+260;
+    ctx.strokeStyle='rgba(201,168,76,0.18)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(220,textY-30);ctx.lineTo(860,textY-30);ctx.stroke();
+    ctx.fillStyle='rgba(200,196,185,0.75)';ctx.font='30px serif';
+    ctx.fillText('고난주간 6일 미션을 모두 완수하였음을',540,textY);
+    ctx.fillText('증명합니다.',540,textY+50);
+    ctx.fillText('그리스도의 고난에 동참하고',540,textY+120);
+    ctx.fillText('부활의 소망을 고백합니다.',540,textY+170);
+    // 미션 이모지
+    missions.forEach(function(m,i){ctx.font='48px sans-serif';ctx.fillText(m.emoji,268+i*100,textY+320)});
+    // 날짜·교회
+    ctx.strokeStyle='rgba(201,168,76,0.18)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(220,textY+372);ctx.lineTo(860,textY+372);ctx.stroke();
+    ctx.fillStyle='rgba(201,168,76,0.7)';ctx.font='28px monospace';ctx.fillText('2026. 4. 5. 부활주일',540,textY+420);
+    ctx.fillStyle='rgba(142,152,184,0.55)';ctx.font='26px sans-serif';ctx.fillText('연천장로교회 '+getGroupLabel(data.group),540,textY+472);
     try{var link=document.createElement('a');link.download='passport_cross_cert_'+data.name+'.png';link.href=c.toDataURL('image/png');document.body.appendChild(link);link.click();document.body.removeChild(link);toast('수료증이 저장되었습니다')}
     catch(e){toast('이미지를 길게 눌러 저장하세요')}
   }
