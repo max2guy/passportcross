@@ -1,8 +1,9 @@
-const CACHE_NAME = 'passport-cross-v46';
+const CACHE_NAME = 'passport-cross-v47';
 const ASSETS = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './icon.svg'
 ];
 
 self.addEventListener('install', e => {
