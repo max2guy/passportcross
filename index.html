@@ -146,7 +146,7 @@ html,body{
 .hg-tag.young{background:rgba(197,165,90,.15);color:var(--gold)}
 .header-cross{font-family:'Cinzel',var(--font-display);font-size:22px;font-weight:900;color:var(--gold);letter-spacing:2px;line-height:1;margin-bottom:4px}
 .header-brand-sub{font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:4px;opacity:.65}
-.header-user{position:absolute;top:50%;right:18px;transform:translateY(-50%);display:flex;align-items:center;gap:6px}
+.header-user{position:absolute;top:50%;right:16px;transform:translateY(-50%);display:flex;align-items:center;gap:8px}
 .header-name{font-size:13px;color:var(--text-dim)}
 .tab-content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 20px 20px}
 .tab-page{display:none}
@@ -333,6 +333,44 @@ html,body{
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* PROFILE PHOTO */
+.header-av{
+  width:34px;height:34px;border-radius:50%;overflow:hidden;
+  background:var(--bg3);border:1.5px solid rgba(197,165,90,.35);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;font-size:15px;
+  transition:border-color .2s;
+}
+.header-av:active{border-color:var(--gold)}
+.profile-hero{
+  display:flex;flex-direction:column;align-items:center;
+  padding:32px 0 20px;border-bottom:1px solid rgba(197,165,90,.08);
+  margin-bottom:8px;
+}
+.profile-circle{
+  width:96px;height:96px;border-radius:50%;overflow:hidden;
+  background:var(--bg3);border:2.5px solid rgba(197,165,90,.4);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;margin-bottom:14px;
+  transition:border-color .2s;
+}
+.profile-circle:active{border-color:var(--gold)}
+.profile-circle-icon{font-size:36px;pointer-events:none}
+.profile-edit-badge{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(0,0,0,.62);color:var(--gold);
+  font-size:10px;text-align:center;padding:5px 0;letter-spacing:.5px;
+}
+.profile-hero-name{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
+.profile-hero-group{font-size:12px;color:var(--text-dim);letter-spacing:1px}
+.cert-photo-wrap{
+  width:84px;height:84px;border-radius:50%;overflow:hidden;
+  border:2.5px solid rgba(197,165,90,.55);
+  margin:0 auto 14px;background:var(--bg3);
+  display:none;
+}
+.cert-photo-img{width:100%;height:100%;object-fit:cover}
+
 /* NAME EDIT */
 .name-edit-overlay{position:fixed;inset:0;z-index:8800;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
 .name-edit-overlay.show{opacity:1;visibility:visible}
@@ -466,7 +504,13 @@ html,body{
   <div class="header">
     <div class="header-cross">THE CROSS</div>
     <div class="header-brand-sub">PASSPORT  ·  고난주간</div>
-    <div class="header-user"><span id="headerName" class="header-name"></span><span class="hg-tag" id="headerGroup"></span></div>
+    <div class="header-user">
+      <div class="header-av" id="headerAv" onclick="switchTabTo('tabMore')">
+        <img id="headerAvImg" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%">
+        <span id="headerAvIcon">👤</span>
+      </div>
+      <span id="headerName" class="header-name"></span><span class="hg-tag" id="headerGroup"></span>
+    </div>
   </div>
   <div class="tab-content">
     <div class="tab-page active" id="tabPassport">
@@ -510,6 +554,16 @@ html,body{
       </div>
     </div>
     <div class="tab-page" id="tabMore">
+      <div class="profile-hero">
+        <div class="profile-circle" id="profileCircle" onclick="document.getElementById('profilePhotoInput').click()">
+          <img id="profilePhotoDisp" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%">
+          <span class="profile-circle-icon" id="profileCircleIcon">📷</span>
+          <div class="profile-edit-badge">사진 변경</div>
+        </div>
+        <div class="profile-hero-name" id="profileHeroName"></div>
+        <div class="profile-hero-group" id="profileHeroGroup"></div>
+        <input type="file" accept="image/*" id="profilePhotoInput" style="display:none" onchange="handleProfilePhoto(this)">
+      </div>
       <div class="more-section-title">나의 기록</div>
       <div class="more-list">
         <div class="more-item" onclick="showCertificate()">
@@ -610,6 +664,9 @@ html,body{
     <h2>THE CROSS PASSPORT</h2>
     <div class="cert-sub">CERTIFICATE OF COMPLETION</div>
     <div class="cert-divider"></div>
+    <div class="cert-photo-wrap" id="certPhotoWrap">
+      <img id="certPhotoImg" class="cert-photo-img">
+    </div>
     <div class="cert-name" id="certName"></div>
     <div class="cert-grade" id="certGrade"></div>
     <div class="cert-msg">고난주간 6일 미션을 모두 완수하였음을 증명합니다. 그리스도의 고난에 동참하고 부활의 소망을 고백합니다.</div>
@@ -837,6 +894,9 @@ function showApp(data){
   var hg=document.getElementById('headerGroup');
   hg.textContent=getGroupLabel(data.group);
   hg.className='hg-tag '+getGroupTagClass(data.group);
+  document.getElementById('profileHeroName').textContent=data.name;
+  document.getElementById('profileHeroGroup').textContent=getGroupLabel(data.group);
+  applyProfilePhoto(data.profilePhoto||null);
   renderStamps(data);renderMissionList(data);renderScreenGrid();
   document.getElementById('app').classList.add('show');
 }
@@ -1039,6 +1099,9 @@ function refreshUI(data){
   document.getElementById('headerName').textContent=data.name;
   var hg=document.getElementById('headerGroup');
   hg.textContent=getGroupLabel(data.group);hg.className='hg-tag '+getGroupTagClass(data.group);
+  document.getElementById('profileHeroName').textContent=data.name;
+  document.getElementById('profileHeroGroup').textContent=getGroupLabel(data.group);
+  applyProfilePhoto(data.profilePhoto||null);
   renderStamps(data);renderMissionList(data);
 }
 
@@ -1211,6 +1274,10 @@ function showCertificate(){
   document.getElementById('certName').textContent=data.name;
   document.getElementById('certGrade').textContent=getGroupLabel(data.group);
   document.getElementById('certChurch').textContent='연천장로교회 '+getGroupLabel(data.group);
+  var cw=document.getElementById('certPhotoWrap');
+  var ci=document.getElementById('certPhotoImg');
+  if(data.profilePhoto){ci.src=data.profilePhoto;cw.style.display='block'}
+  else{cw.style.display='none'}
   document.getElementById('certOverlay').classList.add('show');
   pushOverlay();
 }
@@ -1219,27 +1286,51 @@ function closeCert(){document.getElementById('certOverlay').classList.remove('sh
 function saveCert(){
   var data=getData();if(!data)return;
   var missions=getMissions(data.group);
-  var c=document.createElement('canvas');c.width=1080;c.height=1440;var ctx=c.getContext('2d');
-  var grad=ctx.createLinearGradient(0,0,1080,1440);grad.addColorStop(0,'#151820');grad.addColorStop(1,'#1c1f2a');
-  ctx.fillStyle=grad;ctx.fillRect(0,0,1080,1440);
-  ctx.strokeStyle='#c5a55a';ctx.lineWidth=4;ctx.strokeRect(40,40,1000,1360);
-  ctx.strokeStyle='rgba(197,165,90,0.3)';ctx.lineWidth=1;ctx.strokeRect(60,60,960,1320);
-  ctx.fillStyle='rgba(197,165,90,0.08)';ctx.fillRect(510,120,60,400);ctx.fillRect(380,250,320,60);
-  ctx.fillStyle='#c5a55a';ctx.font='bold 64px serif';ctx.textAlign='center';ctx.fillText('✝',540,200);
-  ctx.font='bold 56px serif';ctx.fillText('THE CROSS PASSPORT',540,340);
-  ctx.font='28px monospace';ctx.fillStyle='rgba(154,150,142,0.6)';ctx.fillText('CERTIFICATE OF COMPLETION',540,400);
-  ctx.fillStyle='#e8e4dc';ctx.font='bold 52px serif';ctx.fillText(data.name,540,560);
-  ctx.fillStyle='rgba(154,150,142,0.6)';ctx.font='32px sans-serif';
-  ctx.fillText(getGroupLabel(data.group),540,620);
-  ctx.fillStyle='rgba(154,150,142,0.7)';ctx.font='30px serif';
-  ctx.fillText('고난주간 6일 미션을 모두 완수하였음을',540,760);ctx.fillText('증명합니다.',540,810);
-  ctx.fillText('그리스도의 고난에 동참하고',540,880);ctx.fillText('부활의 소망을 고백합니다.',540,930);
-  missions.forEach(function(m,i){ctx.font='48px sans-serif';ctx.fillText(m.emoji,280+i*100,1060)});
-  ctx.fillStyle='rgba(197,165,90,0.6)';ctx.font='28px monospace';ctx.fillText('2026. 4. 5. 부활주일',540,1180);
-  ctx.fillStyle='rgba(154,150,142,0.5)';ctx.font='28px sans-serif';
-  ctx.fillText('연천장로교회 '+getGroupLabel(data.group),540,1240);
-  try{var link=document.createElement('a');link.download='passport_cross_cert_'+data.name+'.png';link.href=c.toDataURL('image/png');document.body.appendChild(link);link.click();document.body.removeChild(link);toast('수료증이 저장되었습니다')}
-  catch(e){toast('이미지를 길게 눌러 저장하세요')}
+  function doSave(profileImg){
+    var c=document.createElement('canvas');c.width=1080;c.height=1500;var ctx=c.getContext('2d');
+    var grad=ctx.createLinearGradient(0,0,1080,1500);grad.addColorStop(0,'#151820');grad.addColorStop(1,'#1c1f2a');
+    ctx.fillStyle=grad;ctx.fillRect(0,0,1080,1500);
+    ctx.strokeStyle='#c5a55a';ctx.lineWidth=4;ctx.strokeRect(40,40,1000,1420);
+    ctx.strokeStyle='rgba(197,165,90,0.3)';ctx.lineWidth=1;ctx.strokeRect(60,60,960,1380);
+    ctx.fillStyle='rgba(197,165,90,0.08)';ctx.fillRect(510,120,60,380);ctx.fillRect(380,240,320,60);
+    ctx.fillStyle='#c5a55a';ctx.font='bold 64px serif';ctx.textAlign='center';ctx.fillText('✝',540,200);
+    ctx.font='bold 56px serif';ctx.fillText('THE CROSS PASSPORT',540,330);
+    ctx.font='28px monospace';ctx.fillStyle='rgba(154,150,142,0.6)';ctx.fillText('CERTIFICATE OF COMPLETION',540,390);
+    // 프로필 사진 (있으면)
+    if(profileImg){
+      var pr=110,px=540,py=560;
+      ctx.save();
+      ctx.beginPath();ctx.arc(px,py,pr,0,Math.PI*2);
+      ctx.clip();
+      // 이미지를 정방형으로 크롭해 원 안에 그리기
+      var iw=profileImg.naturalWidth||profileImg.width||pr*2;
+      var ih=profileImg.naturalHeight||profileImg.height||pr*2;
+      var sw=Math.min(iw,ih);var sx=(iw-sw)/2;var sy=(ih-sw)/2;
+      ctx.drawImage(profileImg,sx,sy,sw,sw,px-pr,py-pr,pr*2,pr*2);
+      ctx.restore();
+      ctx.strokeStyle='#c5a55a';ctx.lineWidth=7;
+      ctx.beginPath();ctx.arc(px,py,pr,0,Math.PI*2);ctx.stroke();
+    }
+    var nameY=profileImg?730:580;
+    ctx.fillStyle='#e8e4dc';ctx.font='bold 52px serif';ctx.fillText(data.name,540,nameY);
+    ctx.fillStyle='rgba(154,150,142,0.6)';ctx.font='32px sans-serif';
+    ctx.fillText(getGroupLabel(data.group),540,nameY+60);
+    var textY=nameY+200;
+    ctx.fillStyle='rgba(154,150,142,0.7)';ctx.font='30px serif';
+    ctx.fillText('고난주간 6일 미션을 모두 완수하였음을',540,textY);ctx.fillText('증명합니다.',540,textY+50);
+    ctx.fillText('그리스도의 고난에 동참하고',540,textY+120);ctx.fillText('부활의 소망을 고백합니다.',540,textY+170);
+    missions.forEach(function(m,i){ctx.font='48px sans-serif';ctx.fillText(m.emoji,280+i*100,textY+320)});
+    ctx.fillStyle='rgba(197,165,90,0.6)';ctx.font='28px monospace';ctx.fillText('2026. 4. 5. 부활주일',540,textY+450);
+    ctx.fillStyle='rgba(154,150,142,0.5)';ctx.font='28px sans-serif';
+    ctx.fillText('연천장로교회 '+getGroupLabel(data.group),540,textY+510);
+    try{var link=document.createElement('a');link.download='passport_cross_cert_'+data.name+'.png';link.href=c.toDataURL('image/png');document.body.appendChild(link);link.click();document.body.removeChild(link);toast('수료증이 저장되었습니다')}
+    catch(e){toast('이미지를 길게 눌러 저장하세요')}
+  }
+  if(data.profilePhoto){
+    var img=new Image();img.onload=function(){doSave(img)};img.src=data.profilePhoto;
+  } else {
+    doSave(null);
+  }
 }
 
 function openNameEdit(){
@@ -1280,6 +1371,53 @@ function updateAdminModeText(){
   // Firebase auth 상태 확인 (admin.html의 세션은 별개이므로 localStorage 힌트 사용)
   var isAdmin=localStorage.getItem('passportCrossAdmin')==='true';
   el.textContent=isAdmin?'관리자 페이지로 전환':'관리자 로그인';
+}
+
+function switchTabTo(tabId){
+  var idx=TABS.indexOf(tabId);if(idx<0)return;
+  var cur=getCurTabIdx();goTabByIdx(idx,idx>=cur?1:-1);
+}
+
+function applyProfilePhoto(dataUrl){
+  // 헤더 아바타
+  var avImg=document.getElementById('headerAvImg');
+  var avIcon=document.getElementById('headerAvIcon');
+  if(dataUrl){avImg.src=dataUrl;avImg.style.display='block';if(avIcon)avIcon.style.display='none'}
+  else{avImg.style.display='none';if(avIcon)avIcon.style.display=''}
+  // 더보기 프로필 서클
+  var pd=document.getElementById('profilePhotoDisp');
+  var pi=document.getElementById('profileCircleIcon');
+  if(dataUrl){pd.src=dataUrl;pd.style.display='block';if(pi)pi.style.display='none'}
+  else{pd.style.display='none';if(pi)pi.style.display=''}
+}
+
+function handleProfilePhoto(input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var img=new Image();
+    img.onload=function(){
+      var size=400;
+      var c=document.createElement('canvas');c.width=size;c.height=size;
+      var ctx=c.getContext('2d');
+      var sw=Math.min(img.width,img.height);
+      var sx=(img.width-sw)/2;var sy=(img.height-sw)/2;
+      ctx.drawImage(img,sx,sy,sw,sw,0,0,size,size);
+      var dataUrl=c.toDataURL('image/jpeg',0.82);
+      var data=getData();if(!data)return;
+      data.profilePhoto=dataUrl;saveData(data);
+      db.collection('users').doc(getUID()).set({profilePhoto:dataUrl},{merge:true}).catch(function(){});
+      applyProfilePhoto(dataUrl);
+      // cert overlay가 열려있으면 즉시 반영
+      var cw=document.getElementById('certPhotoWrap');
+      var ci=document.getElementById('certPhotoImg');
+      if(cw&&ci){ci.src=dataUrl;cw.style.display='block'}
+      toast('프로필 사진이 저장되었습니다');
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+  input.value='';
 }
 
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
