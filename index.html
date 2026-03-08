@@ -951,7 +951,7 @@ function startFirestoreListener(uid){
         if(!local.rejectReasons)local.rejectReasons=['','','','','',''];
         local.rejectReasons[i]=remote.rejectReasons&&remote.rejectReasons[i]?remote.rejectReasons[i]:'';
         updated=true;anyRejected=true;
-      } else if((status===0||status===undefined)&&(local.missions[i]===1||local.missions[i]===3)){
+      } else if((status===0||status===undefined)&&local.missions[i]!==0){
         // 관리자 리셋: 로컬 상태·기록·사진 모두 초기화
         local.missions[i]=0;
         if(local.records)local.records[i]='';
