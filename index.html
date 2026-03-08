@@ -611,7 +611,7 @@ html,body{
       </div>
       <div class="more-section-title">나의 기록</div>
       <div class="more-list">
-        <div class="more-item" id="certMoreItem" style="border-radius:0 0 var(--radius) var(--radius)" onclick="showCertificate()">
+        <div class="more-item" id="certMoreItem" style="border-radius:var(--radius)" onclick="showCertificate()">
           <div class="mi-left"><span class="mi-icon">🏅</span><span class="mi-text">수료증 보기</span></div>
           <span class="mi-arrow">›</span>
         </div>
@@ -1222,7 +1222,7 @@ function updateGiftUI(data){
     item.style.pointerEvents=requested?'none':'';
     item.style.opacity=requested?'0.5':'';
     // 수료증 보기 항목의 하단 라운딩: 선물 항목이 숨겨질 때만 적용
-    if(certItem){certItem.style.borderRadius=allDone?'var(--radius) var(--radius) 0 0':'0 0 var(--radius) var(--radius)';}
+    if(certItem){certItem.style.borderRadius=allDone?'var(--radius) var(--radius) 0 0':'var(--radius)';}
   }
 }
 
