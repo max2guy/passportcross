@@ -338,6 +338,9 @@ html,body{
 .cert-card .cert-date{font-family:var(--font-mono);font-size:11px;color:rgba(197,165,90,.7);margin-bottom:4px}
 .cert-card .cert-church{font-size:11px;color:var(--text-dim);opacity:.6}
 .cert-btns{display:flex;gap:10px;margin-top:22px}
+.cert-gift-btn{width:100%;margin-top:10px;padding:13px;border:none;border-radius:var(--radius-sm);background:linear-gradient(135deg,#7e2038,#9e3048);color:#fff;font-family:var(--font-body);font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.5px}
+.cert-gift-btn:active{opacity:.85}
+.cert-gift-btn.done{background:var(--bg3);color:var(--text-dim);pointer-events:none}
 .cert-close{flex:0 0 72px;padding:12px 8px;border:1px solid rgba(197,165,90,.2);border-radius:var(--radius-sm);background:transparent;color:var(--text-dim);font-family:var(--font-body);font-size:13px;cursor:pointer;transition:border-color .2s}
 .cert-close:active{border-color:var(--gold-dim)}
 .cert-save{flex:1;padding:12px;border:none;border-radius:var(--radius-sm);background:var(--gold);color:var(--bg);font-family:var(--font-body);font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.5px}
@@ -612,6 +615,10 @@ html,body{
           <div class="mi-left"><span class="mi-icon">🏅</span><span class="mi-text">수료증 보기</span></div>
           <span class="mi-arrow">›</span>
         </div>
+        <div class="more-item" id="giftMoreItem" style="display:none" onclick="requestGift()">
+          <div class="mi-left"><span class="mi-icon">🎁</span><span class="mi-text" id="giftMoreText">수료선물 받기</span></div>
+          <span class="mi-arrow" id="giftMoreArrow">›</span>
+        </div>
       </div>
       <div class="more-section-title">설정</div>
       <div class="more-list">
@@ -726,6 +733,7 @@ html,body{
       <button class="cert-close" onclick="closeCert()">닫기</button>
       <button class="cert-save" onclick="saveCert()">이미지 저장</button>
     </div>
+    <button class="cert-gift-btn" id="certGiftBtn" onclick="requestGift()">🎁 수료선물 받기</button>
   </div>
 </div>
 
@@ -952,6 +960,8 @@ function startFirestoreListener(uid){
         updated=true;anyReset=true;
       }
     });
+    // giftRequested 동기화
+    if(remote.giftRequested&&!local.giftRequested){local.giftRequested=true;updated=true;}
     if(updated){saveData(local);refreshUI(local);}
     if(anyApproved){toast('✝ 미션이 승인되었습니다!');checkComplete(local);}
     if(anyRejected){toast('미션이 반려되었습니다. 사유를 확인하세요.');}
@@ -1193,7 +1203,25 @@ function verifyPin(){
   }
 }
 
-function checkComplete(data){if(data.missions.every(function(s){return s===2})){setTimeout(function(){toast('🎉 모든 미션 완료! 수료증을 확인하세요')},1000)}}
+function checkComplete(data){
+  if(data.missions.every(function(s){return s===2})){
+    setTimeout(function(){toast('🎉 모든 미션 완료! 수료증을 확인하세요')},1000);
+    updateGiftUI(data);
+  }
+}
+function updateGiftUI(data){
+  var allDone=data.missions.every(function(s){return s===2});
+  var requested=!!data.giftRequested;
+  // 더보기 탭 항목
+  var item=document.getElementById('giftMoreItem');
+  if(item){
+    item.style.display=allDone?'':'none';
+    document.getElementById('giftMoreText').textContent=requested?'수료선물 신청 완료':'수료선물 받기';
+    document.getElementById('giftMoreArrow').textContent=requested?'✓':'›';
+    item.style.pointerEvents=requested?'none':'';
+    item.style.opacity=requested?'0.5':'';
+  }
+}
 
 function refreshUI(data){
   document.getElementById('headerName').textContent=data.name;
@@ -1202,7 +1230,7 @@ function refreshUI(data){
   document.getElementById('profileHeroName').textContent=data.name;
   document.getElementById('profileHeroGroup').textContent=getGroupLabel(data.group);
   applyProfilePhoto(data.profilePhoto||null);
-  renderStamps(data);renderMissionList(data);
+  renderStamps(data);renderMissionList(data);updateGiftUI(data);
 }
 
 function wpSymbol(ctx,idx,s){
@@ -1378,10 +1406,34 @@ function showCertificate(){
   var ci=document.getElementById('certPhotoImg');
   if(data.profilePhoto){ci.src=data.profilePhoto;cw.style.display='block'}
   else{cw.style.display='none'}
+  // 선물 버튼 상태
+  var giftBtn=document.getElementById('certGiftBtn');
+  if(data.giftRequested){giftBtn.textContent='✓ 수료선물 신청 완료';giftBtn.className='cert-gift-btn done'}
+  else{giftBtn.textContent='🎁 수료선물 받기';giftBtn.className='cert-gift-btn'}
   document.getElementById('certOverlay').classList.add('show');
   pushOverlay();
 }
 function closeCert(){document.getElementById('certOverlay').classList.remove('show');popOverlay();}
+
+function requestGift(){
+  var data=getData();if(!data)return;
+  if(data.giftRequested){toast('이미 신청하셨습니다');return}
+  if(!data.missions.every(function(s){return s===2})){toast('미션을 모두 완료해야 합니다');return}
+  var uid=getUID();
+  var now=firebase.firestore.FieldValue.serverTimestamp();
+  db.collection('completions').doc(uid).set({
+    uid:uid,userName:data.name,grade:data.grade,group:data.group,
+    giftRequestedAt:now
+  }).then(function(){
+    return db.collection('users').doc(uid).set({giftRequested:true,giftRequestedAt:now},{merge:true});
+  }).then(function(){
+    data.giftRequested=true;saveData(data);
+    var giftBtn=document.getElementById('certGiftBtn');
+    giftBtn.textContent='✓ 수료선물 신청 완료';giftBtn.className='cert-gift-btn done';
+    updateGiftUI(data);
+    toast('🎁 수료선물 신청이 완료되었습니다!');
+  }).catch(function(e){toast('오류: '+e.message)});
+}
 
 function saveCert(){
   var data=getData();if(!data)return;

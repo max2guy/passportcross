@@ -186,6 +186,18 @@ body{
 .btn-save-mission:active{background:var(--gold-dim)}
 .me-saved{font-size:12px;color:#3a8a50;margin-left:10px;display:none}
 
+/* 완료자 패널 */
+.completions-panel{display:none;padding:0 16px calc(var(--safe-bottom)+40px)}
+.completions-panel.show{display:block}
+.comp-header{display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px}
+.comp-title{font-size:11px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase}
+.comp-count{font-size:12px;color:var(--gold)}
+.comp-card{background:var(--bg2);border:1px solid rgba(197,165,90,.1);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.comp-info .comp-name{font-size:15px;font-weight:700;color:var(--text)}
+.comp-info .comp-meta{font-size:12px;color:var(--text-dim);margin-top:3px}
+.comp-time{text-align:right;flex-shrink:0}
+.comp-time .comp-date{font-size:12px;color:var(--gold-dim)}
+.comp-time .comp-clock{font-size:11px;color:var(--text-dim);margin-top:2px}
 /* ===== 반응형 ===== */
 @media (max-width:390px){
   .topbar-btn{padding:6px 9px;font-size:11px}
@@ -282,6 +294,7 @@ body{
       <div class="topbar-email" id="adminEmail"></div>
     </div>
     <div class="topbar-right">
+      <button class="topbar-btn" onclick="toggleCompletions()" id="completionsBtn">완료자</button>
       <button class="topbar-btn" onclick="toggleMissionEdit()" id="missionEditBtn">미션 편집</button>
       <button class="topbar-btn" onclick="location.href='index.html'">앱 전환</button>
       <button class="topbar-btn danger" onclick="doLogout()">로그아웃</button>
@@ -319,6 +332,15 @@ body{
 
     <div class="section-title" id="sectionLabel">대기중인 제출</div>
     <div class="sub-list" id="subList"><div class="loading">불러오는 중...</div></div>
+
+    <!-- 완료자 패널 -->
+    <div class="completions-panel" id="completionsPanel">
+      <div class="comp-header">
+        <div class="comp-title">미션 완료자 목록</div>
+        <div class="comp-count" id="compCount"></div>
+      </div>
+      <div id="compList"><div class="loading">불러오는 중...</div></div>
+    </div>
 
     <!-- 미션 편집 패널 -->
     <div class="mission-edit-panel" id="missionEditPanel">
@@ -615,6 +637,68 @@ var DEFAULT_MISSIONS_YOUNG=[
 ];
 var editableMissions={youth:[],young:[]};
 
+var completionsVisible=false;
+var unsubCompletions=null;
+
+function toggleCompletions(){
+  completionsVisible=!completionsVisible;
+  document.getElementById('completionsPanel').classList.toggle('show',completionsVisible);
+  document.getElementById('completionsBtn').style.borderColor=completionsVisible?'var(--gold)':'';
+  document.getElementById('completionsBtn').style.color=completionsVisible?'var(--gold)':'';
+  // 다른 패널 닫기
+  if(completionsVisible){
+    missionEditVisible=false;
+    document.getElementById('missionEditPanel').classList.remove('show');
+    document.getElementById('missionEditBtn').textContent='미션 편집';
+    document.querySelector('.sub-list').style.display='none';
+    document.querySelector('.filter-bar').style.display='none';
+    document.querySelector('.section-title').style.display='none';
+    loadCompletions();
+  } else {
+    document.querySelector('.sub-list').style.display='';
+    document.querySelector('.filter-bar').style.display='';
+    document.querySelector('.section-title').style.display='';
+    if(unsubCompletions){unsubCompletions();unsubCompletions=null;}
+  }
+}
+
+function loadCompletions(){
+  var list=document.getElementById('compList');
+  list.innerHTML='<div class="loading">불러오는 중...</div>';
+  if(unsubCompletions)unsubCompletions();
+  unsubCompletions=db.collection('completions').onSnapshot(function(snap){
+    var items=[];
+    snap.forEach(function(doc){items.push(Object.assign({id:doc.id},doc.data()))});
+    items.sort(function(a,b){
+      var at=a.giftRequestedAt?a.giftRequestedAt.seconds:0;
+      var bt=b.giftRequestedAt?b.giftRequestedAt.seconds:0;
+      return at-bt;
+    });
+    document.getElementById('compCount').textContent=items.length+'명';
+    if(items.length===0){list.innerHTML='<div class="empty">아직 완료자가 없습니다</div>';return}
+    list.innerHTML='';
+    items.forEach(function(item,idx){
+      var card=document.createElement('div');card.className='comp-card';
+      var dt=item.giftRequestedAt?new Date(item.giftRequestedAt.seconds*1000):null;
+      var dateStr=dt?dt.toLocaleDateString('ko-KR',{month:'long',day:'numeric'}):'';
+      var timeStr=dt?dt.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):'';
+      var groupLabel=item.group==='young'?'청년부':'중고등부';
+      card.innerHTML=
+        '<div class="comp-info">'
+          +'<div class="comp-name">'+(idx+1)+'. '+item.userName+'</div>'
+          +'<div class="comp-meta">'+item.grade+' · '+groupLabel+'</div>'
+        +'</div>'
+        +'<div class="comp-time">'
+          +'<div class="comp-date">'+dateStr+'</div>'
+          +'<div class="comp-clock">'+timeStr+'</div>'
+        +'</div>';
+      list.appendChild(card);
+    });
+  },function(err){
+    list.innerHTML='<div class="empty" style="color:#e05555">오류: '+err.code+'</div>';
+  });
+}
+
 function toggleMissionEdit(){
   missionEditVisible=!missionEditVisible;
   document.getElementById('missionEditPanel').classList.toggle('show',missionEditVisible);
@@ -622,7 +706,15 @@ function toggleMissionEdit(){
   document.querySelector('.sub-list').style.display=missionEditVisible?'none':'';
   document.querySelector('.filter-bar').style.display=missionEditVisible?'none':'';
   document.querySelector('.section-title').style.display=missionEditVisible?'none':'';
-  if(missionEditVisible)loadMissionEditor();
+  if(missionEditVisible){
+    // 완료자 패널 닫기
+    completionsVisible=false;
+    document.getElementById('completionsPanel').classList.remove('show');
+    document.getElementById('completionsBtn').style.borderColor='';
+    document.getElementById('completionsBtn').style.color='';
+    if(unsubCompletions){unsubCompletions();unsubCompletions=null;}
+    loadMissionEditor();
+  }
 }
 
 function switchMissionGroup(group,btn){
