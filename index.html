@@ -921,11 +921,22 @@ function startFirestoreListener(uid){
     if(!doc.exists)return;
     var remote=doc.data();
     var local=getData();if(!local)return;
-    var updated=false;
+    var updated=false;var anyApproved=false;var anyReset=false;
     remote.missions.forEach(function(status,i){
-      if(status===2&&local.missions[i]!==2){local.missions[i]=2;updated=true}
+      if(status===2&&local.missions[i]!==2){
+        // 관리자 승인
+        local.missions[i]=2;updated=true;anyApproved=true;
+      } else if(status===0&&local.missions[i]!==0){
+        // 관리자 리셋: 로컬 상태·기록·사진 모두 초기화
+        local.missions[i]=0;
+        if(local.records)local.records[i]='';
+        if(local.photos)local.photos[i]='';
+        updated=true;anyReset=true;
+      }
     });
-    if(updated){saveData(local);refreshUI(local);toast('✝ 미션이 승인되었습니다!');checkComplete(local)}
+    if(updated){saveData(local);refreshUI(local);}
+    if(anyApproved){toast('✝ 미션이 승인되었습니다!');checkComplete(local);}
+    if(anyReset){toast('관리자가 미션을 초기화했습니다');}
   });
 }
 
