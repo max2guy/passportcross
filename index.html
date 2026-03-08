@@ -615,10 +615,6 @@ html,body{
           <div class="mi-left"><span class="mi-icon">🏅</span><span class="mi-text">수료증 보기</span></div>
           <span class="mi-arrow">›</span>
         </div>
-        <div class="more-item" id="giftMoreItem" style="display:none" onclick="requestGift()">
-          <div class="mi-left"><span class="mi-icon">🎁</span><span class="mi-text" id="giftMoreText">수료선물 받기</span></div>
-          <span class="mi-arrow" id="giftMoreArrow">›</span>
-        </div>
       </div>
       <div class="more-section-title">설정</div>
       <div class="more-list">
@@ -1209,22 +1205,7 @@ function checkComplete(data){
     updateGiftUI(data);
   }
 }
-function updateGiftUI(data){
-  var allDone=data.missions.every(function(s){return s===2});
-  var requested=!!data.giftRequested;
-  // 더보기 탭 항목
-  var item=document.getElementById('giftMoreItem');
-  var certItem=document.getElementById('certMoreItem');
-  if(item){
-    item.style.display=allDone?'':'none';
-    document.getElementById('giftMoreText').textContent=requested?'수료선물 신청 완료':'수료선물 받기';
-    document.getElementById('giftMoreArrow').textContent=requested?'✓':'›';
-    item.style.pointerEvents=requested?'none':'';
-    item.style.opacity=requested?'0.5':'';
-    // 수료증 보기 항목의 하단 라운딩: 선물 항목이 숨겨질 때만 적용
-    if(certItem){certItem.style.borderRadius=allDone?'var(--radius) var(--radius) 0 0':'var(--radius)';}
-  }
-}
+function updateGiftUI(data){}
 
 function refreshUI(data){
   document.getElementById('headerName').textContent=data.name;
