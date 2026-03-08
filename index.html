@@ -338,7 +338,7 @@ html,body{
 .cert-card .cert-date{font-family:var(--font-mono);font-size:11px;color:rgba(197,165,90,.7);margin-bottom:4px}
 .cert-card .cert-church{font-size:11px;color:var(--text-dim);opacity:.6}
 .cert-btns{display:flex;gap:10px;margin-top:22px}
-.cert-gift-btn{width:100%;margin-top:10px;padding:13px;border:none;border-radius:var(--radius-sm);background:linear-gradient(135deg,#7e2038,#9e3048);color:#fff;font-family:var(--font-body);font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.5px}
+.cert-gift-btn{flex:1;padding:12px 8px;border:none;border-radius:var(--radius-sm);background:linear-gradient(135deg,#7e2038,#9e3048);color:#fff;font-family:var(--font-body);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px}
 .cert-gift-btn:active{opacity:.85}
 .cert-gift-btn.done{background:var(--bg3);color:var(--text-dim);pointer-events:none}
 .cert-close{flex:0 0 72px;padding:12px 8px;border:1px solid rgba(197,165,90,.2);border-radius:var(--radius-sm);background:transparent;color:var(--text-dim);font-family:var(--font-body);font-size:13px;cursor:pointer;transition:border-color .2s}
@@ -730,10 +730,10 @@ html,body{
     <div class="cert-date">2026. 4. 5. 부활주일</div>
     <div class="cert-church" id="certChurch">연천장로교회</div>
     <div class="cert-btns">
-      <button class="cert-close" onclick="closeCert()">닫기</button>
       <button class="cert-save" onclick="saveCert()">이미지 저장</button>
+      <button class="cert-gift-btn" id="certGiftBtn" onclick="requestGift()">🎁 수료선물</button>
+      <button class="cert-close" onclick="closeCert()">닫기</button>
     </div>
-    <button class="cert-gift-btn" id="certGiftBtn" onclick="requestGift()">🎁 수료선물 받기</button>
   </div>
 </div>
 
