@@ -921,7 +921,11 @@ function bootApp(){
     // 새 SW가 제어권을 가져가면 자동 새로고침 (업데이트 즉시 반영)
     var _refreshing=false;
     navigator.serviceWorker.addEventListener('controllerchange',function(){
-      if(!_refreshing){ _refreshing=true; window.location.reload(); }
+      if(!_refreshing){
+        _refreshing=true;
+        toast('🔄 업데이트가 있습니다. 재시작합니다...');
+        setTimeout(function(){ window.location.reload(); }, 1800);
+      }
     });
   }
 }
