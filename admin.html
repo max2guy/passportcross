@@ -149,17 +149,6 @@ body{
 .reject-cancel{padding:9px 16px;background:transparent;border:1px solid rgba(197,165,90,.2);border-radius:var(--radius-sm);color:var(--text-dim);font-size:13px;cursor:pointer;-webkit-appearance:none;appearance:none}
 .reject-confirm{padding:9px 18px;background:transparent;border:1px solid rgba(255,100,100,.4);border-radius:var(--radius-sm);color:#e05555;font-size:13px;font-weight:700;cursor:pointer;-webkit-appearance:none;appearance:none}
 .reject-confirm:active{background:rgba(255,100,100,.08)}
-/* 마스터 관리자 */
-.master-section{padding:16px 16px 20px;display:none;background:rgba(197,165,90,.04);border-bottom:1px solid rgba(197,165,90,.08)}
-.master-section.show{display:block}
-.master-title{font-size:10px;color:var(--gold-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
-.admin-card{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid rgba(197,165,90,.1);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;gap:8px}
-.admin-info{font-size:13px;color:var(--text);min-width:0;flex:1}
-.admin-info span{display:block;font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.btn-reset-pw{padding:6px 10px;background:transparent;border:1px solid rgba(197,165,90,.3);color:var(--gold-dim);border-radius:var(--radius-sm);font-size:11px;cursor:pointer;white-space:nowrap;-webkit-appearance:none;appearance:none}
-.btn-reset-pw:active{border-color:var(--gold);color:var(--gold)}
-.btn-del-admin{padding:6px 10px;background:transparent;border:1px solid rgba(255,100,100,.3);color:#e05555;border-radius:var(--radius-sm);font-size:11px;cursor:pointer;-webkit-appearance:none;appearance:none}
-.admin-actions{display:flex;gap:4px;flex-shrink:0}
 .reset-section{padding:16px 16px 20px;display:none;border-bottom:1px solid rgba(197,165,90,.08)}.reset-section.show{display:block}
 .reset-title{font-size:10px;color:var(--gold-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
 .reset-btns{display:flex;flex-direction:row;gap:8px}
@@ -243,7 +232,6 @@ body{
   .sub-list{padding:0 32px calc(var(--safe-bottom) + 40px);gap:14px}
   .sub-card{padding:20px}
   .sub-photo{max-height:300px}
-  .master-section{padding:20px 32px 24px}
   .reset-section{padding:20px 32px 24px}
   .mission-edit-panel{padding:0 32px 40px}
   .login-box{max-width:440px;padding:44px 40px}
@@ -323,6 +311,7 @@ body{
       <button class="topbar-btn danger" onclick="doLogout()">로그아웃</button>
     </div>
     <div class="topbar-right">
+      <button class="topbar-btn" id="accountsBtn" style="display:none" onclick="location.href='admin-accounts.html'">계정 관리</button>
       <button class="topbar-btn" onclick="toggleCompletions()" id="completionsBtn">완료자</button>
       <button class="topbar-btn" onclick="toggleLockPanel()" id="lockBtn">🔒 잠금</button>
       <button class="topbar-btn" onclick="toggleMissionEdit()" id="missionEditBtn">미션 편집</button>
@@ -331,11 +320,6 @@ body{
   </div>
 
   <div class="main-content">
-    <!-- 마스터 관리자 전용 -->
-    <div class="master-section" id="masterSection">
-      <div class="master-title">계정 관리</div>
-      <div id="adminList"><div class="loading">불러오는 중...</div></div>
-    </div>
     <div class="reset-section" id="resetSection">
       <div class="reset-title">데이터 관리</div>
       <div class="reset-btns">
@@ -434,51 +418,20 @@ auth.onAuthStateChanged(function(user){
     document.getElementById('adminEmail').textContent=user.email;
     startListener();
     if(user.email===MASTER_EMAIL){
-      document.getElementById('masterSection').classList.add('show');
       document.getElementById('resetSection').classList.add('show');
-      loadAdminList();
+      document.getElementById('accountsBtn').style.display='';
     }
   }else{
     localStorage.removeItem('passportCrossAdmin');
     document.getElementById('loginWrap').style.display='flex';
     document.getElementById('appWrap').style.display='none';
-    document.getElementById('masterSection').classList.remove('show');
     document.getElementById('resetSection').classList.remove('show');
+    document.getElementById('accountsBtn').style.display='none';
     if(unsubscribe)unsubscribe();
     // 익명 사용자라면 로그아웃 처리
     if(user && user.isAnonymous){auth.signOut();}
   }
 });
-
-function loadAdminList(){
-  var list=document.getElementById('adminList');
-  db.collection('admins').get().then(function(snap){
-    if(snap.empty){list.innerHTML='<div style="font-size:13px;color:var(--text-dim);padding:8px 0">아직 가입한 관리자가 없습니다</div>';return}
-    list.innerHTML='';
-    snap.forEach(function(doc){
-      var d=doc.data();
-      if(d.email===MASTER_EMAIL)return;
-      var card=document.createElement('div');
-      card.className='admin-card';
-      card.innerHTML='<div class="admin-info">'+d.name+'<span>'+d.email+'</span></div>'
-        +'<div class="admin-actions">'
-        +'<button class="btn-reset-pw" onclick="resetPassword(\''+d.email+'\')">비밀번호 재설정</button>'
-        +'<button class="btn-del-admin" onclick="deleteAdmin(\''+doc.id+'\',\''+d.name+'\')">삭제</button>'
-        +'</div>';
-      list.appendChild(card);
-    });
-    if(list.innerHTML===''){list.innerHTML='<div style="font-size:13px;color:var(--text-dim);padding:8px 0">아직 가입한 관리자가 없습니다</div>'}
-  }).catch(function(e){
-    list.innerHTML='<div style="font-size:12px;color:#e05555;padding:8px 0">오류: '+e.code+' — Firestore 규칙에 admins 컬렉션이 추가됐는지 확인하세요</div>';
-  });
-}
-
-function deleteAdmin(uid,name){
-  if(!confirm('['+name+'] 계정을 삭제하시겠습니까?\n(Firebase Auth 계정은 유지되나 관리자 권한이 제거됩니다)'))return;
-  db.collection('admins').doc(uid).delete().then(function(){
-    loadAdminList();
-  }).catch(function(e){alert('삭제 실패: '+e.message)});
-}
 
 function deleteSubmission(subId,uid,missionIdx){
   if(!confirm('이 제출 내역을 삭제하시겠습니까?'))return;
@@ -530,15 +483,6 @@ function resetAll(){
   Promise.all(subPromises.concat([compPromise,userPromise]))
     .then(function(){alert('전체 초기화 완료')})
     .catch(function(e){alert('오류: '+e.message)});
-}
-
-function resetPassword(email){
-  if(!confirm(email+'\n\n위 계정으로 비밀번호 재설정 메일을 발송하시겠습니까?'))return;
-  auth.sendPasswordResetEmail(email).then(function(){
-    alert('재설정 메일을 발송했습니다.\n'+email);
-  }).catch(function(e){
-    alert('발송 실패: '+e.message);
-  });
 }
 
 function switchTab(tab){
