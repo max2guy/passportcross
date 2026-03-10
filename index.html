@@ -299,7 +299,7 @@ html,body{
   border:1.5px solid rgba(172,18,32,.35);
 }
 .stamp-cross-svg{
-  width:22px;height:22px;
+  width:18px;height:22px;
   color:rgba(172,18,32,.92);
   position:relative;z-index:1;flex-shrink:0;
 }
@@ -604,12 +604,14 @@ html,body{
 </head>
 <body>
 
-<!-- 도장 거친 질감 SVG 필터 -->
+<!-- 도장 잉크 번짐 SVG 필터 -->
 <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
   <defs>
-    <filter id="roughen" x="-10%" y="-10%" width="120%" height="120%">
-      <feTurbulence type="turbulence" baseFrequency="0.055" numOctaves="3" seed="4" result="noise"/>
-      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+    <filter id="roughen" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06 0.07" numOctaves="4" seed="9" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="4.5" xChannelSelector="R" yChannelSelector="G" result="rough"/>
+      <feGaussianBlur stdDeviation="0.55" in="rough" result="bleed"/>
+      <feComposite in="bleed" in2="rough" operator="over"/>
     </filter>
   </defs>
 </svg>
@@ -773,7 +775,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.4.7</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.4.8</div>
       </div>
     </div>
   </div>
@@ -1242,7 +1244,7 @@ function renderStamps(data){
     if(st===2){
       var seal=document.createElement('div');
       seal.className='stamp-seal';
-      seal.innerHTML='<div class="stamp-ring"><svg class="stamp-cross-svg" viewBox="0 0 24 24" fill="currentColor"><rect x="10" y="2" width="4" height="20" rx="1"/><rect x="2" y="8" width="20" height="4" rx="1"/></svg><span>CLEAR</span></div>';
+      seal.innerHTML='<div class="stamp-ring"><svg class="stamp-cross-svg" viewBox="0 0 24 30" fill="currentColor"><rect x="10" y="1" width="4" height="28"/><rect x="3" y="9" width="18" height="4"/></svg><span>CLEAR</span></div>';
       cell.appendChild(seal);
     }
     cell.addEventListener('click',function(){openMissionModal(i)});
