@@ -77,6 +77,17 @@ html,body{
 @keyframes load{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
 
+/* UPDATE OVERLAY */
+#update-overlay{
+  display:none;position:fixed;inset:0;z-index:99999;background:var(--bg);
+  flex-direction:column;align-items:center;justify-content:center;
+}
+#update-overlay.show{display:flex;}
+#update-overlay .u-cross{font-size:48px;color:var(--gold);animation:pulse 1.5s ease-in-out infinite;}
+#update-overlay .u-text{font-family:var(--font-mono);font-size:11px;letter-spacing:5px;color:var(--text-dim);margin:16px 0 24px;}
+#update-overlay .u-bar-wrap{width:160px;height:3px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;}
+#update-overlay .u-bar{height:100%;width:0;background:var(--gold);border-radius:2px;transition:width 1.6s ease;}
+
 /* ONBOARDING */
 #onboarding{
   position:fixed;inset:0;z-index:8888;background:var(--bg);
@@ -514,6 +525,12 @@ html,body{
   <div class="loader"></div>
 </div>
 
+<div id="update-overlay">
+  <div class="u-cross">✝</div>
+  <div class="u-text">UPDATING...</div>
+  <div class="u-bar-wrap"><div class="u-bar"></div></div>
+</div>
+
 <div id="onboarding" class="hide">
   <div class="ob-brand">
     <div class="ob-title">THE CROSS</div>
@@ -923,7 +940,9 @@ function bootApp(){
     navigator.serviceWorker.addEventListener('controllerchange',function(){
       if(!_refreshing){
         _refreshing=true;
-        toast('🔄 업데이트가 있습니다. 재시작합니다...');
+        var ov=document.getElementById('update-overlay');
+        ov.classList.add('show');
+        setTimeout(function(){ ov.querySelector('.u-bar').style.width='100%'; }, 50);
         setTimeout(function(){ window.location.reload(); }, 1800);
       }
     });
