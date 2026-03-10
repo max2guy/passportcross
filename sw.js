@@ -1,4 +1,4 @@
-const CACHE_NAME = 'passport-cross-v56';
+const CACHE_NAME = 'passport-cross-v57';
 const ASSETS = [
   './',
   './index.html',
@@ -27,10 +27,17 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   // 외부 도메인(Firebase, Google API, CDN 등)은 SW 개입 없이 그대로 통과
-  if (url.origin !== self.location.origin) {
+  if (url.origin !== self.location.origin) return;
+
+  // HTML은 Network-First → 항상 최신 HTML + 새 SW 즉시 감지
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match('./index.html'))
+    );
     return;
   }
-  // 로컬 리소스만 캐시 전략 적용
+
+  // JS/CSS/이미지 등 정적 파일은 Cache-First (빠른 로딩)
   e.respondWith(
     caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('./index.html')))
   );

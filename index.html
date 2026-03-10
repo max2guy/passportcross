@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<!-- 브라우저 HTML 캐시 원천 차단 → 항상 최신 sw.js 읽도록 강제 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0d0f14">
@@ -912,7 +916,14 @@ function bootApp(){
       if(data){showApp(data)}else{document.getElementById('onboarding').classList.remove('hide')}
     },1800);
   }
-  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+    // 새 SW가 제어권을 가져가면 자동 새로고침 (업데이트 즉시 반영)
+    var _refreshing=false;
+    navigator.serviceWorker.addEventListener('controllerchange',function(){
+      if(!_refreshing){ _refreshing=true; window.location.reload(); }
+    });
+  }
 }
 
 var obName=document.getElementById('obName');
