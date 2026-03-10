@@ -113,6 +113,40 @@ html,body{
 }
 @keyframes gold-shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
 
+/* UPDATE PROMPT */
+#update-prompt{
+  display:none;position:fixed;inset:0;z-index:99998;
+  background:rgba(0,0,0,0.72);
+  align-items:center;justify-content:center;
+  padding:24px;
+}
+#update-prompt.show{display:flex;}
+#update-prompt .up-box{
+  background:var(--bg2);border:1px solid rgba(197,165,90,0.35);
+  border-radius:18px;padding:32px 28px 24px;
+  width:100%;max-width:320px;text-align:center;
+  box-shadow:0 8px 40px rgba(0,0,0,0.6);
+}
+#update-prompt .up-icon{font-size:36px;color:var(--gold);margin-bottom:14px;}
+#update-prompt .up-title{
+  font-family:var(--font-display);font-size:18px;font-weight:700;
+  color:var(--gold);letter-spacing:2px;margin-bottom:10px;
+}
+#update-prompt .up-text{
+  font-size:14px;color:var(--text-dim);line-height:1.7;margin-bottom:24px;
+}
+#update-prompt .up-btns{display:flex;gap:10px;}
+#update-prompt .up-btns button{
+  flex:1;padding:13px 0;border-radius:10px;border:none;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-body);
+}
+#update-prompt .up-btns .btn-later{
+  background:var(--bg3);color:var(--text-dim);
+}
+#update-prompt .up-btns .btn-update{
+  background:var(--gold);color:var(--bg);
+}
+
 /* ONBOARDING */
 #onboarding{
   position:fixed;inset:0;z-index:8888;background:var(--bg);
@@ -557,6 +591,18 @@ html,body{
   <div class="u-bar-wrap"><div class="u-bar"></div></div>
 </div>
 
+<div id="update-prompt">
+  <div class="up-box">
+    <div class="up-icon">✝</div>
+    <div class="up-title">새 업데이트</div>
+    <div class="up-text">새 버전이 준비되었습니다.<br>지금 업데이트하시겠습니까?</div>
+    <div class="up-btns">
+      <button class="btn-later" onclick="dismissUpdate()">나중에</button>
+      <button class="btn-update" onclick="applyUpdate()">업데이트</button>
+    </div>
+  </div>
+</div>
+
 <div id="onboarding" class="hide">
   <div class="ob-brand">
     <div class="ob-title">THE CROSS</div>
@@ -689,7 +735,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.3.3</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.4</div>
       </div>
     </div>
   </div>
@@ -960,20 +1006,46 @@ function bootApp(){
     },1800);
   }
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('sw.js').catch(function(){});
-    // 새 SW가 제어권을 가져가면 자동 새로고침 (업데이트 즉시 반영)
-    var _refreshing=false;
+    var _swReg=null, _pendingWorker=null, _refreshing=false;
+
+    // controllerchange → 업데이트 오버레이 → 자동 reload
     navigator.serviceWorker.addEventListener('controllerchange',function(){
       if(!_refreshing){
         _refreshing=true;
         var ov=document.getElementById('update-overlay');
         ov.classList.add('show');
-        setTimeout(function(){ ov.querySelector('.u-bar').style.width='100%'; }, 80);
-        setTimeout(function(){ window.location.reload(); }, 3600);
+        setTimeout(function(){ ov.querySelector('.u-bar').style.width='100%'; },80);
+        setTimeout(function(){ window.location.reload(); },3600);
       }
     });
+
+    navigator.serviceWorker.register('sw.js').then(function(reg){
+      _swReg=reg;
+      // 이미 대기 중인 SW 있으면 즉시 팝업
+      if(reg.waiting && navigator.serviceWorker.controller){
+        _pendingWorker=reg.waiting; showUpdatePrompt();
+      }
+      // 새 SW 발견 시
+      reg.addEventListener('updatefound',function(){
+        var nw=reg.installing;
+        nw.addEventListener('statechange',function(){
+          if(nw.state==='installed' && navigator.serviceWorker.controller){
+            _pendingWorker=nw; showUpdatePrompt();
+          }
+        });
+      });
+      // 5분마다 업데이트 체크
+      setInterval(function(){ reg.update(); }, 5*60*1000);
+    }).catch(function(){});
   }
 }
+
+function showUpdatePrompt(){ document.getElementById('update-prompt').classList.add('show'); }
+function applyUpdate(){
+  document.getElementById('update-prompt').classList.remove('show');
+  if(_pendingWorker){ _pendingWorker.postMessage({type:'SKIP_WAITING'}); }
+}
+function dismissUpdate(){ document.getElementById('update-prompt').classList.remove('show'); }
 
 var obName=document.getElementById('obName');
 var obGrade=document.getElementById('obGrade');
