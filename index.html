@@ -747,7 +747,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.4.1</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.4.2</div>
       </div>
     </div>
   </div>
@@ -1046,7 +1046,7 @@ function bootApp(){
         });
       });
       // 5분마다 업데이트 체크
-      setInterval(function(){ reg.update(); }, 5*60*1000);
+      setInterval(function(){ reg.update(); }, 2*60*1000);
     }).catch(function(){});
   }
 }
