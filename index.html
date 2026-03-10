@@ -260,7 +260,9 @@ html,body{
 .passport-card{background:var(--bg2);border:1px solid rgba(197,165,90,.15);border-radius:var(--radius);padding:24px 20px;margin-bottom:16px;position:relative;overflow:hidden}
 .passport-card::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(197,165,90,.08),transparent 70%)}
 .pc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.pc-header h2{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--gold);letter-spacing:2px}
+.pc-header h2{font-family:var(--font-display);font-weight:700;color:var(--gold);letter-spacing:2px;display:flex;flex-direction:column;line-height:1.15}
+.pc-h2-cross{font-size:13px;opacity:.7;letter-spacing:4px}
+.pc-h2-sub{font-size:22px}
 .pc-header .pc-badge{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);background:var(--bg3);padding:4px 10px;border-radius:20px}
 .progress-wrap{margin-bottom:24px}
 .progress-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:6px}
@@ -562,7 +564,8 @@ html,body{
   .stamp-cell .stamp-icon{font-size:46px}
   .stamp-cell .stamp-day{font-size:13px}
   .passport-card{padding:28px 24px}
-  .pc-header h2{font-size:28px}
+  .pc-h2-cross{font-size:15px}
+  .pc-h2-sub{font-size:28px}
   .pc-header .pc-badge{font-size:13px;padding:5px 12px}
   .mission-card{padding:22px 24px}
   .mc-emoji{font-size:52px}
@@ -674,7 +677,7 @@ html,body{
     <div class="tab-page active" id="tabPassport">
       <div class="passport-card">
         <div class="pc-header">
-          <h2>VISA STAMPS</h2>
+          <h2><span class="pc-h2-cross">CROSS</span><span class="pc-h2-sub">VISA STAMPS</span></h2>
           <span class="pc-badge" id="stampCount">0/6</span>
         </div>
         <div class="progress-wrap">
