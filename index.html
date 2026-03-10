@@ -1018,7 +1018,6 @@ function bootApp(){
     },1800);
   }
   if('serviceWorker' in navigator){
-    var _swReg=null, _pendingWorker=null, _refreshing=false;
 
     // controllerchange → 업데이트 오버레이 → 자동 reload
     navigator.serviceWorker.addEventListener('controllerchange',function(){
@@ -1051,6 +1050,9 @@ function bootApp(){
     }).catch(function(){});
   }
 }
+
+// 전역 선언 — bootApp() 안 SW 등록 코드와 applyUpdate() 함수가 공유
+var _swReg=null, _pendingWorker=null, _refreshing=false;
 
 function showUpdatePrompt(){ document.getElementById('update-prompt').classList.add('show'); }
 function applyUpdate(){
