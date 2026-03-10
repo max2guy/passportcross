@@ -103,9 +103,9 @@ body{
 }
 .filter-bar::-webkit-scrollbar{display:none}
 .filter-btn{
-  padding:7px 16px;border-radius:20px;
+  padding:6px 12px;border-radius:20px;
   border:1px solid rgba(197,165,90,.2);background:transparent;
-  color:var(--text-dim);font-size:13px;cursor:pointer;
+  color:var(--text-dim);font-size:12px;cursor:pointer;
   white-space:nowrap;flex-shrink:0;
   transition:all .2s;-webkit-appearance:none;appearance:none;
 }
@@ -352,11 +352,11 @@ body{
     </div>
 
     <div class="filter-bar">
-      <button class="filter-btn active" data-filter="pending" onclick="setFilter('pending',this)">대기중</button>
       <button class="filter-btn" data-filter="all" onclick="setFilter('all',this)">전체</button>
+      <button class="filter-btn active" data-filter="pending" onclick="setFilter('pending',this)">대기중</button>
+      <button class="filter-btn" data-filter="approved" onclick="setFilter('approved',this)">승인완료</button>
       <button class="filter-btn" data-filter="youth" onclick="setFilter('youth',this)">중고등부</button>
       <button class="filter-btn" data-filter="young" onclick="setFilter('young',this)">청년부</button>
-      <button class="filter-btn" data-filter="approved" onclick="setFilter('approved',this)">승인완료</button>
     </div>
 
     <div class="section-title" id="sectionLabel">대기중인 제출</div>
