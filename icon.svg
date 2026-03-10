@@ -1,74 +1,84 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>Concept B — Circle Medallion (원형 메달리온)</title>
   <defs>
-    <!-- 배경 그라디언트 -->
-    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#1e2248"/>
-      <stop offset="100%" stop-color="#13162b"/>
+    <linearGradient id="bgB" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#181c36"/>
+      <stop offset="100%" stop-color="#0c0f22"/>
     </linearGradient>
-    <!-- 금색 그라디언트 -->
-    <linearGradient id="gv" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"   stop-color="#f2e09a"/>
+    <linearGradient id="goldV-B" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#fff0b0"/>
+      <stop offset="25%"  stop-color="#e8c96a"/>
+      <stop offset="60%"  stop-color="#c9a030"/>
+      <stop offset="100%" stop-color="#8a6520"/>
+    </linearGradient>
+    <linearGradient id="goldH-B" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#8a6520"/>
       <stop offset="35%"  stop-color="#d4a84c"/>
-      <stop offset="100%" stop-color="#9e7e30"/>
+      <stop offset="50%"  stop-color="#f0da80"/>
+      <stop offset="65%"  stop-color="#d4a84c"/>
+      <stop offset="100%" stop-color="#8a6520"/>
     </linearGradient>
-    <linearGradient id="gh" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%"   stop-color="#9e7e30"/>
+    <!-- 원형 테두리 금색 -->
+    <linearGradient id="ringGold-B" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#f8eaa0"/>
       <stop offset="40%"  stop-color="#d4a84c"/>
-      <stop offset="60%"  stop-color="#d4a84c"/>
-      <stop offset="100%" stop-color="#9e7e30"/>
+      <stop offset="100%" stop-color="#8a6520"/>
     </linearGradient>
-    <!-- 중앙 글로우 -->
-    <radialGradient id="glow" cx="256" cy="290" r="200" gradientUnits="userSpaceOnUse">
-      <stop offset="0%"   stop-color="#c9a84c" stop-opacity="0.14"/>
+    <radialGradient id="innerGlow-B" cx="256" cy="256" r="190" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#c9a84c" stop-opacity="0.18"/>
+      <stop offset="70%"  stop-color="#c9a84c" stop-opacity="0.04"/>
       <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
     </radialGradient>
-    <!-- 십자가 글로우 필터 -->
-    <filter id="cf" x="-30%" y="-10%" width="160%" height="120%">
-      <feGaussianBlur stdDeviation="10" result="b"/>
+    <filter id="crossGlow-B" x="-50%" y="-20%" width="200%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="ringGlow-B" x="-5%" y="-5%" width="110%" height="110%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
       <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
 
   <!-- 배경 -->
-  <rect width="512" height="512" rx="90" fill="url(#bg)"/>
+  <rect width="512" height="512" fill="url(#bgB)"/>
 
-  <!-- 중앙 글로우 -->
-  <rect width="512" height="512" rx="90" fill="url(#glow)"/>
+  <!-- 원형 글로우 배경 -->
+  <circle cx="256" cy="256" r="220" fill="url(#innerGlow-B)"/>
 
-  <!-- 외부 프레임 -->
-  <rect x="17" y="17" width="478" height="478" rx="76"
-        fill="none" stroke="#c9a84c" stroke-width="2.8" opacity="0.7"/>
-  <!-- 내부 프레임 -->
-  <rect x="29" y="29" width="454" height="454" rx="65"
-        fill="none" stroke="#c9a84c" stroke-width="1.2" opacity="0.3"/>
+  <!-- ── 이중 원형 메달리온 테두리 ── -->
+  <!-- 외부 원 (굵고 빛나는) -->
+  <circle cx="256" cy="256" r="218"
+          fill="none" stroke="url(#ringGold-B)" stroke-width="5"
+          filter="url(#ringGlow-B)" opacity="0.95"/>
+  <!-- 내부 원 (얇고 은은한) -->
+  <circle cx="256" cy="256" r="207"
+          fill="none" stroke="#c9a84c" stroke-width="1.2" opacity="0.4"/>
+  <!-- 최외부 원 (매우 얇) -->
+  <circle cx="256" cy="256" r="228"
+          fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.25"/>
+
+  <!-- 12시/3시/6시/9시 방향 원형 장식 점 -->
+  <circle cx="256" cy="31" r="4" fill="#c9a84c" opacity="0.7"/>
+  <circle cx="481" cy="256" r="4" fill="#c9a84c" opacity="0.7"/>
+  <circle cx="256" cy="481" r="4" fill="#c9a84c" opacity="0.7"/>
+  <circle cx="31" cy="256" r="4" fill="#c9a84c" opacity="0.7"/>
+  <!-- 45도 방향 소형 점 -->
+  <circle cx="410" cy="102" r="2.5" fill="#c9a84c" opacity="0.45"/>
+  <circle cx="410" cy="410" r="2.5" fill="#c9a84c" opacity="0.45"/>
+  <circle cx="102" cy="410" r="2.5" fill="#c9a84c" opacity="0.45"/>
+  <circle cx="102" cy="102" r="2.5" fill="#c9a84c" opacity="0.45"/>
 
   <!-- 십자가 글로우 레이어 -->
-  <rect x="234" y="68" width="44" height="376" rx="8"
-        fill="#c9a84c" opacity="0.18" filter="url(#cf)"/>
-  <rect x="114" y="158" width="284" height="44" rx="8"
-        fill="#c9a84c" opacity="0.14" filter="url(#cf)"/>
+  <rect x="232" y="88" width="48" height="336" rx="10"
+        fill="#d4a030" opacity="0.22" filter="url(#crossGlow-B)"/>
+  <rect x="112" y="162" width="288" height="48" rx="10"
+        fill="#d4a030" opacity="0.18" filter="url(#crossGlow-B)"/>
 
-  <!-- 십자가 본체 — 세로 -->
-  <rect x="234" y="68" width="44" height="376" rx="7" fill="url(#gv)"/>
-  <!-- 십자가 본체 — 가로 -->
-  <rect x="114" y="158" width="284" height="44" rx="7" fill="url(#gh)"/>
+  <!-- 십자가 본체 (원 안에 맞게 조정) -->
+  <rect x="232" y="88" width="48" height="336" rx="8" fill="url(#goldV-B)"/>
+  <rect x="112" y="162" width="288" height="48" rx="8" fill="url(#goldH-B)"/>
 
-  <!-- 코너 브래킷 장식 -->
-  <g stroke="#c9a84c" stroke-width="3" stroke-linecap="round"
-     fill="none" opacity="0.55">
-    <!-- 좌상 -->
-    <path d="M52,52 v30 M52,52 h30"/>
-    <!-- 우상 -->
-    <path d="M460,52 v30 M460,52 h-30"/>
-    <!-- 좌하 -->
-    <path d="M52,460 v-30 M52,460 h30"/>
-    <!-- 우하 -->
-    <path d="M460,460 v-30 M460,460 h-30"/>
-  </g>
-
-  <!-- 가로 막대 위아래 얇은 장식선 -->
-  <line x1="114" y1="157" x2="398" y2="157"
-        stroke="#c9a84c" stroke-width="0.8" opacity="0.35"/>
-  <line x1="114" y1="203" x2="398" y2="203"
-        stroke="#c9a84c" stroke-width="0.8" opacity="0.35"/>
+  <!-- 가로선 얇은 장식 -->
+  <line x1="112" y1="161" x2="400" y2="161" stroke="#f2e09a" stroke-width="0.7" opacity="0.4"/>
+  <line x1="112" y1="211" x2="400" y2="211" stroke="#f2e09a" stroke-width="0.7" opacity="0.4"/>
 </svg>
