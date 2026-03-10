@@ -284,23 +284,29 @@ html,body{
   display:flex;align-items:center;justify-content:center;
   pointer-events:none;z-index:2;
   transform:rotate(-14deg);
+  filter:url(#roughen);
 }
 .stamp-ring{
-  width:66px;height:66px;border-radius:50%;
-  border:5px solid rgba(172,18,32,.9);
-  background:rgba(172,18,32,.04);
-  display:flex;align-items:center;justify-content:center;
-  position:relative;
+  width:70px;height:70px;border-radius:50%;
+  border:4px solid rgba(172,18,32,.92);
+  background:rgba(172,18,32,.12);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;gap:3px;
 }
 .stamp-ring::before{
   content:'';position:absolute;inset:5px;
   border-radius:50%;
-  border:1.5px solid rgba(172,18,32,.4);
+  border:1.5px solid rgba(172,18,32,.35);
+}
+.stamp-cross-svg{
+  width:22px;height:22px;
+  color:rgba(172,18,32,.92);
+  position:relative;z-index:1;flex-shrink:0;
 }
 .stamp-ring span{
-  font-family:var(--font-mono);font-size:11px;font-weight:700;
-  color:rgba(172,18,32,.9);letter-spacing:2px;
-  text-transform:uppercase;position:relative;z-index:1;
+  font-family:var(--font-mono);font-size:9px;font-weight:700;
+  color:rgba(172,18,32,.92);letter-spacing:2.5px;
+  text-transform:uppercase;position:relative;z-index:1;line-height:1;
 }
 .pastoral{background:var(--bg2);border-left:3px solid var(--wine);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:16px 18px;margin-top:8px}
 .pastoral h4{font-family:var(--font-serif);font-size:13px;color:var(--gold);margin-bottom:8px;font-weight:400}
@@ -598,6 +604,16 @@ html,body{
 </head>
 <body>
 
+<!-- 도장 거친 질감 SVG 필터 -->
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <defs>
+    <filter id="roughen" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="turbulence" baseFrequency="0.055" numOctaves="3" seed="4" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
 <div id="splash">
   <div class="logo">
     <span class="sub">THE CROSS</span>
@@ -757,7 +773,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.4.6</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.4.7</div>
       </div>
     </div>
   </div>
@@ -1226,7 +1242,7 @@ function renderStamps(data){
     if(st===2){
       var seal=document.createElement('div');
       seal.className='stamp-seal';
-      seal.innerHTML='<div class="stamp-ring"><span>Clear</span></div>';
+      seal.innerHTML='<div class="stamp-ring"><svg class="stamp-cross-svg" viewBox="0 0 24 24" fill="currentColor"><rect x="10" y="2" width="4" height="20" rx="1"/><rect x="2" y="8" width="20" height="4" rx="1"/></svg><span>CLEAR</span></div>';
       cell.appendChild(seal);
     }
     cell.addEventListener('click',function(){openMissionModal(i)});
