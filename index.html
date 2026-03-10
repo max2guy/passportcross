@@ -79,14 +79,39 @@ html,body{
 
 /* UPDATE OVERLAY */
 #update-overlay{
-  display:none;position:fixed;inset:0;z-index:99999;background:var(--bg);
-  flex-direction:column;align-items:center;justify-content:center;
+  display:none;position:fixed;inset:0;z-index:99999;
+  background:var(--bg);
+  flex-direction:column;align-items:center;justify-content:center;gap:0;
 }
 #update-overlay.show{display:flex;}
-#update-overlay .u-cross{font-size:48px;color:var(--gold);animation:pulse 1.5s ease-in-out infinite;}
-#update-overlay .u-text{font-family:var(--font-mono);font-size:11px;letter-spacing:5px;color:var(--text-dim);margin:16px 0 24px;}
-#update-overlay .u-bar-wrap{width:160px;height:3px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;}
-#update-overlay .u-bar{height:100%;width:0;background:var(--gold);border-radius:2px;transition:width 1.6s ease;}
+#update-overlay .u-cross{
+  font-size:64px;color:var(--gold);
+  animation:pulse 1.2s ease-in-out infinite;
+  margin-bottom:28px;
+}
+#update-overlay .u-title{
+  font-family:var(--font-display);font-size:20px;font-weight:700;
+  color:var(--gold);letter-spacing:3px;margin-bottom:10px;
+}
+#update-overlay .u-text{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:4px;
+  color:var(--text-dim);margin-bottom:36px;
+}
+#update-overlay .u-bar-wrap{
+  width:240px;height:6px;
+  background:rgba(255,255,255,0.08);
+  border-radius:3px;overflow:hidden;
+  box-shadow:0 0 12px rgba(197,165,90,0.15);
+}
+#update-overlay .u-bar{
+  height:100%;width:0;
+  background:linear-gradient(90deg,var(--gold),#f2e09a,var(--gold));
+  background-size:200% 100%;
+  border-radius:3px;
+  transition:width 3.2s cubic-bezier(0.4,0,0.2,1);
+  animation:gold-shimmer 1.5s linear infinite;
+}
+@keyframes gold-shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
 
 /* ONBOARDING */
 #onboarding{
@@ -527,7 +552,8 @@ html,body{
 
 <div id="update-overlay">
   <div class="u-cross">✝</div>
-  <div class="u-text">UPDATING...</div>
+  <div class="u-title">업데이트 중</div>
+  <div class="u-text">새 버전을 설치하고 있습니다...</div>
   <div class="u-bar-wrap"><div class="u-bar"></div></div>
 </div>
 
@@ -663,7 +689,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.3</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.3.1</div>
       </div>
     </div>
   </div>
@@ -942,8 +968,8 @@ function bootApp(){
         _refreshing=true;
         var ov=document.getElementById('update-overlay');
         ov.classList.add('show');
-        setTimeout(function(){ ov.querySelector('.u-bar').style.width='100%'; }, 50);
-        setTimeout(function(){ window.location.reload(); }, 1800);
+        setTimeout(function(){ ov.querySelector('.u-bar').style.width='100%'; }, 80);
+        setTimeout(function(){ window.location.reload(); }, 3600);
       }
     });
   }
