@@ -1387,11 +1387,34 @@ function renderScreenGrid(){
   });
 }
 
+// ── 이미지 저장 공통 함수 ──
+// iOS/iPadOS: Web Share API → 공유 시트 → "이미지 저장" → 사진 앱
+// 그 외: <a download> 방식
+function saveCanvasAsPng(canvas, filename, successMsg) {
+  if(navigator.share){
+    canvas.toBlob(function(blob){
+      var file=new File([blob],filename,{type:'image/png'});
+      navigator.share({files:[file]})
+        .then(function(){ toast(successMsg); })
+        .catch(function(e){ if(e.name!=='AbortError') fallbackDownload(canvas,filename,successMsg); });
+    },'image/png');
+  } else {
+    fallbackDownload(canvas,filename,successMsg);
+  }
+}
+function fallbackDownload(canvas, filename, successMsg) {
+  try{
+    var link=document.createElement('a');link.download=filename;
+    link.href=canvas.toDataURL('image/png');
+    document.body.appendChild(link);link.click();document.body.removeChild(link);
+    toast(successMsg);
+  } catch(e){ toast('이미지를 길게 눌러 저장하세요'); }
+}
+
 function downloadWallpaper(idx){
   var w=WALLPAPERS[idx];var c=document.createElement('canvas');c.width=1080;c.height=1920;
   drawWallpaper(c,w,idx);
-  try{var link=document.createElement('a');link.download='passport_cross_'+w.day+'.png';link.href=c.toDataURL('image/png');document.body.appendChild(link);link.click();document.body.removeChild(link);toast('배경화면이 저장되었습니다')}
-  catch(e){toast('이미지를 길게 눌러 저장하세요')}
+  saveCanvasAsPng(c,'passport_cross_'+w.day+'.png','배경화면이 저장되었습니다');
 }
 
 document.getElementById('badgeCard').addEventListener('click',function(){
@@ -1400,8 +1423,7 @@ document.getElementById('badgeCard').addEventListener('click',function(){
   ctx.fillStyle='rgba(197,165,90,0.15)';ctx.fillRect(236,80,40,352);ctx.fillRect(136,200,240,40);
   ctx.fillStyle='#e8e4dc';ctx.font='bold 48px sans-serif';ctx.textAlign='center';ctx.fillText('미디어',256,220);ctx.fillText('금식 중',256,280);
   ctx.fillStyle='rgba(197,165,90,0.7)';ctx.font='24px sans-serif';ctx.fillText('THE CROSS PASSPORT',256,380);
-  try{var link=document.createElement('a');link.download='media_fast_badge.png';link.href=c.toDataURL('image/png');document.body.appendChild(link);link.click();document.body.removeChild(link);toast('배지가 저장되었습니다')}
-  catch(e){toast('이미지를 길게 눌러 저장하세요')}
+  saveCanvasAsPng(c,'media_fast_badge.png','배지가 저장되었습니다');
 });
 
 function showCertificate(){
@@ -1505,8 +1527,7 @@ function saveCert(){
     ctx.beginPath();ctx.moveTo(220,textY+372);ctx.lineTo(860,textY+372);ctx.stroke();
     ctx.fillStyle='rgba(201,168,76,0.7)';ctx.font='28px monospace';ctx.fillText('2026. 4. 5. 부활주일',540,textY+420);
     ctx.fillStyle='rgba(142,152,184,0.55)';ctx.font='26px sans-serif';ctx.fillText('연천장로교회 '+getGroupLabel(data.group),540,textY+472);
-    try{var link=document.createElement('a');link.download='passport_cross_cert_'+data.name+'.png';link.href=c.toDataURL('image/png');document.body.appendChild(link);link.click();document.body.removeChild(link);toast('수료증이 저장되었습니다')}
-    catch(e){toast('이미지를 길게 눌러 저장하세요')}
+    saveCanvasAsPng(c,'passport_cross_cert_'+data.name+'.png','수료증이 저장되었습니다');
   }
   if(data.profilePhoto){
     var img=new Image();img.onload=function(){doSave(img)};img.src=data.profilePhoto;
