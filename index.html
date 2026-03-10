@@ -84,11 +84,23 @@ html,body{
   flex-direction:column;align-items:center;justify-content:center;gap:0;
 }
 #update-overlay.show{display:flex;}
-#update-overlay .u-cross{
-  font-size:64px;color:var(--gold);
-  animation:pulse 1.2s ease-in-out infinite;
-  margin-bottom:28px;
+#update-overlay .u-gears{
+  display:flex;align-items:flex-end;gap:2px;margin-bottom:28px;
+  line-height:1;
 }
+#update-overlay .u-gears .g1{
+  font-size:64px;color:var(--gold);
+  display:inline-block;
+  animation:gear-cw 2.5s linear infinite;
+}
+#update-overlay .u-gears .g2{
+  font-size:38px;color:var(--gold);opacity:0.75;
+  display:inline-block;
+  animation:gear-ccw 1.5s linear infinite;
+  margin-bottom:4px;
+}
+@keyframes gear-cw  {from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes gear-ccw {from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
 #update-overlay .u-title{
   font-family:var(--font-display);font-size:20px;font-weight:700;
   color:var(--gold);letter-spacing:3px;margin-bottom:10px;
@@ -585,7 +597,7 @@ html,body{
 </div>
 
 <div id="update-overlay">
-  <div class="u-cross">✝</div>
+  <div class="u-gears"><span class="g1">⚙</span><span class="g2">⚙</span></div>
   <div class="u-title">업데이트 중</div>
   <div class="u-text">새 버전을 설치하고 있습니다...</div>
   <div class="u-bar-wrap"><div class="u-bar"></div></div>
@@ -735,7 +747,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.4</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.4.1</div>
       </div>
     </div>
   </div>
