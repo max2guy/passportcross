@@ -1748,7 +1748,7 @@ function saveName(){
 function confirmReset(){if(confirm('모든 데이터가 삭제됩니다. 초기화하시겠습니까?')){if(unsubscribeFirestore)unsubscribeFirestore();localStorage.removeItem('passportCross');localStorage.removeItem('passportCrossUID');location.reload()}}
 
 function forceRefresh(){
-  toast('캐시를 지우고 새로고침합니다...');
+  toast('캐시를 지우고 새로고침합니다');
   if('serviceWorker' in navigator){
     navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister();});});
   }
