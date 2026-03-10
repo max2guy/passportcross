@@ -1403,10 +1403,12 @@ function renderScreenGrid(){
 }
 
 // ── 이미지 저장 공통 함수 ──
-// iOS/iPadOS: Web Share API → 공유 시트 → "이미지 저장" → 사진 앱
-// 그 외: <a download> 방식
+// iPhone/iPad(iPadOS 13+ 포함): Web Share API → 공유 시트 → "이미지 저장" → 사진 앱
+// Android/PC: <a download> 직접 저장
+var _isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+               (/Mac/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 function saveCanvasAsPng(canvas, filename, successMsg) {
-  if(navigator.share){
+  if(_isApple && navigator.share){
     canvas.toBlob(function(blob){
       var file=new File([blob],filename,{type:'image/png'});
       navigator.share({files:[file]})
