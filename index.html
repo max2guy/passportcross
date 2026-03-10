@@ -754,7 +754,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.4.3</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.4.4</div>
       </div>
     </div>
   </div>
@@ -1060,6 +1060,18 @@ function bootApp(){
 
 // 전역 선언 — bootApp() 안 SW 등록 코드와 applyUpdate() 함수가 공유
 var _swReg=null, _pendingWorker=null, _refreshing=false;
+// 미션 잠금 오버라이드 (관리자 설정): 0=자동, 1=강제열림, -1=강제잠금
+var _missionOverrides=[0,0,0,0,0,0];
+// Firestore missionData/config 실시간 구독
+(function(){
+  db.collection('missionData').doc('config').onSnapshot(function(doc){
+    if(doc.exists && Array.isArray(doc.data().overrides)){
+      _missionOverrides=doc.data().overrides;
+    } else {
+      _missionOverrides=[0,0,0,0,0,0];
+    }
+  },function(){});
+})();
 
 function showUpdatePrompt(){ document.getElementById('update-prompt').classList.add('show'); }
 function applyUpdate(){
@@ -1264,13 +1276,19 @@ function openMissionModal(idx){
     rejectTxt.textContent=reason;rejectBox.style.display='block';
     btn.textContent='다시 제출하기';btn.className='btn-submit-mission';btn.disabled=false;textArea.disabled=false;
   }
-  else if(!isMissionAvailable(m.date)){
-    var dp=m.date.split('/');
-    btn.textContent='🔒 '+dp[0]+'월 '+dp[1]+'일에 열립니다';
-    btn.className='btn-submit-mission done-btn';btn.disabled=true;
-    textArea.disabled=true;document.getElementById('verifyFile').disabled=true;
+  else{
+    var ov=_missionOverrides[idx]||0;
+    var forceLocked=ov===-1;
+    var forceOpen=ov===1;
+    if(forceLocked || (!forceOpen && !isMissionAvailable(m.date))){
+      var dp=m.date.split('/');
+      btn.textContent=forceLocked?'🔒 미션이 잠겨 있습니다':'🔒 '+dp[0]+'월 '+dp[1]+'일에 열립니다';
+      btn.className='btn-submit-mission done-btn';btn.disabled=true;
+      textArea.disabled=true;document.getElementById('verifyFile').disabled=true;
+    } else {
+      btn.textContent='실천 완료 제출하기';btn.className='btn-submit-mission';btn.disabled=false;textArea.disabled=false;document.getElementById('verifyFile').disabled=false;
+    }
   }
-  else{btn.textContent='실천 완료 제출하기';btn.className='btn-submit-mission';btn.disabled=false;textArea.disabled=false;document.getElementById('verifyFile').disabled=false}
   if(data.photos[idx]){preview.src=data.photos[idx];preview.style.display='block'}
   document.getElementById('missionModal').classList.add('show');
   pushOverlay();

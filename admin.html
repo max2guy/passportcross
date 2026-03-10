@@ -186,6 +186,26 @@ body{
 .btn-save-mission:active{background:var(--gold-dim)}
 .me-saved{font-size:12px;color:#3a8a50;margin-left:10px;display:none}
 
+/* 잠금 패널 */
+.lock-panel{display:none;padding:16px 16px 32px}
+.lock-panel.show{display:block}
+.lock-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-top:8px;margin-bottom:12px}
+.lock-panel-title{font-size:10px;color:var(--gold-dim);letter-spacing:1.5px;text-transform:uppercase}
+.lock-all-btns{display:flex;gap:6px}
+.btn-lock-all{padding:7px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;-webkit-appearance:none;appearance:none}
+.btn-lock-all.do-lock{background:transparent;border:1px solid rgba(224,85,85,.4);color:#e05555}
+.btn-lock-all.do-unlock{background:transparent;border:1px solid rgba(42,107,58,.4);color:#3a8a50}
+.btn-lock-all:active{opacity:.6}
+.lock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(min-width:768px){.lock-grid{grid-template-columns:repeat(6,1fr)}}
+.lock-cell{background:var(--bg2);border:1px solid rgba(197,165,90,.12);border-radius:var(--radius);padding:14px 8px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;user-select:none;-webkit-tap-highlight-color:transparent}
+.lock-cell.locked{border-color:rgba(224,85,85,.45);background:rgba(224,85,85,.05)}
+.lock-cell .lc-day{font-size:17px;font-weight:700;color:var(--gold);margin-bottom:6px}
+.lock-cell .lc-icon{font-size:24px;line-height:1;margin-bottom:6px}
+.lock-cell .lc-status{font-size:11px;font-weight:700}
+.lock-cell.locked .lc-status{color:#e05555}
+.lock-cell:not(.locked) .lc-status{color:#3a8a50}
+
 /* 완료자 패널 */
 .completions-panel{display:none;padding:0 16px calc(var(--safe-bottom)+40px)}
 .completions-panel.show{display:block}
@@ -295,6 +315,7 @@ body{
     </div>
     <div class="topbar-right">
       <button class="topbar-btn" onclick="toggleCompletions()" id="completionsBtn">완료자</button>
+      <button class="topbar-btn" onclick="toggleLockPanel()" id="lockBtn">🔒 잠금</button>
       <button class="topbar-btn" onclick="toggleMissionEdit()" id="missionEditBtn">미션 편집</button>
       <button class="topbar-btn" onclick="location.href='index.html'">앱 전환</button>
       <button class="topbar-btn danger" onclick="doLogout()">로그아웃</button>
@@ -332,6 +353,22 @@ body{
 
     <div class="section-title" id="sectionLabel">대기중인 제출</div>
     <div class="sub-list" id="subList"><div class="loading">불러오는 중...</div></div>
+
+    <!-- 잠금 패널 -->
+    <div class="lock-panel" id="lockPanel">
+      <div class="lock-top">
+        <div class="lock-panel-title">미션 잠금 관리</div>
+        <div class="lock-all-btns">
+          <button class="btn-lock-all do-lock" onclick="setAllLocks(-1)">전체 잠금</button>
+          <button class="btn-lock-all do-unlock" onclick="setAllLocks(1)">전체 열기</button>
+          <button class="btn-lock-all" style="border:1px solid rgba(197,165,90,.3);color:var(--gold-dim)" onclick="setAllLocks(0)">전체 자동</button>
+        </div>
+      </div>
+      <div class="lock-grid" id="lockGrid"></div>
+      <div style="margin-top:14px;font-size:11px;color:var(--text-dim);line-height:1.6">
+        ⚙ 자동 — 날짜 기준 자동 오픈 &nbsp;|&nbsp; 🔓 열림 — 날짜 무관 강제 오픈 &nbsp;|&nbsp; 🔒 잠금 — 날짜 무관 강제 잠금
+      </div>
+    </div>
 
     <!-- 완료자 패널 -->
     <div class="completions-panel" id="completionsPanel">
@@ -641,6 +678,83 @@ var DEFAULT_MISSIONS_YOUNG=[
   {day:'토',date:'4/4',name:'💌 부활 초청장',emoji:'💌',content:'교회에 오지 않는 친구·동료에게 부활주일 예배 초청 메시지 보내기. 진심을 담아 복음을 전합니다.',howto:'📸 보낸 초청 메시지 캡처 업로드',verifyType:'photo'}
 ];
 var editableMissions={youth:[],young:[]};
+
+// ===== 미션 잠금 =====
+var lockPanelVisible=false;
+var _overrides=[0,0,0,0,0,0]; // 0=자동, 1=강제열림, -1=강제잠금
+var LOCK_DAYS=['월','화','수','목','금','토'];
+
+function toggleLockPanel(){
+  lockPanelVisible=!lockPanelVisible;
+  document.getElementById('lockPanel').classList.toggle('show',lockPanelVisible);
+  var btn=document.getElementById('lockBtn');
+  btn.style.borderColor=lockPanelVisible?'var(--gold)':'';
+  btn.style.color=lockPanelVisible?'var(--gold)':'';
+  if(lockPanelVisible){
+    // 다른 패널 닫기
+    missionEditVisible=false;
+    document.getElementById('missionEditPanel').classList.remove('show');
+    document.getElementById('missionEditBtn').textContent='미션 편집';
+    completionsVisible=false;
+    document.getElementById('completionsPanel').classList.remove('show');
+    document.getElementById('completionsBtn').style.borderColor='';
+    document.getElementById('completionsBtn').style.color='';
+    if(unsubCompletions){unsubCompletions();unsubCompletions=null;}
+    document.querySelector('.sub-list').style.display='none';
+    document.querySelector('.filter-bar').style.display='none';
+    document.querySelector('.section-title').style.display='none';
+    loadLockPanel();
+  } else {
+    document.querySelector('.sub-list').style.display='';
+    document.querySelector('.filter-bar').style.display='';
+    document.querySelector('.section-title').style.display='';
+  }
+}
+
+function loadLockPanel(){
+  db.collection('missionData').doc('config').get().then(function(doc){
+    if(doc.exists && Array.isArray(doc.data().overrides)){
+      _overrides=doc.data().overrides;
+    } else {
+      _overrides=[0,0,0,0,0,0];
+    }
+    renderLockGrid();
+  }).catch(function(){renderLockGrid();});
+}
+
+function renderLockGrid(){
+  var grid=document.getElementById('lockGrid');
+  grid.innerHTML='';
+  LOCK_DAYS.forEach(function(day,i){
+    var v=_overrides[i]||0;
+    var cell=document.createElement('div');
+    var icon=v===1?'🔓':v===-1?'🔒':'⚙';
+    var label=v===1?'열림':v===-1?'잠금':'자동';
+    var cls='lock-cell'+(v===-1?' locked':'');
+    cell.className=cls;
+    cell.innerHTML='<div class="lc-day">'+day+'</div><div class="lc-icon">'+icon+'</div><div class="lc-status">'+label+'</div>';
+    cell.onclick=function(){cycleLock(i);};
+    grid.appendChild(cell);
+  });
+}
+
+function cycleLock(i){
+  // 0(자동) → 1(열림) → -1(잠금) → 0
+  var cur=_overrides[i]||0;
+  _overrides[i]=cur===0?1:cur===1?-1:0;
+  saveLocks();
+}
+
+function setAllLocks(v){
+  _overrides=[v,v,v,v,v,v];
+  saveLocks();
+}
+
+function saveLocks(){
+  db.collection('missionData').doc('config').set({overrides:_overrides},{merge:true})
+    .then(function(){renderLockGrid();})
+    .catch(function(e){alert('저장 실패: '+e.message);});
+}
 
 var completionsVisible=false;
 var unsubCompletions=null;
