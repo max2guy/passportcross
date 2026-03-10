@@ -1334,9 +1334,10 @@ function submitMission(){
   var idx=currentMissionIdx;if(idx<0)return;
   var data=getData();if(!data)return;
   var missions=getMissions(data.group);var m=missions[idx];
-  if(!isMissionAvailable(m.date)){
+  var ov=_missionOverrides[idx]||0;
+  if(ov===-1 || (ov===0 && !isMissionAvailable(m.date))){
     var dp=m.date.split('/');
-    toast('이 미션은 '+dp[0]+'월 '+dp[1]+'일에 열립니다');
+    toast(ov===-1?'이 미션은 잠겨 있습니다':'이 미션은 '+dp[0]+'월 '+dp[1]+'일에 열립니다');
     return;
   }
   var text=document.getElementById('verifyText').value.trim();
