@@ -162,8 +162,8 @@ body{
 .admin-actions{display:flex;gap:4px;flex-shrink:0}
 .reset-section{padding:16px 16px 20px;display:none;border-bottom:1px solid rgba(197,165,90,.08)}.reset-section.show{display:block}
 .reset-title{font-size:10px;color:var(--gold-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
-.reset-btns{display:flex;flex-direction:column;gap:8px}
-.btn-danger{padding:13px 16px;background:transparent;border:1px solid rgba(255,100,100,.3);color:#e05555;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;text-align:left;word-break:keep-all;line-height:1.5;-webkit-appearance:none;appearance:none}
+.reset-btns{display:flex;flex-direction:row;gap:8px}
+.btn-danger{flex:1;padding:11px 10px;background:transparent;border:1px solid rgba(255,100,100,.3);color:#e05555;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;text-align:center;word-break:keep-all;line-height:1.5;-webkit-appearance:none;appearance:none}
 .btn-danger:active{background:rgba(255,100,100,.08)}
 /* 미션 편집 */
 .mission-edit-panel{display:none;padding:0 16px 32px}
@@ -339,8 +339,8 @@ body{
     <div class="reset-section" id="resetSection">
       <div class="reset-title">데이터 관리</div>
       <div class="reset-btns">
-        <button class="btn-danger" onclick="resetApproved()">승인 내역 일괄 삭제<br><small style="opacity:.7;font-size:11px">승인된 제출만 삭제하고 미션 상태 초기화</small></button>
-        <button class="btn-danger" onclick="resetAll()">전체 미션 리셋<br><small style="opacity:.7;font-size:11px">모든 제출 삭제 + 전 학생 미션 초기화</small></button>
+        <button class="btn-danger" onclick="resetApproved()">승인 내역 삭제<br><small style="opacity:.6;font-size:10px">승인 제출 삭제 + 미션 초기화</small></button>
+        <button class="btn-danger" onclick="resetAll()">전체 미션 리셋<br><small style="opacity:.6;font-size:10px">전체 삭제 + 학생 초기화</small></button>
       </div>
     </div>
 
