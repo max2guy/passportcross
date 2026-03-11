@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE CROSS PASSPORT — 교사·임원 안내서</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f1a;
+  --bg2:#13162a;
+  --bg3:#1c2038;
+  --bg4:#242848;
+  --gold:#c9a84c;
+  --gold-bright:#e8d282;
+  --gold-dim:#9e7e38;
+  --text:#ede9de;
+  --text-dim:#8e98b8;
+  --text-muted:#4a5470;
+  --green:#3a8a50;
+  --green-bg:rgba(58,138,80,0.12);
+  --red:#e05555;
+  --red-bg:rgba(224,85,85,0.10);
+  --blue:#4a80c8;
+  --blue-bg:rgba(74,128,200,0.10);
+  --radius:14px;
+  --radius-sm:8px;
+}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  font-size:15px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── 헤더 ── */
+.hero{
+  background:linear-gradient(160deg,#141830 0%,#0d0f1a 60%,#080a14 100%);
+  border-bottom:1px solid rgba(201,168,76,.15);
+  padding:64px 24px 48px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 600px 300px at 50% 120%, rgba(201,168,76,.08), transparent);
+  pointer-events:none;
+}
+.hero-eyebrow{
+  font-size:11px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold-dim);margin-bottom:16px;
+}
+.hero h1{
+  font-size:clamp(28px,5vw,48px);
+  font-weight:900;
+  color:var(--gold);
+  letter-spacing:3px;
+  line-height:1.2;
+  margin-bottom:8px;
+}
+.hero-sub{
+  font-size:clamp(14px,2.5vw,18px);
+  color:var(--text-dim);
+  margin-bottom:24px;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(201,168,76,.1);
+  border:1px solid rgba(201,168,76,.25);
+  border-radius:100px;
+  padding:8px 20px;
+  font-size:13px;color:var(--gold-bright);
+}
+
+/* ── 레이아웃 ── */
+.container{
+  max-width:860px;
+  margin:0 auto;
+  padding:0 20px 80px;
+}
+
+/* ── 섹션 ── */
+.section{
+  margin-top:56px;
+}
+.section-label{
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold-dim);margin-bottom:8px;
+}
+.section h2{
+  font-size:22px;font-weight:700;color:var(--gold-bright);
+  margin-bottom:20px;padding-bottom:12px;
+  border-bottom:1px solid rgba(201,168,76,.15);
+}
+
+/* ── 카드 ── */
+.card{
+  background:var(--bg2);
+  border:1px solid rgba(201,168,76,.12);
+  border-radius:var(--radius);
+  padding:24px;
+  margin-bottom:16px;
+}
+.card.highlight{
+  border-color:rgba(201,168,76,.3);
+  background:linear-gradient(135deg,var(--bg3),var(--bg2));
+}
+.card h3{
+  font-size:16px;font-weight:700;color:var(--gold);
+  margin-bottom:10px;
+}
+.card p{margin-bottom:8px;color:var(--text);line-height:1.8;}
+.card p:last-child{margin-bottom:0}
+
+/* ── 미션 테이블 ── */
+.mission-table{width:100%;border-collapse:collapse;margin-top:8px;}
+.mission-table th{
+  font-size:11px;letter-spacing:1px;color:var(--text-muted);
+  text-align:left;padding:8px 12px;border-bottom:1px solid rgba(201,168,76,.12);
+}
+.mission-table td{
+  padding:12px 12px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  vertical-align:top;
+  font-size:14px;
+}
+.mission-table tr:last-child td{border-bottom:none;}
+.mission-table .day-badge{
+  display:inline-block;
+  background:rgba(201,168,76,.12);
+  border:1px solid rgba(201,168,76,.25);
+  color:var(--gold);
+  font-size:11px;font-weight:700;
+  padding:2px 8px;border-radius:4px;
+  white-space:nowrap;
+}
+.mission-table .theme{font-size:11px;color:var(--text-dim);}
+.mission-table .verify-type{
+  font-size:11px;
+  padding:2px 8px;border-radius:100px;
+  white-space:nowrap;
+}
+.vt-photo{background:var(--blue-bg);color:var(--blue);}
+.vt-text{background:var(--green-bg);color:var(--green);}
+.vt-parent{background:var(--red-bg);color:var(--red);}
+
+/* ── 흐름 다이어그램 ── */
+.flow{
+  display:flex;flex-direction:column;gap:0;
+  position:relative;
+  padding-left:32px;
+}
+.flow-item{
+  position:relative;
+  padding:16px 0 16px 20px;
+  border-left:2px solid rgba(201,168,76,.2);
+}
+.flow-item:last-child{border-left-color:transparent;}
+.flow-dot{
+  position:absolute;
+  left:-9px;top:20px;
+  width:16px;height:16px;
+  background:var(--gold);
+  border-radius:50%;
+  border:3px solid var(--bg);
+  box-shadow:0 0 0 1px var(--gold);
+}
+.flow-title{font-weight:700;color:var(--gold-bright);margin-bottom:4px;font-size:15px;}
+.flow-desc{font-size:14px;color:var(--text-dim);line-height:1.7;}
+
+/* ── 역할 카드 ── */
+.role-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:4px;}
+.role-card{
+  background:var(--bg2);border:1px solid rgba(201,168,76,.12);border-radius:var(--radius);
+  padding:20px;
+}
+.role-card .role-icon{font-size:28px;margin-bottom:10px;}
+.role-card h3{font-size:15px;font-weight:700;color:var(--gold);margin-bottom:8px;}
+.role-card ul{padding-left:16px;color:var(--text-dim);font-size:13px;line-height:2;}
+
+/* ── 상태 뱃지 ── */
+.status-list{display:flex;flex-direction:column;gap:10px;}
+.status-item{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:14px 16px;border-radius:var(--radius-sm);
+  background:var(--bg3);
+}
+.status-badge{
+  font-size:11px;font-weight:700;letter-spacing:1px;
+  padding:3px 10px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:2px;
+}
+.sb-pending{background:rgba(200,160,50,.15);color:#e8c850;border:1px solid rgba(200,160,50,.3);}
+.sb-approved{background:var(--green-bg);color:#5ad880;border:1px solid rgba(90,216,128,.3);}
+.sb-rejected{background:var(--red-bg);color:#e07070;border:1px solid rgba(224,112,112,.3);}
+.sb-none{background:rgba(100,100,120,.15);color:#6a7090;border:1px solid rgba(100,100,120,.25);}
+.status-info{font-size:13px;color:var(--text);line-height:1.7;}
+.status-info strong{color:var(--text);display:block;margin-bottom:2px;}
+
+/* ── 팁 박스 ── */
+.tip{
+  display:flex;gap:14px;align-items:flex-start;
+  padding:16px 18px;border-radius:var(--radius-sm);
+  margin-bottom:12px;font-size:14px;line-height:1.7;
+}
+.tip.gold{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);}
+.tip.blue{background:var(--blue-bg);border:1px solid rgba(74,128,200,.2);}
+.tip.green{background:var(--green-bg);border:1px solid rgba(58,138,80,.25);}
+.tip.red{background:var(--red-bg);border:1px solid rgba(224,85,85,.2);}
+.tip-icon{font-size:20px;flex-shrink:0;line-height:1.4;}
+.tip-body{flex:1;}
+.tip-body strong{color:var(--text);display:block;margin-bottom:2px;}
+
+/* ── 단계 번호 ── */
+.steps{display:flex;flex-direction:column;gap:12px;}
+.step{
+  display:flex;gap:16px;align-items:flex-start;
+  padding:16px;background:var(--bg2);border-radius:var(--radius-sm);
+  border:1px solid rgba(201,168,76,.1);
+}
+.step-num{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--gold);color:var(--bg);
+  font-weight:900;font-size:13px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:2px;
+}
+.step-body{flex:1;}
+.step-body strong{color:var(--gold-bright);display:block;margin-bottom:4px;font-size:15px;}
+.step-body p{font-size:14px;color:var(--text-dim);line-height:1.7;margin:0;}
+
+/* ── URL 표시 ── */
+.url-box{
+  background:var(--bg3);border:1px solid rgba(201,168,76,.2);
+  border-radius:var(--radius-sm);padding:14px 18px;
+  font-family:'Courier New',monospace;font-size:14px;
+  color:var(--gold-bright);word-break:break-all;
+  margin:12px 0;
+}
+
+/* ── 구분선 ── */
+.divider{
+  border:none;
+  border-top:1px solid rgba(201,168,76,.08);
+  margin:48px 0 0;
+}
+
+/* ── 푸터 ── */
+.footer{
+  text-align:center;padding:32px 20px;
+  font-size:12px;color:var(--text-muted);line-height:2;
+}
+.footer strong{color:var(--gold-dim);}
+
+/* ── 반응형 ── */
+@media(max-width:500px){
+  .hero{padding:48px 16px 36px;}
+  .hero h1{letter-spacing:1px;}
+  .container{padding:0 14px 60px;}
+  .card{padding:18px 16px;}
+  .mission-table{font-size:13px;}
+  .mission-table th,.mission-table td{padding:8px 8px;}
+  .role-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ──────── HERO ──────── -->
+<div class="hero">
+  <div class="hero-eyebrow">연천장로교회 · 중고등부 · 청년부</div>
+  <h1>THE CROSS PASSPORT</h1>
+  <div class="hero-sub">2026 고난주간 6일 미션 챌린지 — 교사·임원 안내서</div>
+  <div class="hero-badge">✝ 2026. 3. 30(월) ~ 4. 4(토) · 부활주일 수료</div>
+</div>
+
+<div class="container">
+
+  <!-- ──────── 1. 개요 ──────── -->
+  <div class="section">
+    <div class="section-label">Overview</div>
+    <h2>01. 프로그램 개요</h2>
+
+    <div class="card highlight">
+      <h3>✝ 무엇인가요?</h3>
+      <p>THE CROSS PASSPORT는 고난주간(성월요일~성토요일) 6일 동안 매일 하나의 미션을 실천하고, 사진·글로 인증하는 <strong>모바일 앱 기반 제자훈련 프로그램</strong>입니다.</p>
+      <p>학생들은 앱을 스마트폰 홈화면에 설치하고, 미션을 완수할 때마다 '여권 도장'을 받아 6일을 완주하면 부활주일에 수료증과 선물을 받습니다.</p>
+    </div>
+
+    <div class="tip gold">
+      <span class="tip-icon">🎯</span>
+      <div class="tip-body">
+        <strong>목회적 의도</strong>
+        "THE CROSS PASSPORT는 자격증이 아닙니다." 미션을 수행하는 이유는 하나님께 점수를 따기 위함이 아닙니다. 우리를 위해 모든 물과 피를 쏟으신 그리스도의 은혜에 감사하여, 우리 삶의 주인이 누구인지 고백하는 작은 응답입니다.
+      </div>
+    </div>
+
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-icon">📱</div>
+        <h3>학생 앱</h3>
+        <ul>
+          <li>홈화면 설치 (PWA)</li>
+          <li>미션 확인 및 제출</li>
+          <li>여권 도장 수집</li>
+          <li>배경화면·배지 다운로드</li>
+          <li>수료증 저장</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-icon">🔐</div>
+        <h3>관리자 앱</h3>
+        <ul>
+          <li>제출 목록 실시간 확인</li>
+          <li>미션 승인 / 반려</li>
+          <li>반려 사유 전달</li>
+          <li>수료선물 신청자 확인</li>
+          <li>미션 잠금/해제 제어</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-icon">☁️</div>
+        <h3>클라우드 연동</h3>
+        <ul>
+          <li>Firebase 실시간 동기화</li>
+          <li>기기 바꿔도 기록 유지</li>
+          <li>관리자 즉시 반영</li>
+          <li>인터넷 없이도 기본 동작</li>
+          <li>별도 회원가입 불필요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────── 2. 미션 목록 ──────── -->
+  <div class="section">
+    <div class="section-label">Missions</div>
+    <h2>02. 6일 미션 목록</h2>
+
+    <div class="card">
+      <h3>📋 중고등부 미션</h3>
+      <table class="mission-table">
+        <thead>
+          <tr>
+            <th>날짜</th>
+            <th>테마</th>
+            <th>미션명</th>
+            <th>인증 방법</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="day-badge">월 3/30</span></td>
+            <td><div>성전 청결</div><div class="theme">마태복음 21:12-13</div></td>
+            <td>🧹 클린 마이 룸<br><span style="font-size:12px;color:var(--text-dim)">방 정리 & 신앙 방해물 치우기</span></td>
+            <td><span class="verify-type vt-photo">📸 사진</span></td>
+          </tr>
+          <tr>
+            <td><span class="day-badge">화 3/31</span></td>
+            <td><div>가장 큰 계명</div><div class="theme">마태복음 22:37-39</div></td>
+            <td>📱 디지털 효도<br><span style="font-size:12px;color:var(--text-dim)">폰 내려놓고 부모님과 10분 대화</span></td>
+            <td><span class="verify-type vt-parent">👨‍👩‍👧 부모/교사 PIN</span></td>
+          </tr>
+          <tr>
+            <td><span class="day-badge">수 4/1</span></td>
+            <td><div>향유 옥합</div><div class="theme">마태복음 26:6-13</div></td>
+            <td>💰 옥합 저금<br><span style="font-size:12px;color:var(--text-dim)">편의점/카페 비용 아껴 저금</span></td>
+            <td><span class="verify-type vt-text">✍️ 텍스트</span></td>
+          </tr>
+          <tr>
+            <td><span class="day-badge">목 4/2</span></td>
+            <td><div>섬김의 본</div><div class="theme">요한복음 13:14-15</div></td>
+            <td>🙇 낮은 자리<br><span style="font-size:12px;color:var(--text-dim)">식사 후 뒷정리 또는 감사 문자</span></td>
+            <td><span class="verify-type vt-photo">📸 사진</span></td>
+          </tr>
+          <tr>
+            <td><span class="day-badge">금 4/3</span></td>
+            <td><div>다 이루었다</div><div class="theme">요한복음 19:30</div></td>
+            <td>📴 No Data Day<br><span style="font-size:12px;color:var(--text-dim)">데이터 끄고 요한복음 18~19장 완독</span></td>
+            <td><span class="verify-type vt-text">✍️ 텍스트</span></td>
+          </tr>
+          <tr>
+            <td><span class="day-badge">토 4/4</span></td>
+            <td><div>부활의 소망</div><div class="theme">마태복음 27:62-66</div></td>
+            <td>💌 소망의 편지<br><span style="font-size:12px;color:var(--text-dim)">친구에게 부활절 초청 메시지</span></td>
+            <td><span class="verify-type vt-photo">📸 사진</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>📋 청년부 미션</h3>
+      <table class="mission-table">
+        <thead>
+          <tr>
+            <th>날짜</th>
+            <th>테마</th>
+            <th>미션명</th>
+            <th>인증 방법</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="day-badge">월 3/30</span></td>
+            <td><div>성전 청결</div><div class="theme">마태복음 21:12-13</div></td>
+            <td>🧹 내면의 성전<br><span style="font-size:12px;color:var(--text-dim)">SNS 알림 끄기 & 불필요 구독 정리</span></td>
+            <td><span class="verify-type vt-photo">📸 사진</span></td>
+          </tr>
+          <tr>
+            <td><span class="day-badge">화 3/31</span></td>
+            <td><div>가장 큰 계명</div><div class="theme">마태복음 22:37-39</div></td>
+            <td>📞 먼저 연락하기<br><span style="font-size:12px;color:var(--text-dim)">소원해진 지체에게 먼저 안부 연락</span></td>
+            <td><span class="verify-type vt-photo">📸 사진</span></td>
+          </tr>
+          <tr>
+            <td><span class="day-badge">수 4/1</span></td>
+            <td><div>향유 옥합</div><div class="theme">마태복음 26:6-13</div></td>
+            <td>💰 옥합 헌금<br><span style="font-size:12px;color:var(--text-dim)">커피/외식 절제 후 구제헌금으로 구별</span></td>
+            <td><span class="verify-type vt-text">✍️ 텍스트</span></td>
+          </tr>
+          <tr>
+            <td><span class="day-badge">목 4/2</span></td>
+            <td><div>섬김의 본</div><div class="theme">요한복음 13:14-15</div></td>
+            <td>🙇 낮은 섬김<br><span style="font-size:12px;color:var(--text-dim)">남이 하기 싫어하는 일 자발적으로 맡기</span></td>
+            <td><span class="verify-type vt-photo">📸 사진</span></td>
+          </tr>
+          <tr>
+            <td><span class="day-badge">금 4/3</span></td>
+            <td><div>다 이루었다</div><div class="theme">요한복음 19:30</div></td>
+            <td>📴 미디어 금식<br><span style="font-size:12px;color:var(--text-dim)">유튜브·SNS 하루 금식 + 묵상 기도문</span></td>
+            <td><span class="verify-type vt-text">✍️ 텍스트</span></td>
+          </tr>
+          <tr>
+            <td><span class="day-badge">토 4/4</span></td>
+            <td><div>부활의 소망</div><div class="theme">마태복음 27:62-66</div></td>
+            <td>💌 부활 초청장<br><span style="font-size:12px;color:var(--text-dim)">교회에 오지 않는 친구에게 부활주일 초청</span></td>
+            <td><span class="verify-type vt-photo">📸 사진</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ──────── 3. 학생 사용법 ──────── -->
+  <div class="section">
+    <div class="section-label">Student Guide</div>
+    <h2>03. 학생 앱 사용 방법</h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>앱 설치 (홈화면에 추가)</strong>
+          <p>담당 교사에게 앱 주소(QR코드)를 받아 Safari(iOS) 또는 Chrome(Android)으로 접속한 뒤, 공유 버튼 → "홈 화면에 추가"를 탭합니다. 일반 앱처럼 홈화면 아이콘이 생깁니다.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>이름·학년·그룹 등록 (최초 1회)</strong>
+          <p>앱 첫 실행 시 이름, 학년(또는 직장), 소속(중고등부/청년부)을 입력합니다. 이 정보는 관리자 화면에 그대로 표시됩니다.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>매일 미션 탭에서 당일 미션 확인</strong>
+          <p>하단 [미션] 탭을 누르면 6일치 미션 카드가 보입니다. 오늘 날짜 미션만 열리며, 이후 날짜는 잠겨 있습니다. 카드를 탭하면 성구, 내용, 인증 방법이 표시됩니다.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>미션 실천 후 인증 제출</strong>
+          <p>사진 미션은 📷 사진 첨부 후 [실천 완료] 버튼을 누릅니다. 텍스트 미션은 소감을 입력 후 제출합니다. 화요일 미션(부모 확인)은 교사가 PIN을 입력해 승인합니다.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>관리자 검토 후 도장 획득</strong>
+          <p>제출 즉시 [대기중] 상태가 되며, 관리자가 확인 후 승인하면 [여권] 탭에 도장이 찍힙니다. 앱이 켜져 있으면 실시간으로 알림이 옵니다.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <strong>6일 완주 → 수료증 & 선물 신청</strong>
+          <p>6개 도장을 모두 받으면 [더보기] 탭 → [수료증 보기]에서 수료증을 이미지로 저장할 수 있습니다. 수료증 화면에서 [수료선물 받기] 버튼으로 선물을 신청합니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip blue" style="margin-top:16px;">
+      <span class="tip-icon">💡</span>
+      <div class="tip-body">
+        <strong>배경화면 & 배지</strong>
+        [배경화면] 탭에서 매일 테마에 맞는 잠금화면 배경화면을 저장할 수 있습니다. 미디어 금식 배지도 프로필 이미지로 사용 가능합니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────── 4. 미션 상태 ──────── -->
+  <div class="section">
+    <div class="section-label">Status System</div>
+    <h2>04. 미션 상태 시스템</h2>
+
+    <div class="status-list">
+      <div class="status-item">
+        <span class="status-badge sb-none">미완료</span>
+        <div class="status-info">
+          <strong>아직 제출하지 않은 상태</strong>
+          오늘 날짜 미션만 열려 있으며, 미래 날짜는 자동으로 잠겨 있습니다.
+        </div>
+      </div>
+      <div class="status-item">
+        <span class="status-badge sb-pending">대기중</span>
+        <div class="status-info">
+          <strong>학생이 제출 완료 → 관리자 검토 대기</strong>
+          [미션] 탭 카드에 "검토 중" 표시. 관리자 앱에 즉시 목록이 올라옵니다.
+        </div>
+      </div>
+      <div class="status-item">
+        <span class="status-badge sb-approved">승인</span>
+        <div class="status-info">
+          <strong>관리자가 승인 → 여권 도장 획득</strong>
+          [여권] 탭에 도장이 찍히고 학생 앱에 실시간으로 반영됩니다.
+        </div>
+      </div>
+      <div class="status-item">
+        <span class="status-badge sb-rejected">반려</span>
+        <div class="status-info">
+          <strong>관리자가 반려 → 재제출 가능</strong>
+          반려 사유가 앱에 표시되며, 학생은 수정 후 다시 제출할 수 있습니다.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────── 5. 관리자 사용법 ──────── -->
+  <div class="section">
+    <div class="section-label">Admin Guide</div>
+    <h2>05. 관리자 앱 사용 방법</h2>
+
+    <div class="tip red">
+      <span class="tip-icon">🔐</span>
+      <div class="tip-body">
+        <strong>관리자 계정 필요</strong>
+        관리자 앱은 이메일/비밀번호로 로그인합니다. 계정은 담당 전도사·목사님께 받으세요. 일반 학생이 접근할 수 없습니다.
+      </div>
+    </div>
+
+    <div class="flow">
+      <div class="flow-item">
+        <div class="flow-dot"></div>
+        <div class="flow-title">① 로그인</div>
+        <div class="flow-desc">관리자 앱 주소에 접속 → 이메일·비밀번호 입력 → 로그인</div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-dot"></div>
+        <div class="flow-title">② 제출 목록 확인</div>
+        <div class="flow-desc">상단 통계(총 제출 / 대기 / 승인 / 반려)와 필터(그룹별·상태별)로 목록을 확인합니다. 사진 첨부가 있으면 썸네일이 표시됩니다.</div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-dot"></div>
+        <div class="flow-title">③ 승인 또는 반려</div>
+        <div class="flow-desc">제출 카드에서 [✔ 승인] 또는 [✘ 반려]를 누릅니다. 반려 시 사유를 입력하면 학생 앱에 바로 전달됩니다.</div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-dot"></div>
+        <div class="flow-title">④ 수료선물 신청자 확인</div>
+        <div class="flow-desc">[수료선물] 탭에서 6일 모두 완주한 학생 목록을 확인합니다. 이름·학년·그룹·신청 시각이 표시됩니다.</div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-dot"></div>
+        <div class="flow-title">⑤ 미션 잠금/해제 (선택)</div>
+        <div class="flow-desc">기본값은 날짜 기준 자동 잠금입니다. 필요 시 관리자 앱에서 특정 미션을 강제 열기/닫기할 수 있습니다.</div>
+      </div>
+    </div>
+
+    <div class="tip gold" style="margin-top:16px;">
+      <span class="tip-icon">📌</span>
+      <div class="tip-body">
+        <strong>화요일 미션 (부모/교사 PIN 승인)</strong>
+        중고등부 화요일 미션 "디지털 효도"는 부모님 또는 교사가 직접 학생 폰에 4자리 PIN을 입력해 승인하는 방식입니다. PIN은 관리자 앱 로그인 시 표시되는 번호를 사용하거나 담당자에게 별도 안내 받으세요.
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────── 6. 탭 구성 ──────── -->
+  <div class="section">
+    <div class="section-label">App Structure</div>
+    <h2>06. 앱 탭 구성</h2>
+
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-icon">📕</div>
+        <h3>여권 탭</h3>
+        <ul>
+          <li>이름·학년·그룹 표시</li>
+          <li>6일 도장 현황</li>
+          <li>진행률 바</li>
+          <li>목회적 안내 메시지</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-icon">📋</div>
+        <h3>미션 탭</h3>
+        <ul>
+          <li>6일 미션 카드</li>
+          <li>오늘만 잠금 해제</li>
+          <li>성구 전문 표시</li>
+          <li>사진/텍스트 제출</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-icon">🖼️</div>
+        <h3>배경화면 탭</h3>
+        <ul>
+          <li>6일 테마 잠금화면</li>
+          <li>이미지 저장 가능</li>
+          <li>미디어 금식 배지</li>
+          <li>프로필 이미지 활용</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-icon">⚙️</div>
+        <h3>더보기 탭</h3>
+        <ul>
+          <li>프로필 사진 설정</li>
+          <li>수료증 보기·저장</li>
+          <li>수료선물 신청</li>
+          <li>이름 변경</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────── 7. 자주 묻는 질문 ──────── -->
+  <div class="section">
+    <div class="section-label">FAQ</div>
+    <h2>07. 자주 묻는 질문</h2>
+
+    <div class="card">
+      <h3>Q. 앱을 설치해야 하나요? 브라우저에서도 되나요?</h3>
+      <p>브라우저에서도 작동하지만, 홈화면 설치를 권장합니다. 설치하면 오프라인에서도 기본 기능이 동작하고, 앱처럼 전체화면으로 사용할 수 있습니다.</p>
+    </div>
+
+    <div class="card">
+      <h3>Q. 폰을 바꾸거나 앱을 지웠어요. 기록이 사라지나요?</h3>
+      <p>인터넷이 연결된 상태에서 앱을 사용했다면 Firebase 클라우드에 자동 저장됩니다. 같은 기기에서 앱을 재설치하면 기록이 복구됩니다. 단, 기기가 완전히 바뀐 경우 담당 관리자에게 문의하세요.</p>
+    </div>
+
+    <div class="card">
+      <h3>Q. 미션을 잘못 제출했어요.</h3>
+      <p>관리자가 반려 처리 후 사유를 전달하면, 학생은 수정 후 재제출할 수 있습니다. 관리자에게 직접 문의하는 것이 가장 빠릅니다.</p>
+    </div>
+
+    <div class="card">
+      <h3>Q. 오늘 날짜 미션이 잠겨 있어요.</h3>
+      <p>기기 날짜/시간이 잘못 설정되어 있을 수 있습니다. 설정 → 일반 → 날짜 및 시간 → 자동 설정을 켜주세요. 또는 관리자에게 문의하면 강제 잠금 해제가 가능합니다.</p>
+    </div>
+
+    <div class="card">
+      <h3>Q. 앱이 업데이트되었다는 팝업이 떴어요.</h3>
+      <p>[지금 업데이트] 버튼을 누르면 최신 버전으로 자동 전환됩니다. 업데이트 중 잠깐 화면이 새로고침됩니다. 나중에 버튼을 눌러도 무방합니다.</p>
+    </div>
+
+    <div class="card">
+      <h3>Q. 수료증은 언제 받을 수 있나요?</h3>
+      <p>6개 미션이 모두 <strong>승인</strong> 완료된 후 [더보기] → [수료증 보기]에서 확인 가능합니다. 수료증 화면에서 이미지 저장 및 수료선물 신청이 가능합니다. 부활주일(4월 5일) 예배 때 선물을 드릴 예정입니다.</p>
+    </div>
+  </div>
+
+  <!-- ──────── 8. 교사 역할 안내 ──────── -->
+  <div class="section">
+    <div class="section-label">Teacher Role</div>
+    <h2>08. 교사·임원이 해야 할 일</h2>
+
+    <div class="tip green">
+      <span class="tip-icon">✅</span>
+      <div class="tip-body">
+        <strong>고난주간 전 (사전 준비)</strong>
+        학생들에게 앱 QR코드를 배포하고 설치를 도와주세요. 첫 이름·그룹 등록까지 확인하면 좋습니다.
+      </div>
+    </div>
+
+    <div class="tip green">
+      <span class="tip-icon">✅</span>
+      <div class="tip-body">
+        <strong>고난주간 중 (매일)</strong>
+        관리자 앱에서 전날/당일 제출 목록을 확인하고 승인·반려합니다. 가급적 24시간 이내에 처리해 주세요. 반려 시 구체적인 사유를 입력해 학생이 재도전할 수 있게 합니다.
+      </div>
+    </div>
+
+    <div class="tip green">
+      <span class="tip-icon">✅</span>
+      <div class="tip-body">
+        <strong>화요일 미션 현장 승인</strong>
+        중고등부 "디지털 효도" 미션은 교사가 학생 폰에 직접 PIN을 입력해 현장 승인합니다. 주일 예배 또는 모임 시 진행하거나, 부모님께 PIN을 알려줄 수 있습니다.
+      </div>
+    </div>
+
+    <div class="tip blue">
+      <span class="tip-icon">💬</span>
+      <div class="tip-body">
+        <strong>반려 사유 작성 팁</strong>
+        "사진이 미션과 관련이 없어 보여요. 정리 전/후 사진을 다시 찍어 올려주세요." 처럼 구체적으로 적어주세요. 학생들이 재도전 의욕을 잃지 않도록 따뜻하게 써주세요.
+      </div>
+    </div>
+
+    <div class="tip gold">
+      <span class="tip-icon">🎁</span>
+      <div class="tip-body">
+        <strong>수료선물 명단 확인</strong>
+        부활주일 전날(4/4 토) 밤 또는 당일 아침에 관리자 앱 [수료선물] 탭에서 최종 명단을 출력/캡처해 선물 준비에 활용하세요.
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────── 9. 기술 정보 ──────── -->
+  <div class="section">
+    <div class="section-label">Technical</div>
+    <h2>09. 기술 정보 (참고용)</h2>
+
+    <div class="card">
+      <h3>🏗️ 구성</h3>
+      <p><strong>PWA (Progressive Web App)</strong> — 별도 앱스토어 설치 없이 웹 브라우저로 접속 후 홈화면에 추가하는 방식. iOS Safari, Android Chrome, 삼성 인터넷 모두 지원.</p>
+      <p><strong>Firebase</strong> — Google의 클라우드 서비스. 익명 인증(학생), 이메일 인증(관리자), Firestore 데이터베이스 사용. 실시간 동기화.</p>
+      <p><strong>Service Worker</strong> — 오프라인 캐싱. 인터넷이 끊겨도 기본 화면은 볼 수 있음. 앱 업데이트 시 자동 감지 후 팝업.</p>
+    </div>
+
+    <div class="card">
+      <h3>🔒 데이터 보안</h3>
+      <p>학생 데이터는 Firebase Firestore에 저장되며 별도 서버 없이 Google 클라우드에서 보호됩니다. 학생 간 데이터는 서로 볼 수 없으며, 관리자만 전체 목록에 접근 가능합니다.</p>
+      <p>학생 앱은 회원가입 없는 익명 인증 방식이므로 개인정보 수집이 최소화됩니다 (이름·학년·그룹만 저장).</p>
+    </div>
+
+    <div class="card">
+      <h3>📱 지원 환경</h3>
+      <p>iOS 14 이상 (Safari 권장) · Android 8 이상 (Chrome 또는 삼성 인터넷 권장) · PC 브라우저도 동작하나 모바일 최적화</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+</div>
+
+<div class="footer">
+  <strong>THE CROSS PASSPORT</strong><br>
+  연천장로교회 · 2026 고난주간 · v2.4.9<br>
+  문의: 담당 전도사·목사님에게 연락주세요
+</div>
+
+</body>
+</html>
