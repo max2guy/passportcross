@@ -1,15 +1,12 @@
 /**
  * THE CROSS PASSPORT — Firebase Cloud Functions
  *
- * Trigger 1: submissions 컬렉션 신규 문서 생성
- *   → 모든 관리자(교사)에게 "새 미션 제출" 푸시 알림 발송
+ * Trigger 1: submissions 신규 문서 → 관리자에게 "새 미션 제출" 푸시
+ * Trigger 2: submissions status → 'approved' → 해당 학생에게 "미션 승인" 푸시
+ * Schedule 3: 매일 AM 07:00 KST → 전체 학생에게 "오늘의 미션 도착" 푸시
+ * Schedule 4: 매일 PM 07:00 KST → 당일 미션 미제출 학생에게 "완료하셨나요?" 푸시
  *
- * Trigger 2: submissions 컬렉션 문서 수정 + status → 'approved'
- *   → 해당 학생에게 "미션 승인" 푸시 알림 발송
- *
- * 배포 명령어 (functions/ 디렉토리에서):
- *   npm install
- *   firebase deploy --only functions
+ * 배포: firebase deploy --only functions
  */
 
 const functions = require('firebase-functions');
@@ -19,6 +16,67 @@ admin.initializeApp();
 
 const db = admin.firestore();
 const messaging = admin.messaging();
+
+/* 고난주간 미션 메타데이터 (날짜 → 테마/구절 매핑) */
+const MISSIONS_META = [
+  { day: '월', theme: '성전 청결',   verse: '마태복음 21:13' },
+  { day: '화', theme: '가장 큰 계명', verse: '마태복음 22:37' },
+  { day: '수', theme: '향유 옥합',   verse: '마태복음 26:12' },
+  { day: '목', theme: '섬김의 본',   verse: '요한복음 13:15' },
+  { day: '금', theme: '다 이루었다', verse: '요한복음 19:30' },
+  { day: '토', theme: '부활의 소망', verse: '시편 130:5'    }
+];
+// 행사 시작일 (KST 기준)
+const EVENT_START = new Date('2026-03-30T00:00:00+09:00');
+
+/* 오늘의 미션 인덱스 (0=월 ~ 5=토), 범위 밖이면 -1 */
+function getDayIndex() {
+  const diffDays = Math.floor((Date.now() - EVENT_START.getTime()) / 86400000);
+  return (diffDays >= 0 && diffDays <= 5) ? diffDays : -1;
+}
+
+/* users 컬렉션에서 FCM 토큰 전체 수집 */
+async function getAllUserTokens() {
+  const snap = await db.collection('users').get();
+  const tokens = [], uidByIdx = {};
+  snap.forEach(function(doc) {
+    const t = doc.data().fcmToken;
+    if (t) { uidByIdx[tokens.length] = doc.id; tokens.push(t); }
+  });
+  return { tokens, uidByIdx };
+}
+
+/* users 컬렉션에서 당일 미션 미제출(0) 학생 토큰만 수집 */
+async function getIncompleteUserTokens(dayIdx) {
+  const snap = await db.collection('users').get();
+  const tokens = [], uidByIdx = {};
+  snap.forEach(function(doc) {
+    const d = doc.data();
+    const t = d.fcmToken;
+    const missions = d.missions || [];
+    // 0 = 미제출, 3 = 반려(재제출 필요) → 알림 대상
+    if (t && (missions[dayIdx] === 0 || missions[dayIdx] === 3 || missions[dayIdx] === undefined)) {
+      uidByIdx[tokens.length] = doc.id; tokens.push(t);
+    }
+  });
+  return { tokens, uidByIdx };
+}
+
+/* 멀티캐스트 발송 + 만료 토큰 정리 (users 컬렉션) */
+async function sendToUsers(tokens, uidByIdx, title, body) {
+  if (!tokens.length) return;
+  const res = await messaging.sendEachForMulticast({ data: { title, body }, tokens });
+  console.log(`발송 성공: ${res.successCount}, 실패: ${res.failureCount}`);
+  const EXPIRED = ['messaging/invalid-registration-token','messaging/registration-token-not-registered'];
+  const deletes = [];
+  res.responses.forEach(function(r, i) {
+    if (!r.success && r.error && EXPIRED.includes(r.error.code) && uidByIdx[i]) {
+      deletes.push(db.collection('users').doc(uidByIdx[i])
+        .update({ fcmToken: admin.firestore.FieldValue.delete() }).catch(function(){}));
+    }
+  });
+  await Promise.all(deletes);
+}
 
 /* ─────────────────────────────────────────────
  * 유틸: 만료된 FCM 토큰을 Firestore에서 삭제
@@ -157,5 +215,44 @@ exports.notifyStudentOnApproval = functions
       console.error('학생 알림 발송 실패:', err.message);
     }
 
+    return null;
+  });
+
+/* ─────────────────────────────────────────────
+ * Schedule 3: AM 07:00 KST — 오늘의 미션 도착 알림 (전체 학생)
+ * ───────────────────────────────────────────── */
+exports.morningPush = functions
+  .region('asia-northeast3')
+  .pubsub.schedule('0 7 * * *')
+  .timeZone('Asia/Seoul')
+  .onRun(async function() {
+    const dayIdx = getDayIndex();
+    if (dayIdx < 0) { console.log('행사 기간 아님'); return null; }
+    const m = MISSIONS_META[dayIdx];
+    const { tokens, uidByIdx } = await getAllUserTokens();
+    await sendToUsers(
+      tokens, uidByIdx,
+      '☀️ 오늘의 미션이 도착했습니다',
+      m.day + '요일 · ' + m.theme + ' — ' + m.verse + ' 오늘의 미션을 확인하세요 →'
+    );
+    return null;
+  });
+
+/* ─────────────────────────────────────────────
+ * Schedule 4: PM 07:00 KST — 미션 완료 독려 알림 (미제출 학생만)
+ * ───────────────────────────────────────────── */
+exports.eveningPush = functions
+  .region('asia-northeast3')
+  .pubsub.schedule('0 19 * * *')
+  .timeZone('Asia/Seoul')
+  .onRun(async function() {
+    const dayIdx = getDayIndex();
+    if (dayIdx < 0) { console.log('행사 기간 아님'); return null; }
+    const { tokens, uidByIdx } = await getIncompleteUserTokens(dayIdx);
+    await sendToUsers(
+      tokens, uidByIdx,
+      '🌙 오늘 미션, 완료하셨나요?',
+      '아직 인증을 올리지 않으셨습니다. 실천한 내용을 기록해 주세요.'
+    );
     return null;
   });
