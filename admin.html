@@ -27,38 +27,12 @@ body{
   -webkit-font-smoothing:antialiased;
   -webkit-tap-highlight-color:transparent;
 }
-/* LOGIN */
-.login-wrap{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-height:100vh;min-height:-webkit-fill-available;
-  padding:calc(var(--safe-top) + 24px) 20px calc(var(--safe-bottom) + 24px);
+/* AUTH LOADING */
+.auth-loading{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;
+  font-size:13px;color:var(--text-dim);letter-spacing:1px;
 }
-.login-box{width:100%;max-width:380px;background:var(--bg2);border:1px solid rgba(197,165,90,.2);border-radius:var(--radius);padding:36px 28px}
-.login-brand{text-align:center;margin-bottom:24px}
-.login-title{font-size:11px;font-weight:700;color:var(--gold-dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px}
-.login-title-main{font-size:22px;font-weight:700;color:var(--gold);letter-spacing:2px}
-.login-sub{font-size:12px;color:var(--text-dim);margin-top:6px}
-.login-field{margin-bottom:16px}
-.login-field label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px}
-.login-field input{
-  width:100%;padding:13px 14px;background:var(--bg3);
-  border:1px solid rgba(197,165,90,.15);border-radius:var(--radius-sm);
-  color:var(--text);font-size:15px;outline:none;
-  -webkit-appearance:none;appearance:none;
-}
-.login-field input:focus{border-color:var(--gold-dim)}
-.login-btn{
-  width:100%;padding:15px;margin-top:8px;
-  background:var(--gold);color:var(--bg);font-size:15px;font-weight:700;
-  border:none;border-radius:var(--radius-sm);cursor:pointer;letter-spacing:1px;
-  -webkit-appearance:none;appearance:none;
-}
-.login-btn:active{background:var(--gold-dim)}
-.login-error{font-size:13px;color:#e05555;text-align:center;margin-top:12px;min-height:18px;word-break:keep-all}
-.login-tabs{display:flex;margin-bottom:24px;border-bottom:1px solid rgba(197,165,90,.15)}
-.login-tab{flex:1;padding:11px 8px;text-align:center;font-size:14px;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s}
-.login-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
-.login-form{display:none}.login-form.active{display:block}
 /* APP */
 .app-wrap{display:none;flex-direction:column;min-height:100vh}
 /* TOPBAR */
@@ -249,56 +223,8 @@ body{
 </head>
 <body>
 
-<!-- 로그인 화면 -->
-<div class="login-wrap" id="loginWrap">
-  <div class="login-box">
-    <div class="login-brand">
-      <div class="login-title">THE CROSS PASSPORT</div>
-      <div class="login-title-main">관리자</div>
-      <div class="login-sub">ADMIN PANEL</div>
-    </div>
-    <div class="login-tabs">
-      <div class="login-tab active" onclick="switchTab('login')">로그인</div>
-      <div class="login-tab" onclick="switchTab('signup')">계정 만들기</div>
-    </div>
-
-    <!-- 로그인 폼 -->
-    <div class="login-form active" id="formLogin">
-      <div class="login-field">
-        <label>이메일</label>
-        <input type="email" id="loginEmail" placeholder="이메일 입력" autocomplete="email">
-      </div>
-      <div class="login-field">
-        <label>비밀번호</label>
-        <input type="password" id="loginPassword" placeholder="비밀번호 입력" autocomplete="current-password">
-      </div>
-      <button class="login-btn" onclick="doLogin()">로그인</button>
-    </div>
-
-    <!-- 가입 폼 -->
-    <div class="login-form" id="formSignup">
-      <div class="login-field">
-        <label>이름</label>
-        <input type="text" id="signupName" placeholder="이름 입력">
-      </div>
-      <div class="login-field">
-        <label>이메일</label>
-        <input type="email" id="signupEmail" placeholder="이메일 입력" autocomplete="email">
-      </div>
-      <div class="login-field">
-        <label>비밀번호</label>
-        <input type="password" id="signupPassword" placeholder="6자리 이상">
-      </div>
-      <div class="login-field">
-        <label>초대 코드</label>
-        <input type="text" id="signupCode" placeholder="관리자에게 받은 초대 코드">
-      </div>
-      <button class="login-btn" onclick="doSignup()">계정 만들기</button>
-    </div>
-
-    <div class="login-error" id="loginError"></div>
-  </div>
-</div>
+<!-- 권한 확인 중 로딩 화면 (auth 완료 전까지 표시) -->
+<div class="auth-loading" id="authLoading">접속 확인 중...</div>
 
 <!-- 관리자 앱 -->
 <div class="app-wrap" id="appWrap">
@@ -315,7 +241,7 @@ body{
       <button class="topbar-btn" onclick="toggleCompletions()" id="completionsBtn">완료자</button>
       <button class="topbar-btn" onclick="toggleLockPanel()" id="lockBtn">🔒 잠금</button>
       <button class="topbar-btn" onclick="toggleMissionEdit()" id="missionEditBtn">미션 편집</button>
-      <button class="topbar-btn" onclick="location.href='index.html'">앱 전환</button>
+      <button class="topbar-btn" onclick="location.href='index.html'">📖 내 여권으로 돌아가기</button>
     </div>
   </div>
 
@@ -398,8 +324,7 @@ body{
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-var INVITE_CODE='cross2026'; // 초대 코드 (변경 가능)
-var MASTER_EMAIL='max2guy@gmail.com';
+var MASTER_EMAIL='max2guy@gmail.com'; // 최고 관리자 이메일
 var firebaseConfig={apiKey:"AIzaSyCxCyx8-wtwVNmDzOUuVKdJ4kfFcw2VBpY",authDomain:"passport-cross.firebaseapp.com",projectId:"passport-cross",storageBucket:"passport-cross.firebasestorage.app",messagingSenderId:"68059868627",appId:"1:68059868627:web:9191ca01a05edaf055d326"};
 firebase.initializeApp(firebaseConfig);
 var db=firebase.firestore();
@@ -409,29 +334,55 @@ var allSubmissions=[];
 var currentFilter='pending';
 var unsubscribe=null;
 
-// 로그인 상태 감지 — 익명 사용자는 관리자 패널 접근 불가
+/* ===== Auth Guard =====
+ * 페이지 로드 시 권한을 검증합니다.
+ *  1. 비로그인 or 익명 → index.html 즉시 리다이렉트
+ *  2. Google 로그인 + MASTER_EMAIL → 바로 통과
+ *  3. Google 로그인 + 일반 교사 → Firestore admins/{email} 확인
+ *     → 없으면 alert + index.html 리다이렉트
+ */
 auth.onAuthStateChanged(function(user){
-  if(user && !user.isAnonymous && user.email){
-    localStorage.setItem('passportCrossAdmin','true');
-    document.getElementById('loginWrap').style.display='none';
-    document.getElementById('appWrap').style.display='flex';
-    document.getElementById('adminEmail').textContent=user.email;
-    startListener();
-    if(user.email===MASTER_EMAIL){
-      document.getElementById('resetSection').classList.add('show');
-      document.getElementById('accountsBtn').style.display='';
-    }
-  }else{
-    localStorage.removeItem('passportCrossAdmin');
-    document.getElementById('loginWrap').style.display='flex';
-    document.getElementById('appWrap').style.display='none';
-    document.getElementById('resetSection').classList.remove('show');
-    document.getElementById('accountsBtn').style.display='none';
-    if(unsubscribe)unsubscribe();
-    // 익명 사용자라면 로그아웃 처리
-    if(user && user.isAnonymous){auth.signOut();}
+  var loading=document.getElementById('authLoading');
+  if(!user||user.isAnonymous||!user.email){
+    // 비로그인 또는 익명 사용자 → index.html로 튕겨냄
+    window.location.href='index.html';
+    return;
   }
+  // 최고 관리자: admins 컬렉션 조회 없이 즉시 통과
+  if(user.email===MASTER_EMAIL){
+    if(loading)loading.style.display='none';
+    showAdminApp(user);
+    return;
+  }
+  // 일반 교사: admins/{email} 문서 존재 확인
+  db.collection('admins').doc(user.email).get()
+    .then(function(doc){
+      if(loading)loading.style.display='none';
+      if(doc.exists){
+        showAdminApp(user);
+      } else {
+        alert('권한이 없습니다.\n관리자에게 이메일 등록을 요청하세요.');
+        auth.signOut().then(function(){ window.location.href='index.html'; });
+      }
+    })
+    .catch(function(err){
+      if(loading)loading.style.display='none';
+      alert('권한 확인 중 오류: '+err.message);
+      auth.signOut().then(function(){ window.location.href='index.html'; });
+    });
 });
+
+/** 권한 확인 통과 후 관리자 앱 UI를 표시하고 Firestore 리스너를 시작합니다 */
+function showAdminApp(user){
+  document.getElementById('appWrap').style.display='flex';
+  document.getElementById('adminEmail').textContent=user.email;
+  startListener();
+  // 최고 관리자 전용 기능 노출
+  if(user.email===MASTER_EMAIL){
+    document.getElementById('resetSection').classList.add('show');
+    document.getElementById('accountsBtn').style.display='';
+  }
+}
 
 function deleteSubmission(subId,uid,missionIdx){
   if(!confirm('이 제출 내역을 삭제하시겠습니까?'))return;
@@ -485,51 +436,7 @@ function resetAll(){
     .catch(function(e){alert('오류: '+e.message)});
 }
 
-function switchTab(tab){
-  document.querySelectorAll('.login-tab').forEach(function(t,i){t.classList.toggle('active',i===(tab==='login'?0:1))});
-  document.getElementById('formLogin').classList.toggle('active',tab==='login');
-  document.getElementById('formSignup').classList.toggle('active',tab==='signup');
-  document.getElementById('loginError').textContent='';
-}
-
-function doLogin(){
-  var email=document.getElementById('loginEmail').value.trim();
-  var pw=document.getElementById('loginPassword').value;
-  document.getElementById('loginError').textContent='';
-  if(!email||!pw){document.getElementById('loginError').textContent='이메일과 비밀번호를 입력하세요';return}
-  auth.signInWithEmailAndPassword(email,pw).catch(function(err){
-    var msg=err.code==='auth/invalid-credential'?'이메일 또는 비밀번호가 올바르지 않습니다':err.message;
-    document.getElementById('loginError').textContent=msg;
-  });
-}
-
-function doSignup(){
-  var name=document.getElementById('signupName').value.trim();
-  var email=document.getElementById('signupEmail').value.trim();
-  var pw=document.getElementById('signupPassword').value;
-  var code=document.getElementById('signupCode').value.trim();
-  var err=document.getElementById('loginError');
-  err.textContent='';
-  if(!name||!email||!pw||!code){err.textContent='모든 항목을 입력하세요';return}
-  if(code!==INVITE_CODE){err.textContent='초대 코드가 올바르지 않습니다';return}
-  if(pw.length<6){err.textContent='비밀번호는 6자리 이상이어야 합니다';return}
-  auth.createUserWithEmailAndPassword(email,pw).then(function(cred){
-    var uid=cred.user.uid;
-    return cred.user.updateProfile({displayName:name}).then(function(){
-      return db.collection('admins').doc(uid).set({name:name,email:email,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-    });
-  }).then(function(){
-    err.style.color='#3a8a50';err.textContent='계정이 생성되었습니다. 로그인해 주세요.';
-    auth.signOut();
-    setTimeout(function(){switchTab('login');err.textContent='';err.style.color='';},1500);
-  }).catch(function(e){
-    var msg=e.code==='auth/email-already-in-use'?'이미 사용 중인 이메일입니다':e.message;
-    err.textContent=msg;
-  });
-}
-
-document.getElementById('loginPassword').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
-
+// 로그아웃 → onAuthStateChanged(null) → index.html 리다이렉트
 function doLogout(){auth.signOut()}
 
 function startListener(){

@@ -213,8 +213,6 @@ html,body{
   border:none;border-radius:var(--radius-sm);cursor:pointer;letter-spacing:1px;transition:background .2s;
 }
 .ob-btn:active{background:var(--gold-dim)}
-.ob-admin-link{display:block;text-align:center;margin-top:16px;font-size:12px;color:var(--text-dim);text-decoration:none;letter-spacing:.5px;opacity:.6}
-.ob-admin-link:hover{opacity:1;color:var(--gold)}
 .ob-btn:disabled{opacity:.4;pointer-events:none}
 
 /* APP SHELL */
@@ -669,7 +667,6 @@ html,body{
     <input type="text" id="obName" placeholder="이름을 입력하세요" maxlength="10" autocomplete="off">
   </div>
   <button class="ob-btn" id="obSubmit" disabled>여권 발급받기</button>
-  <a href="admin.html" class="ob-admin-link">관리자 로그인</a>
   <select id="obGrade" style="display:none"></select>
 </div>
 
@@ -765,11 +762,38 @@ html,body{
           <span class="mi-arrow">›</span>
         </div>
       </div>
-      <div class="more-section-title">관리자</div>
-      <div class="more-list">
-        <div class="more-item" onclick="goAdmin()">
-          <div class="mi-left"><span class="mi-icon">🔐</span><span class="mi-text" id="adminModeText">관리자 로그인</span></div>
+      <div class="more-section-title">교사 · 임원</div>
+
+      <!-- 로그아웃 상태: 구글 로그인 버튼 -->
+      <div id="adminLoginSection" class="more-list">
+        <div class="more-item" onclick="adminLoginWithGoogle()">
+          <div class="mi-left"><span class="mi-icon">🔐</span><span class="mi-text">교사/임원 구글 로그인</span></div>
           <span class="mi-arrow">›</span>
+        </div>
+      </div>
+
+      <!-- 로그인 상태: 관리자 메뉴 (기본 숨김) -->
+      <div id="adminMenu" style="display:none">
+        <div class="more-list">
+          <div class="more-item" onclick="goAdminPage()">
+            <div class="mi-left"><span class="mi-icon">📋</span><span class="mi-text">관리자 페이지 (도장찍기) 이동</span></div>
+            <span class="mi-arrow">›</span>
+          </div>
+          <!-- 최고관리자(max2guy@gmail.com) 전용: 새 관리자 추가 -->
+          <div class="more-item" id="addTeacherBtn" style="display:none" onclick="addTeacherAdmin()">
+            <div class="mi-left"><span class="mi-icon">➕</span><span class="mi-text">새 관리자 추가</span></div>
+            <span class="mi-arrow">›</span>
+          </div>
+          <div class="more-item" onclick="adminLogout()">
+            <div class="mi-left">
+              <span class="mi-icon">🚪</span>
+              <div>
+                <div class="mi-text">로그아웃</div>
+                <div id="adminLoggedInEmail" style="font-size:11px;color:var(--text-dim);margin-top:2px"></div>
+              </div>
+            </div>
+            <span class="mi-arrow">›</span>
+          </div>
         </div>
       </div>
       <div style="text-align:center;padding:32px 0 16px">
@@ -978,6 +1002,25 @@ auth.signInAnonymously().then(function(){
 // 3초 안에 auth 안 되면 강제 실행
 setTimeout(function(){if(!appReady){appReady=true;bootApp();}},3000);
 
+/* ===== 교사/임원 로그인 상태 감지 =====
+ * - Google 로그인 상태면 권한 확인 후 관리자 메뉴 표시
+ * - 익명 or 완전 비로그인 상태면 관리자 메뉴 숨김
+ * - 비로그인(null) 상태면 익명 세션 즉시 복구 (학생 앱 보호)
+ */
+auth.onAuthStateChanged(function(user){
+  if(user && !user.isAnonymous && user.email){
+    // Google(또는 이메일) 로그인 상태 → 교사 권한 확인
+    checkAdminRole(user);
+  } else {
+    // 익명 or 완전 비로그인
+    updateAdminUI(null);
+    if(!user){
+      // 완전 로그아웃 상태 → 익명 세션 복구 (학생 앱이 auth 없이 멈추지 않도록)
+      auth.signInAnonymously().catch(function(){});
+    }
+  }
+});
+
 function getUID(){
   var user=auth.currentUser;
   if(user)return user.uid;
@@ -989,6 +1032,109 @@ function getUID(){
 var unsubscribeFirestore=null;
 var currentMissionIdx=-1;
 var selectedGroup='';
+
+/* ===== 교사/임원 관리자 기능 ===== */
+var MASTER_EMAIL='max2guy@gmail.com'; // 최고 관리자 — admins 컬렉션 체크 없이 통과
+
+/**
+ * 구글 팝업으로 교사/임원 로그인
+ * 성공 시 onAuthStateChanged → checkAdminRole 순으로 자동 처리됨
+ */
+function adminLoginWithGoogle(){
+  var provider=new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(function(err){
+    if(err.code==='auth/popup-closed-by-user')return; // 사용자가 팝업 닫음 (정상)
+    toast('로그인 실패: '+err.message);
+  });
+}
+
+/**
+ * 관리자 권한 확인
+ *  - MASTER_EMAIL: 즉시 통과 (Firestore 조회 없음)
+ *  - 그 외: Firestore admins/{email} 문서 존재 여부 확인
+ *  - 등록 안 됐으면 alert + 강제 로그아웃 (→ onAuthStateChanged → 익명 세션 복구)
+ */
+function checkAdminRole(user){
+  if(!user||!user.email){auth.signOut();return;}
+  if(user.email===MASTER_EMAIL){
+    updateAdminUI(user);
+    toast('관리자로 로그인되었습니다');
+    return;
+  }
+  // admins 컬렉션에 이메일 문서가 있는지 확인
+  db.collection('admins').doc(user.email).get()
+    .then(function(doc){
+      if(doc.exists){
+        updateAdminUI(user);
+        toast('교사 로그인 완료');
+      } else {
+        alert('권한이 없습니다.\n관리자에게 이메일 등록을 요청하세요.');
+        auth.signOut(); // → onAuthStateChanged(null) → 익명 세션 자동 복구
+      }
+    })
+    .catch(function(err){
+      alert('권한 확인 중 오류: '+err.message);
+      auth.signOut();
+    });
+}
+
+/**
+ * 관리자 UI 표시/숨김
+ * user가 null이면 로그인 버튼 표시, 아니면 관리자 메뉴 표시
+ */
+function updateAdminUI(user){
+  var loginSection=document.getElementById('adminLoginSection');
+  var menu=document.getElementById('adminMenu');
+  var addBtn=document.getElementById('addTeacherBtn');
+  var emailEl=document.getElementById('adminLoggedInEmail');
+  if(!user){
+    // 로그아웃 상태
+    if(loginSection)loginSection.style.display='';
+    if(menu)menu.style.display='none';
+  } else {
+    // 로그인 상태
+    if(loginSection)loginSection.style.display='none';
+    if(menu)menu.style.display='';
+    if(emailEl)emailEl.textContent=user.email;
+    // 최고 관리자만 "새 관리자 추가" 버튼 노출
+    if(addBtn)addBtn.style.display=(user.email===MASTER_EMAIL?'':'none');
+  }
+}
+
+/**
+ * 관리자 로그아웃
+ * signOut → onAuthStateChanged(null) → updateAdminUI(null) + signInAnonymously 자동 복구
+ */
+function adminLogout(){
+  auth.signOut();
+}
+
+/** 관리자 페이지(admin.html)로 이동 */
+function goAdminPage(){
+  window.location.href='admin.html';
+}
+
+/**
+ * 새 관리자(교사) 이메일 등록
+ * 최고 관리자(MASTER_EMAIL)만 실행 가능
+ * Firestore admins/{email} 문서를 생성: { addedAt, addedBy }
+ */
+function addTeacherAdmin(){
+  var user=auth.currentUser;
+  if(!user||user.email!==MASTER_EMAIL){alert('최고 관리자만 사용할 수 있습니다.');return;}
+  var email=prompt('등록할 교사의 구글 이메일 주소를 입력하세요:');
+  if(!email)return;
+  email=email.trim().toLowerCase();
+  if(!email.includes('@')){alert('올바른 이메일 형식이 아닙니다.');return;}
+  db.collection('admins').doc(email).set({
+    addedAt:firebase.firestore.FieldValue.serverTimestamp(),
+    addedBy:MASTER_EMAIL
+  }).then(function(){
+    toast(email+' 등록 완료');
+  }).catch(function(err){
+    alert('등록 실패: '+err.message);
+  });
+}
 
 function getMissions(g){return g==='young'?MISSIONS_YOUNG:MISSIONS_YOUTH}
 function getGroupLabel(g){return g==='young'?'청년부':'중고등부'}
@@ -1199,7 +1345,7 @@ function switchTab(tabId,btn,dir){
   document.getElementById(tabId).classList.add('active');
   document.querySelectorAll('.tab-bar button').forEach(function(b){b.classList.remove('active')});
   btn.classList.add('active');
-  if(tabId==='tabMore')updateAdminModeText();
+  // (구 updateAdminModeText 제거됨 — onAuthStateChanged가 실시간으로 관리자 UI 유지)
 }
 
 // ===== 스와이프 탭 이동 =====
@@ -1758,18 +1904,6 @@ function forceRefresh(){
   setTimeout(function(){location.reload(true);},800);
 }
 
-function goAdmin(){
-  // 관리자로 로그인되어 있으면 admin.html로, 아니면 로그인 페이지로 (같은 admin.html)
-  window.location.href='admin.html';
-}
-
-// 더보기 탭 열릴 때 관리자 로그인 상태 표시 업데이트
-function updateAdminModeText(){
-  var el=document.getElementById('adminModeText');if(!el)return;
-  // Firebase auth 상태 확인 (admin.html의 세션은 별개이므로 localStorage 힌트 사용)
-  var isAdmin=localStorage.getItem('passportCrossAdmin')==='true';
-  el.textContent=isAdmin?'관리자 페이지로 전환':'관리자 로그인';
-}
 
 function switchTabTo(tabId){
   var idx=TABS.indexOf(tabId);if(idx<0)return;
