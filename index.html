@@ -254,6 +254,32 @@ html,body{
 .tab-bar button.active{color:var(--gold)}
 .tab-bar button .tab-icon{font-size:20px}
 
+/* COMMUNITY THERMO */
+.community-thermo{background:var(--bg2);border:1px solid rgba(197,165,90,.15);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;position:relative;overflow:hidden}
+.community-thermo::before{content:'✝';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:64px;opacity:.04;pointer-events:none}
+.thermo-label{font-size:10px;color:var(--gold-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.thermo-count-row{display:flex;align-items:baseline;gap:6px;margin-bottom:10px}
+.thermo-count{font-family:var(--font-mono);font-size:36px;font-weight:700;color:var(--gold);line-height:1}
+.thermo-unit{font-size:13px;color:var(--text-dim)}
+.thermo-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.thermo-fill{height:100%;background:linear-gradient(90deg,var(--wine),var(--gold));border-radius:3px;transition:width 1.2s ease;width:0%}
+.thermo-desc{font-size:12px;color:var(--text-dim);line-height:1.6}
+
+/* GRACE FEED */
+.feed-page{overflow-y:auto;-webkit-overflow-scrolling:touch}
+.feed-list{padding:16px 16px calc(var(--safe-bottom)+80px);display:flex;flex-direction:column;gap:14px}
+.feed-card{background:var(--bg2);border:1px solid rgba(197,165,90,.12);border-radius:var(--radius);overflow:hidden}
+.feed-card-header{display:flex;align-items:center;gap:10px;padding:14px 16px 10px}
+.feed-avatar{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid rgba(197,165,90,.2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;overflow:hidden}
+.feed-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.feed-meta{flex:1;min-width:0}
+.feed-name{font-size:14px;font-weight:700;color:var(--text)}
+.feed-day{font-size:11px;color:var(--gold-dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feed-card-body{padding:0 16px 14px}
+.feed-text{font-size:14px;color:var(--text);line-height:1.8;word-break:keep-all;white-space:pre-wrap;margin-bottom:2px}
+.feed-photo{width:100%;max-height:300px;object-fit:cover;display:block;border-radius:var(--radius-sm);margin-top:10px}
+.feed-empty{text-align:center;padding:60px 20px;color:var(--text-dim);font-size:14px;line-height:2.2}
+
 /* PASSPORT */
 .passport-card{background:var(--bg2);border:1px solid rgba(197,165,90,.15);border-radius:var(--radius);padding:24px 20px;margin-bottom:16px;position:relative;overflow:hidden}
 .passport-card::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(197,165,90,.08),transparent 70%)}
@@ -701,6 +727,15 @@ html,body{
         </div>
         <div class="stamp-grid" id="stampGrid"></div>
       </div>
+      <div class="community-thermo" id="communityThermo" style="display:none">
+        <div class="thermo-label">Community Progress</div>
+        <div class="thermo-count-row">
+          <span class="thermo-count" id="thermoCount">0</span>
+          <span class="thermo-unit">보의 십자가 길</span>
+        </div>
+        <div class="thermo-bar"><div class="thermo-fill" id="thermoFill"></div></div>
+        <div class="thermo-desc" id="thermoDesc">우리 공동체가 함께 걷고 있습니다</div>
+      </div>
       <div class="pastoral">
         <h4>✝ 목회적 안내</h4>
         <p><strong>"THE CROSS PASSPORT는 자격증이 아닙니다."</strong><br>
@@ -712,6 +747,11 @@ html,body{
     </div>
     <div class="tab-page" id="tabMission">
       <div class="mission-list" id="missionList"></div>
+    </div>
+    <div class="tab-page feed-page" id="tabFeed">
+      <div class="feed-list" id="feedList">
+        <div class="feed-empty">불러오는 중...</div>
+      </div>
     </div>
     <div class="tab-page" id="tabScreen">
       <div class="screen-section">
@@ -799,13 +839,14 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.5.6</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.0</div>
       </div>
     </div>
   </div>
   <nav class="tab-bar">
     <button class="active" onclick="switchTab('tabPassport',this)"><span class="tab-icon">📕</span>여권</button>
     <button onclick="switchTab('tabMission',this)"><span class="tab-icon">📋</span>미션</button>
+    <button onclick="switchTab('tabFeed',this)"><span class="tab-icon">🕊️</span>나눔</button>
     <button onclick="switchTab('tabScreen',this)"><span class="tab-icon">🖼️</span>배경화면</button>
     <button onclick="switchTab('tabMore',this)"><span class="tab-icon">⚙️</span>더보기</button>
   </nav>
@@ -1394,6 +1435,8 @@ function showApp(data){
   applyProfilePhoto(data.profilePhoto||null);
   renderStamps(data);renderMissionList(data);renderScreenGrid();
   document.getElementById('app').classList.add('show');
+  // 피드 & 온도계 실시간 리스너 시작
+  if(data.group)startFeedListener(data.group);
   // SW 등록 완료 후 FCM 초기화 (학생 토큰 발급 + 포그라운드 수신)
   initFCM();
 }
@@ -1411,7 +1454,80 @@ function switchTab(tabId,btn,dir){
 }
 
 // ===== 스와이프 탭 이동 =====
-var TABS=['tabPassport','tabMission','tabScreen','tabMore'];
+var TABS=['tabPassport','tabMission','tabFeed','tabScreen','tabMore'];
+
+// ===== 피드 & 온도계 =====
+var _feedUnsub=null;
+
+function startFeedListener(group){
+  if(_feedUnsub){_feedUnsub();_feedUnsub=null;}
+  _feedUnsub=db.collection('submissions')
+    .where('status','==','approved')
+    .onSnapshot(function(snap){
+      var groupCount=0;
+      var docs=[];
+      snap.forEach(function(doc){
+        var d=doc.data();
+        if(d.group===group)groupCount++;
+        if(d.text||d.photo)docs.push(doc); // 내용 있는 것만 피드에
+      });
+      // 클라이언트 정렬 (approvedAt 내림차순)
+      docs.sort(function(a,b){
+        var at=a.data().approvedAt;var bt=b.data().approvedAt;
+        if(!at&&!bt)return 0;if(!at)return 1;if(!bt)return -1;
+        return bt.seconds-at.seconds;
+      });
+      updateThermo(groupCount,group);
+      renderFeed(docs);
+    },function(){
+      document.getElementById('feedList').innerHTML='<div class="feed-empty">피드를 불러올 수 없습니다</div>';
+    });
+}
+
+function updateThermo(count,group){
+  var el=document.getElementById('communityThermo');
+  if(!el)return;
+  el.style.display='';
+  document.getElementById('thermoCount').textContent=count;
+  var gl=group==='young'?'청년부':'중고등부';
+  document.getElementById('thermoDesc').textContent=gl+' 공동체가 함께 걸어간 십자가의 길';
+  // 진행 바: 예상 최대(20명×6=120)를 기준으로 시각화
+  var pct=Math.min(100,Math.round(count/120*100));
+  document.getElementById('thermoFill').style.width=pct+'%';
+}
+
+function renderFeed(docs){
+  var list=document.getElementById('feedList');
+  if(!list)return;
+  if(docs.length===0){
+    list.innerHTML='<div class="feed-empty">✝<br>아직 나눔이 없습니다.<br>첫 미션 승인 후 여기에 표시됩니다.</div>';
+    return;
+  }
+  var html='';
+  docs.forEach(function(doc){
+    var d=doc.data();
+    var name=escFeed(d.userName||'익명');
+    var gl=d.group==='young'?'청년부':'중고등부';
+    var dayLabel=d.missionDay?d.missionDay+'요일 · ':'';
+    var missionName=escFeed(d.missionName||'미션');
+    var textHtml=d.text?'<div class="feed-text">'+escFeed(d.text)+'</div>':'';
+    var photoHtml=d.photo?'<img class="feed-photo" src="'+escFeed(d.photo)+'" loading="lazy" alt="">':'';
+    html+='<div class="feed-card">'
+      +'<div class="feed-card-header">'
+        +'<div class="feed-avatar">🙏</div>'
+        +'<div class="feed-meta">'
+          +'<div class="feed-name">'+name+' <span style="font-size:11px;color:var(--text-dim);font-weight:400">'+escFeed(gl)+'</span></div>'
+          +'<div class="feed-day">'+escFeed(dayLabel)+missionName+'</div>'
+        +'</div>'
+      +'</div>'
+      +'<div class="feed-card-body">'+textHtml+photoHtml+'</div>'
+    +'</div>';
+  });
+  list.innerHTML=html;
+}
+
+function escFeed(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
 var _sx=0,_sy=0,_st=0;
 
 function getCurTabIdx(){
