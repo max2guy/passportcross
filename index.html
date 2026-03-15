@@ -839,7 +839,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.2</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.3</div>
       </div>
     </div>
   </div>
@@ -1852,61 +1852,58 @@ function wpSymbol(ctx,idx,s){
 }
 
 function drawWallpaper(c,w,idx){
-  return new Promise(function(resolve){
-    var ctx=c.getContext('2d');var W=c.width,H=c.height;var s=W/1080;
-    function drawOverlayAndText(){
-      // 다크 그라디언트 오버레이
-      var ov=ctx.createLinearGradient(0,0,0,H);
-      ov.addColorStop(0,'rgba(13,15,20,0.40)');ov.addColorStop(1,'rgba(13,15,20,0.95)');
-      ctx.fillStyle=ov;ctx.fillRect(0,0,W,H);
-      // 테두리
-      ctx.strokeStyle='rgba(197,165,90,0.52)';ctx.lineWidth=3*s;ctx.strokeRect(36*s,36*s,W-72*s,H-72*s);
-      ctx.strokeStyle='rgba(197,165,90,0.18)';ctx.lineWidth=1*s;ctx.strokeRect(58*s,58*s,W-116*s,H-116*s);
-      // 코너 장식
-      var cm=44*s,co=58*s;ctx.strokeStyle='rgba(197,165,90,0.55)';ctx.lineWidth=2*s;
-      [[co,co,1,1],[W-co,co,-1,1],[co,H-co,1,-1],[W-co,H-co,-1,-1]].forEach(function(p){
-        ctx.beginPath();ctx.moveTo(p[0]+p[2]*cm,p[1]);ctx.lineTo(p[0],p[1]);ctx.lineTo(p[0],p[1]+p[3]*cm);ctx.stroke();
-      });
-      // 헤더
-      ctx.textAlign='center';ctx.textBaseline='alphabetic';
-      ctx.fillStyle='rgba(197,165,90,0.72)';ctx.font='bold '+(21*s)+'px monospace';
-      ctx.fillText('✝  THE CROSS PASSPORT',W*.5,140*s);
-      ctx.strokeStyle='rgba(197,165,90,0.22)';ctx.lineWidth=1*s;
-      ctx.beginPath();ctx.moveTo(155*s,182*s);ctx.lineTo(925*s,182*s);ctx.stroke();
-      ctx.fillStyle='rgba(154,150,142,0.72)';ctx.font=(26*s)+'px sans-serif';
-      ctx.fillText(w.day+'요일  ·  '+w.theme,W*.5,238*s);
-      // 본문 성경 구절
-      ctx.fillStyle='#ede9e0';ctx.font='bold '+(70*s)+'px serif';
-      var lines=w.text.split('\n');var ty=H*.615;
-      lines.forEach(function(line,i){ctx.fillText(line,W*.5,ty+i*90*s)});
-      ctx.fillStyle='rgba(197,165,90,0.88)';ctx.font=(37*s)+'px monospace';
-      ctx.fillText(w.verse,W*.5,ty+lines.length*90*s+70*s);
-      // 하단
-      ctx.strokeStyle='rgba(197,165,90,0.22)';ctx.lineWidth=1*s;
-      ctx.beginPath();ctx.moveTo(155*s,H-192*s);ctx.lineTo(925*s,H-192*s);ctx.stroke();
-      ctx.fillStyle='rgba(154,150,142,0.38)';ctx.font=(25*s)+'px sans-serif';
-      ctx.fillText('연천장로교회  ·  2026 고난주간',W*.5,H-145*s);
-      resolve();
-    }
-    if(w.bg){
-      var img=new Image();
-      img.onload=function(){
-        var iR=img.width/img.height,cR=W/H;
-        var sx,sy,sw,sh;
-        if(iR>cR){sw=img.height*cR;sh=img.height;sx=(img.width-sw)/2;sy=0;}
-        else{sw=img.width;sh=img.width/cR;sx=0;sy=(img.height-sh)/2;}
-        ctx.drawImage(img,sx,sy,sw,sh,0,0,W,H);
-        drawOverlayAndText();
-      };
-      img.onerror=function(){
+  return document.fonts.ready.then(function(){
+    return new Promise(function(resolve){
+      var ctx=c.getContext('2d');var W=c.width,H=c.height;var s=W/1080;
+      function drawOverlayAndText(){
+        // 다크 그라디언트 오버레이
+        var ov=ctx.createLinearGradient(0,0,0,H);
+        ov.addColorStop(0,'rgba(13,15,20,0.35)');ov.addColorStop(1,'rgba(13,15,20,0.96)');
+        ctx.fillStyle=ov;ctx.fillRect(0,0,W,H);
+        ctx.textAlign='center';ctx.textBaseline='alphabetic';
+        // 헤더 — Playfair Display
+        ctx.fillStyle='rgba(197,165,90,0.80)';
+        ctx.font='700 '+(22*s)+'px "Playfair Display", serif';
+        ctx.fillText('✝  THE CROSS PASSPORT',W*.5,136*s);
+        // 부제 — Noto Serif KR
+        ctx.fillStyle='rgba(200,196,188,0.70)';
+        ctx.font='400 '+(24*s)+'px "Noto Serif KR", serif';
+        ctx.fillText(w.day+'요일  ·  '+w.theme,W*.5,222*s);
+        // 본문 성경 구절 — Noto Serif KR bold, 작은 크기
+        ctx.fillStyle='rgba(237,233,224,0.95)';
+        ctx.font='700 '+(52*s)+'px "Noto Serif KR", serif';
+        var lines=w.text.split('\n');var ty=H*.60;
+        lines.forEach(function(line,i){ctx.fillText(line,W*.5,ty+i*72*s);});
+        // 출처 구절 — Playfair Display
+        ctx.fillStyle='rgba(197,165,90,0.85)';
+        ctx.font='400 '+(30*s)+'px "Playfair Display", serif';
+        ctx.fillText(w.verse,W*.5,ty+lines.length*72*s+62*s);
+        // 하단 교회명 — Noto Serif KR
+        ctx.fillStyle='rgba(154,150,142,0.45)';
+        ctx.font='400 '+(22*s)+'px "Noto Serif KR", serif';
+        ctx.fillText('연천장로교회  ·  2026 고난주간',W*.5,H-120*s);
+        resolve();
+      }
+      if(w.bg){
+        var img=new Image();
+        img.onload=function(){
+          var iR=img.width/img.height,cR=W/H;
+          var sx,sy,sw,sh;
+          if(iR>cR){sw=img.height*cR;sh=img.height;sx=(img.width-sw)/2;sy=0;}
+          else{sw=img.width;sh=img.width/cR;sx=0;sy=(img.height-sh)/2;}
+          ctx.drawImage(img,sx,sy,sw,sh,0,0,W,H);
+          drawOverlayAndText();
+        };
+        img.onerror=function(){
+          ctx.fillStyle='#17192e';ctx.fillRect(0,0,W,H);
+          drawOverlayAndText();
+        };
+        img.src=w.bg;
+      } else {
         ctx.fillStyle='#17192e';ctx.fillRect(0,0,W,H);
         drawOverlayAndText();
-      };
-      img.src=w.bg;
-    } else {
-      ctx.fillStyle='#17192e';ctx.fillRect(0,0,W,H);
-      drawOverlayAndText();
-    }
+      }
+    });
   });
 }
 
