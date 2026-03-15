@@ -414,7 +414,11 @@ function updateAdminFCMToken(user){
       location.reload();
     }
   });
-  navigator.serviceWorker.ready.then(function(reg){
+  // sw.js 등록 (미등록 시 navigator.serviceWorker.ready가 영원히 pending되는 문제 방지)
+  var swReady = ('serviceWorker' in navigator)
+    ? navigator.serviceWorker.register('sw.js').then(function(){ return navigator.serviceWorker.ready; })
+    : Promise.reject('serviceWorker 미지원');
+  swReady.then(function(reg){
     return Notification.requestPermission().then(function(perm){
       if(perm!=='granted')return null;
       return messaging.getToken({vapidKey:VAPID_KEY,serviceWorkerRegistration:reg});

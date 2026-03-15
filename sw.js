@@ -21,12 +21,29 @@ messaging.onBackgroundMessage(function(payload) {
   self.registration.showNotification(notif.title || 'THE CROSS PASSPORT', {
     body: notif.body || '',
     icon: './icon-192.png',
-    badge: './icon-192.png'
+    badge: './icon-192.png',
+    data: { url: self.location.origin + self.location.pathname.replace(/sw\.js$/, '') }
   });
 });
 
+// 알림 탭 → 앱 열기 (이미 열려있으면 포커스, 없으면 새 창)
+self.addEventListener('notificationclick', function(e) {
+  e.notification.close();
+  const target = (e.notification.data && e.notification.data.url) || self.location.origin;
+  e.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(list) {
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].url.startsWith(self.location.origin) && 'focus' in list[i]) {
+          return list[i].focus();
+        }
+      }
+      if (clients.openWindow) return clients.openWindow(target);
+    })
+  );
+});
+
 /* ===== 캐시 전략 ===== */
-const CACHE_NAME = 'passport-cross-v80';
+const CACHE_NAME = 'passport-cross-v81';
 const ASSETS = [
   './',
   './index.html',
