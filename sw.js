@@ -43,7 +43,7 @@ self.addEventListener('notificationclick', function(e) {
 });
 
 /* ===== 캐시 전략 ===== */
-const CACHE_NAME = 'passport-cross-v99';
+const CACHE_NAME = 'passport-cross-v100';
 const ASSETS = [
   './',
   './index.html',
