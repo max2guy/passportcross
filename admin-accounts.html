@@ -150,7 +150,8 @@ function loadAdminList(){
     var html='';
     snap.forEach(function(doc){
       var d=doc.data();
-      if(d.email===MASTER_EMAIL)return;
+      // doc.id가 MASTER_EMAIL이거나 name 필드 없는 FCM 전용 문서는 건너뜀
+      if(doc.id===MASTER_EMAIL||d.email===MASTER_EMAIL||!d.name)return;
       html+='<div class="admin-card">'
         +'<div class="admin-info">'+escHtml(d.name)+'<span class="admin-email">'+escHtml(d.email)+'</span></div>'
         +'<div class="admin-actions">'
