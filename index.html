@@ -879,7 +879,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.7.1</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.7.2</div>
       </div>
     </div>
   </div>
@@ -1997,7 +1997,7 @@ function drawWallpaper(c,w,idx,fullRes){
           g.addColorStop(1,'rgba(0,0,0,0)');
           ctx.fillStyle=g;ctx.fillRect(0,y1,W,y2-y1);
         }
-        var lines=w.text.split('\n');var lh=78*ys;var ty=1090*ys;
+        var lines=w.text.split('\n');var lh=68*ys;var ty=940*ys;
         var verseY=ty+(lines.length-1)*lh+lh*0.5+55*ys;
         ctx.shadowColor='transparent';ctx.shadowBlur=0;
         band(1038*ys,verseY+42*ys, 0.55); // 성경구절+출처
@@ -2011,7 +2011,7 @@ function drawWallpaper(c,w,idx,fullRes){
         ctx.font='400 '+(24*fs)+'px "Noto Serif KR",serif';
         ctx.fillText(w.day+'요일  ·  '+w.theme,W*.5,185*ys);
         ctx.fillStyle='rgba(237,233,224,0.97)';
-        ctx.font='700 '+(52*fs)+'px "Noto Serif KR",serif';
+        ctx.font='700 '+(38*fs)+'px "Noto Serif KR",serif';
         lines.forEach(function(line,i){ctx.fillText(line,W*.5,ty+i*lh);});
         ctx.fillStyle='rgba(197,165,90,0.88)';
         ctx.font='italic 400 '+(28*fs)+'px "Playfair Display",serif';
