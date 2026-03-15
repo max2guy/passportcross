@@ -839,7 +839,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.4</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.5</div>
       </div>
     </div>
   </div>
@@ -1851,58 +1851,66 @@ function wpSymbol(ctx,idx,s){
   ctx.restore();
 }
 
-function drawWallpaper(c,w,idx){
+function drawWallpaper(c,w,idx,fullRes){
   return document.fonts.ready.then(function(){
     return new Promise(function(resolve){
-      var ctx=c.getContext('2d');var W=c.width,H=c.height;var s=W/1080;
-      function drawOverlayAndText(){
-        // 다크 그라디언트 오버레이
+      function paintText(ctx,W,H){
+        // fs: 폰트 크기 기준 (W 기반), ys: y 위치 기준 (H 기반)
+        var fs=W/1080, ys=H/1920;
         var ov=ctx.createLinearGradient(0,0,0,H);
         ov.addColorStop(0,'rgba(13,15,20,0.35)');ov.addColorStop(1,'rgba(13,15,20,0.96)');
         ctx.fillStyle=ov;ctx.fillRect(0,0,W,H);
-        // textBaseline='middle' → y좌표가 항상 텍스트 정중앙 → 폰트 관계없이 정확히 정렬됨
         ctx.textAlign='center';ctx.textBaseline='middle';
-        // 헤더 — Playfair Display  (y=110s: 상단에서 110px)
+        // 헤더
         ctx.fillStyle='rgba(197,165,90,0.80)';
-        ctx.font='700 '+(22*s)+'px "Playfair Display",serif';
-        ctx.fillText('✝  THE CROSS PASSPORT',W*.5,110*s);
-        // 부제 — Noto Serif KR  (y=185s)
+        ctx.font='700 '+(22*fs)+'px "Playfair Display",serif';
+        ctx.fillText('✝  THE CROSS PASSPORT',W*.5,110*ys);
+        // 부제
         ctx.fillStyle='rgba(200,196,188,0.70)';
-        ctx.font='400 '+(24*s)+'px "Noto Serif KR",serif';
-        ctx.fillText(w.day+'요일  ·  '+w.theme,W*.5,185*s);
-        // 본문 성경 구절 — Noto Serif KR bold  (1행 y=1090s, 행간 78s)
+        ctx.font='400 '+(24*fs)+'px "Noto Serif KR",serif';
+        ctx.fillText(w.day+'요일  ·  '+w.theme,W*.5,185*ys);
+        // 성경 구절
         ctx.fillStyle='rgba(237,233,224,0.95)';
-        ctx.font='700 '+(52*s)+'px "Noto Serif KR",serif';
-        var lines=w.text.split('\n');var lh=78*s;var ty=1090*s;
+        ctx.font='700 '+(52*fs)+'px "Noto Serif KR",serif';
+        var lines=w.text.split('\n');var lh=78*ys;var ty=1090*ys;
         lines.forEach(function(line,i){ctx.fillText(line,W*.5,ty+i*lh);});
-        // 출처 구절 — Playfair Display italic  (구절 마지막 행 아래 55s)
+        // 출처
         ctx.fillStyle='rgba(197,165,90,0.85)';
-        ctx.font='italic 400 '+(28*s)+'px "Playfair Display",serif';
-        ctx.fillText(w.verse,W*.5,ty+(lines.length-1)*lh+lh*0.5+55*s);
-        // 하단 교회명 — Noto Serif KR  (y=1820s: 하단에서 100px)
+        ctx.font='italic 400 '+(28*fs)+'px "Playfair Display",serif';
+        ctx.fillText(w.verse,W*.5,ty+(lines.length-1)*lh+lh*0.5+55*ys);
+        // 교회명
         ctx.fillStyle='rgba(154,150,142,0.45)';
-        ctx.font='400 '+(20*s)+'px "Noto Serif KR",serif';
-        ctx.fillText('연천장로교회  ·  2026 고난주간',W*.5,1820*s);
+        ctx.font='400 '+(20*fs)+'px "Noto Serif KR",serif';
+        ctx.fillText('연천장로교회  ·  2026 고난주간',W*.5,1820*ys);
         resolve();
       }
       if(w.bg){
         var img=new Image();
         img.onload=function(){
-          var iR=img.width/img.height,cR=W/H;
-          var sx,sy,sw,sh;
-          if(iR>cR){sw=img.height*cR;sh=img.height;sx=(img.width-sw)/2;sy=0;}
-          else{sw=img.width;sh=img.width/cR;sx=0;sy=(img.height-sh)/2;}
-          ctx.drawImage(img,sx,sy,sw,sh,0,0,W,H);
-          drawOverlayAndText();
+          if(fullRes){
+            // 원본 해상도 그대로 → 리사이징 없이 원본 색감/화질 보존
+            c.width=img.naturalWidth;c.height=img.naturalHeight;
+            var ctx=c.getContext('2d');
+            ctx.drawImage(img,0,0);
+            paintText(ctx,c.width,c.height);
+          } else {
+            // 썸네일: cover-fit
+            var ctx=c.getContext('2d');var W=c.width,H=c.height;
+            var iR=img.width/img.height,cR=W/H,sx,sy,sw,sh;
+            if(iR>cR){sw=img.height*cR;sh=img.height;sx=(img.width-sw)/2;sy=0;}
+            else{sw=img.width;sh=img.width/cR;sx=0;sy=(img.height-sh)/2;}
+            ctx.drawImage(img,sx,sy,sw,sh,0,0,W,H);
+            paintText(ctx,W,H);
+          }
         };
         img.onerror=function(){
-          ctx.fillStyle='#17192e';ctx.fillRect(0,0,W,H);
-          drawOverlayAndText();
+          var ctx=c.getContext('2d');ctx.fillStyle='#17192e';ctx.fillRect(0,0,c.width,c.height);
+          paintText(ctx,c.width,c.height);
         };
         img.src=w.bg;
       } else {
-        ctx.fillStyle='#17192e';ctx.fillRect(0,0,W,H);
-        drawOverlayAndText();
+        var ctx=c.getContext('2d');ctx.fillStyle='#17192e';ctx.fillRect(0,0,c.width,c.height);
+        paintText(ctx,c.width,c.height);
       }
     });
   });
@@ -1952,7 +1960,7 @@ function downloadWallpaper(idx){
   var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
   if(isIOS){toast('아이폰은 이미지를 꾹~ 눌러서\n[사진 앱에 저장]을 선택해주세요.');return;}
   var w=WALLPAPERS[idx];var c=document.createElement('canvas');c.width=1080;c.height=1920;
-  drawWallpaper(c,w,idx).then(function(){
+  drawWallpaper(c,w,idx,true).then(function(){ // fullRes=true → 원본 해상도로 저장
     saveCanvasAsPng(c,'passport_cross_'+w.day+'.png','배경화면이 저장되었습니다');
   });
 }
