@@ -839,7 +839,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.1</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.2</div>
       </div>
     </div>
   </div>
@@ -1020,12 +1020,18 @@ var MISSIONS_YOUNG = [
 ];
 
 var WALLPAPERS = [
-  {day:'월',theme:'성전 청결',verse:'마 21:13',text:'내 집은\n기도하는 집이라',colors:['#130608','#261018','#0d0f14']},
-  {day:'화',theme:'가장 큰 계명',verse:'마 22:37',text:'네 마음을 다하고\n목숨을 다하여',colors:['#060814','#10142e','#0d0f14']},
-  {day:'수',theme:'향유 옥합',verse:'마 26:7',text:'매우 귀한 향유\n한 옥합을',colors:['#140e06','#28200a','#0d0f14']},
-  {day:'목',theme:'섬김의 본',verse:'요 13:15',text:'본을\n보였노라',colors:['#060c14','#0e1828','#0d0f14']},
-  {day:'금',theme:'다 이루었다',verse:'요 19:30',text:'다\n이루었다',colors:['#1a0404','#2e0808','#120808']},
-  {day:'토',theme:'부활의 소망',verse:'마 27:63',text:'삼 일 후에\n다시 살아나리라',colors:['#060e08','#0e1e10','#0d0f14']}
+  {day:'월',theme:'성전 청결',   verse:'마태복음 21:13', bg:'bg1.png',
+   text:'기록된 바 내 집은\n만민이 기도하는\n집이라 일컬음을\n받으리라'},
+  {day:'화',theme:'가장 큰 계명',verse:'마태복음 22:37', bg:'bg2.png',
+   text:'네 마음을 다하고\n목숨을 다하고\n뜻을 다하여 주\n너의 하나님을 사랑하라'},
+  {day:'수',theme:'향유 옥합',   verse:'마태복음 26:12', bg:'bg3.png',
+   text:'이 여자가 내 몸에\n이 향유를 부은 것은\n내 장례를 위하여\n함이니라'},
+  {day:'목',theme:'섬김의 본',   verse:'요한복음 13:15', bg:'bg4.png',
+   text:'내가 너희에게 본을\n보였으니 내가 너희에게\n행한 것 같이 너희도\n행하게 하려 함이라'},
+  {day:'금',theme:'다 이루었다', verse:'요한복음 19:30', bg:'bg5.png',
+   text:'예수께서 신 포도주를\n받으신 후에 이르시되\n다 이루었다 하시고\n머리를 숙이니'},
+  {day:'토',theme:'부활의 소망', verse:'시편 130:5',     bg:'bg6.png',
+   text:'나 곧 내 영혼은\n여호와를 기다리며\n나는 주의 말씀을\n바라는도다'}
 ];
 
 var firebaseConfig={apiKey:"AIzaSyCxCyx8-wtwVNmDzOUuVKdJ4kfFcw2VBpY",authDomain:"passport-cross.firebaseapp.com",projectId:"passport-cross",storageBucket:"passport-cross.firebasestorage.app",messagingSenderId:"68059868627",appId:"1:68059868627:web:9191ca01a05edaf055d326"};
@@ -1846,49 +1852,62 @@ function wpSymbol(ctx,idx,s){
 }
 
 function drawWallpaper(c,w,idx){
-  var ctx=c.getContext('2d');var W=c.width,H=c.height;var s=W/1080;
-  // 배경
-  var bg=ctx.createLinearGradient(0,0,0,H);
-  bg.addColorStop(0,w.colors[0]);bg.addColorStop(0.55,w.colors[1]);bg.addColorStop(1,w.colors[2]);
-  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
-  // 중앙 글로우
-  var ag=ctx.createRadialGradient(W*.5,H*.38,0,W*.5,H*.38,W*.68);
-  ag.addColorStop(0,'rgba(197,165,90,0.09)');ag.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=ag;ctx.fillRect(0,0,W,H);
-  // 배경 십자가
-  var vw=52*s,vh=480*s,hw=300*s,cx=W*.5,cy=H*.38;
-  ctx.save();ctx.globalAlpha=0.07;ctx.fillStyle='#c5a55a';
-  ctx.fillRect(cx-vw/2,cy-vh/2,vw,vh);ctx.fillRect(cx-hw/2,cy-vh/2+vh*.25,hw,vw);
-  ctx.restore();
-  // 일러스트 심볼
-  ctx.save();ctx.translate(W*.5,H*.38);wpSymbol(ctx,idx,s);ctx.restore();
-  // 테두리
-  ctx.strokeStyle='rgba(197,165,90,0.52)';ctx.lineWidth=3*s;ctx.strokeRect(36*s,36*s,W-72*s,H-72*s);
-  ctx.strokeStyle='rgba(197,165,90,0.18)';ctx.lineWidth=1*s;ctx.strokeRect(58*s,58*s,W-116*s,H-116*s);
-  // 코너 장식
-  var cm=44*s,co=58*s;ctx.strokeStyle='rgba(197,165,90,0.55)';ctx.lineWidth=2*s;
-  [[co,co,1,1],[W-co,co,-1,1],[co,H-co,1,-1],[W-co,H-co,-1,-1]].forEach(function(p){
-    ctx.beginPath();ctx.moveTo(p[0]+p[2]*cm,p[1]);ctx.lineTo(p[0],p[1]);ctx.lineTo(p[0],p[1]+p[3]*cm);ctx.stroke();
+  return new Promise(function(resolve){
+    var ctx=c.getContext('2d');var W=c.width,H=c.height;var s=W/1080;
+    function drawOverlayAndText(){
+      // 다크 그라디언트 오버레이
+      var ov=ctx.createLinearGradient(0,0,0,H);
+      ov.addColorStop(0,'rgba(13,15,20,0.40)');ov.addColorStop(1,'rgba(13,15,20,0.95)');
+      ctx.fillStyle=ov;ctx.fillRect(0,0,W,H);
+      // 테두리
+      ctx.strokeStyle='rgba(197,165,90,0.52)';ctx.lineWidth=3*s;ctx.strokeRect(36*s,36*s,W-72*s,H-72*s);
+      ctx.strokeStyle='rgba(197,165,90,0.18)';ctx.lineWidth=1*s;ctx.strokeRect(58*s,58*s,W-116*s,H-116*s);
+      // 코너 장식
+      var cm=44*s,co=58*s;ctx.strokeStyle='rgba(197,165,90,0.55)';ctx.lineWidth=2*s;
+      [[co,co,1,1],[W-co,co,-1,1],[co,H-co,1,-1],[W-co,H-co,-1,-1]].forEach(function(p){
+        ctx.beginPath();ctx.moveTo(p[0]+p[2]*cm,p[1]);ctx.lineTo(p[0],p[1]);ctx.lineTo(p[0],p[1]+p[3]*cm);ctx.stroke();
+      });
+      // 헤더
+      ctx.textAlign='center';ctx.textBaseline='alphabetic';
+      ctx.fillStyle='rgba(197,165,90,0.72)';ctx.font='bold '+(21*s)+'px monospace';
+      ctx.fillText('✝  THE CROSS PASSPORT',W*.5,140*s);
+      ctx.strokeStyle='rgba(197,165,90,0.22)';ctx.lineWidth=1*s;
+      ctx.beginPath();ctx.moveTo(155*s,182*s);ctx.lineTo(925*s,182*s);ctx.stroke();
+      ctx.fillStyle='rgba(154,150,142,0.72)';ctx.font=(26*s)+'px sans-serif';
+      ctx.fillText(w.day+'요일  ·  '+w.theme,W*.5,238*s);
+      // 본문 성경 구절
+      ctx.fillStyle='#ede9e0';ctx.font='bold '+(70*s)+'px serif';
+      var lines=w.text.split('\n');var ty=H*.615;
+      lines.forEach(function(line,i){ctx.fillText(line,W*.5,ty+i*90*s)});
+      ctx.fillStyle='rgba(197,165,90,0.88)';ctx.font=(37*s)+'px monospace';
+      ctx.fillText(w.verse,W*.5,ty+lines.length*90*s+70*s);
+      // 하단
+      ctx.strokeStyle='rgba(197,165,90,0.22)';ctx.lineWidth=1*s;
+      ctx.beginPath();ctx.moveTo(155*s,H-192*s);ctx.lineTo(925*s,H-192*s);ctx.stroke();
+      ctx.fillStyle='rgba(154,150,142,0.38)';ctx.font=(25*s)+'px sans-serif';
+      ctx.fillText('연천장로교회  ·  2026 고난주간',W*.5,H-145*s);
+      resolve();
+    }
+    if(w.bg){
+      var img=new Image();
+      img.onload=function(){
+        var iR=img.width/img.height,cR=W/H;
+        var sx,sy,sw,sh;
+        if(iR>cR){sw=img.height*cR;sh=img.height;sx=(img.width-sw)/2;sy=0;}
+        else{sw=img.width;sh=img.width/cR;sx=0;sy=(img.height-sh)/2;}
+        ctx.drawImage(img,sx,sy,sw,sh,0,0,W,H);
+        drawOverlayAndText();
+      };
+      img.onerror=function(){
+        ctx.fillStyle='#17192e';ctx.fillRect(0,0,W,H);
+        drawOverlayAndText();
+      };
+      img.src=w.bg;
+    } else {
+      ctx.fillStyle='#17192e';ctx.fillRect(0,0,W,H);
+      drawOverlayAndText();
+    }
   });
-  // 헤더
-  ctx.textAlign='center';ctx.textBaseline='alphabetic';
-  ctx.fillStyle='rgba(197,165,90,0.72)';ctx.font='bold '+(21*s)+'px monospace';
-  ctx.fillText('✝  THE CROSS PASSPORT',W*.5,140*s);
-  ctx.strokeStyle='rgba(197,165,90,0.22)';ctx.lineWidth=1*s;
-  ctx.beginPath();ctx.moveTo(155*s,182*s);ctx.lineTo(925*s,182*s);ctx.stroke();
-  ctx.fillStyle='rgba(154,150,142,0.72)';ctx.font=(26*s)+'px sans-serif';
-  ctx.fillText(w.day+'요일  ·  '+w.theme,W*.5,238*s);
-  // 본문 성경 구절
-  ctx.fillStyle='#ede9e0';ctx.font='bold '+(80*s)+'px serif';
-  var lines=w.text.split('\n');var ty=H*.615;
-  lines.forEach(function(line,i){ctx.fillText(line,W*.5,ty+i*100*s)});
-  ctx.fillStyle='rgba(197,165,90,0.88)';ctx.font=(37*s)+'px monospace';
-  ctx.fillText(w.verse,W*.5,ty+lines.length*100*s+70*s);
-  // 하단
-  ctx.strokeStyle='rgba(197,165,90,0.22)';ctx.lineWidth=1*s;
-  ctx.beginPath();ctx.moveTo(155*s,H-192*s);ctx.lineTo(925*s,H-192*s);ctx.stroke();
-  ctx.fillStyle='rgba(154,150,142,0.38)';ctx.font=(25*s)+'px sans-serif';
-  ctx.fillText('연천장로교회  ·  2026 고난주간',W*.5,H-145*s);
 }
 
 function renderScreenGrid(){
@@ -1896,7 +1915,7 @@ function renderScreenGrid(){
   WALLPAPERS.forEach(function(w,i){
     var item=document.createElement('div');item.className='screen-item';
     var pc=document.createElement('canvas');pc.width=270;pc.height=480;
-    drawWallpaper(pc,w,i);
+    drawWallpaper(pc,w,i); // async — canvas updates in place when resolved
     var footer=document.createElement('div');footer.className='si-footer';
     footer.innerHTML='<span>'+w.day+'요일 · '+w.theme+'</span><span class="si-dl">저장</span>';
     item.appendChild(pc);item.appendChild(footer);
@@ -1932,9 +1951,12 @@ function fallbackDownload(canvas, filename, successMsg) {
 }
 
 function downloadWallpaper(idx){
+  var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+  if(isIOS){toast('아이폰은 이미지를 꾹~ 눌러서\n[사진 앱에 저장]을 선택해주세요.');return;}
   var w=WALLPAPERS[idx];var c=document.createElement('canvas');c.width=1080;c.height=1920;
-  drawWallpaper(c,w,idx);
-  saveCanvasAsPng(c,'passport_cross_'+w.day+'.png','배경화면이 저장되었습니다');
+  drawWallpaper(c,w,idx).then(function(){
+    saveCanvasAsPng(c,'passport_cross_'+w.day+'.png','배경화면이 저장되었습니다');
+  });
 }
 
 document.getElementById('badgeCard').addEventListener('click',function(){

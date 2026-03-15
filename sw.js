@@ -43,7 +43,7 @@ self.addEventListener('notificationclick', function(e) {
 });
 
 /* ===== 캐시 전략 ===== */
-const CACHE_NAME = 'passport-cross-v90';
+const CACHE_NAME = 'passport-cross-v92';
 const ASSETS = [
   './',
   './index.html',
@@ -57,7 +57,7 @@ self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
-  // skipWaiting 제거 → 사용자 확인 후 업데이트 적용
+  self.skipWaiting(); // 새 SW 즉시 활성화
 });
 
 // 앱에서 "업데이트" 버튼 클릭 시 메시지 수신 → 즉시 활성화
