@@ -839,7 +839,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.0</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.1</div>
       </div>
     </div>
   </div>
@@ -1469,7 +1469,7 @@ function startFeedListener(group){
       snap.forEach(function(doc){
         var d=doc.data();
         if(d.group===group)groupCount++;
-        if(d.text||d.photo)docs.push(doc); // 내용 있는 것만 피드에
+        docs.push(doc);
       });
       // 클라이언트 정렬 (approvedAt 내림차순)
       docs.sort(function(a,b){
@@ -1511,7 +1511,8 @@ function renderFeed(docs){
     var dayLabel=d.missionDay?d.missionDay+'요일 · ':'';
     var missionName=escFeed(d.missionName||'미션');
     var textHtml=d.text?'<div class="feed-text">'+escFeed(d.text)+'</div>':'';
-    var photoHtml=d.photo?'<img class="feed-photo" src="'+escFeed(d.photo)+'" loading="lazy" alt="">':'';
+    var photoHtml=d.photo?'<img class="feed-photo" src="'+d.photo+'" loading="lazy" alt="">':'';
+    var bodyHtml=textHtml||photoHtml?textHtml+photoHtml:'<div class="feed-text" style="color:var(--text-dim);font-size:13px">✝ 미션을 완수했습니다</div>';
     html+='<div class="feed-card">'
       +'<div class="feed-card-header">'
         +'<div class="feed-avatar">🙏</div>'
@@ -1520,7 +1521,7 @@ function renderFeed(docs){
           +'<div class="feed-day">'+escFeed(dayLabel)+missionName+'</div>'
         +'</div>'
       +'</div>'
-      +'<div class="feed-card-body">'+textHtml+photoHtml+'</div>'
+      +'<div class="feed-card-body">'+bodyHtml+'</div>'
     +'</div>';
   });
   list.innerHTML=html;
