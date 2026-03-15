@@ -839,7 +839,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.5</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.6</div>
       </div>
     </div>
   </div>
@@ -1857,12 +1857,10 @@ function drawWallpaper(c,w,idx,fullRes){
       function paintText(ctx,W,H){
         // fs: 폰트 크기 기준 (W 기반), ys: y 위치 기준 (H 기반)
         var fs=W/1080, ys=H/1920;
-        var ov=ctx.createLinearGradient(0,0,0,H);
-        ov.addColorStop(0,'rgba(13,15,20,0.35)');ov.addColorStop(1,'rgba(13,15,20,0.96)');
-        ctx.fillStyle=ov;ctx.fillRect(0,0,W,H);
         ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.shadowColor='rgba(0,0,0,0.75)';ctx.shadowBlur=18;
         // 헤더
-        ctx.fillStyle='rgba(197,165,90,0.80)';
+        ctx.fillStyle='rgba(197,165,90,0.90)';
         ctx.font='700 '+(22*fs)+'px "Playfair Display",serif';
         ctx.fillText('✝  THE CROSS PASSPORT',W*.5,110*ys);
         // 부제
