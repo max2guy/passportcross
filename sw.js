@@ -1,4 +1,32 @@
-const CACHE_NAME = 'passport-cross-v79';
+/* ===== FCM 백그라운드 메시지 (앱이 꺼져있을 때 푸시 수신) =====
+ * Firebase Messaging은 반드시 SW 상단에 초기화해야 함
+ */
+importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+  apiKey: "AIzaSyCxCyx8-wtwVNmDzOUuVKdJ4kfFcw2VBpY",
+  authDomain: "passport-cross.firebaseapp.com",
+  projectId: "passport-cross",
+  storageBucket: "passport-cross.firebasestorage.app",
+  messagingSenderId: "68059868627",
+  appId: "1:68059868627:web:9191ca01a05edaf055d326"
+});
+
+const messaging = firebase.messaging();
+
+// 백그라운드 수신 → 기기 시스템 알림으로 표시
+messaging.onBackgroundMessage(function(payload) {
+  const notif = payload.notification || {};
+  self.registration.showNotification(notif.title || 'THE CROSS PASSPORT', {
+    body: notif.body || '',
+    icon: './icon-192.png',
+    badge: './icon-192.png'
+  });
+});
+
+/* ===== 캐시 전략 ===== */
+const CACHE_NAME = 'passport-cross-v80';
 const ASSETS = [
   './',
   './index.html',
