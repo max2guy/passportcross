@@ -219,9 +219,29 @@ body{
   .stats-bar{padding:20px 40px 0}
   .section-title{padding:8px 40px 12px}
 }
+/* SW 업데이트 배너 */
+#admin-update-banner{
+  display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  z-index:9999;
+  background:rgba(28,31,42,.97);border:1px solid rgba(201,168,76,.4);
+  border-radius:14px;padding:14px 20px;
+  display:none;align-items:center;gap:14px;
+  box-shadow:0 4px 24px rgba(0,0,0,.6);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  font-size:13px;color:#ede9de;white-space:nowrap;
+}
+#admin-update-banner.show{display:flex}
+#admin-update-banner button{
+  padding:7px 16px;background:var(--gold);color:#0d0f1a;
+  border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;
+}
 </style>
 </head>
 <body>
+<div id="admin-update-banner">
+  ✝ 새 버전이 있습니다
+  <button onclick="applyAdminUpdate()">지금 업데이트</button>
+</div>
 
 <!-- 권한 확인 중 로딩 화면 (auth 완료 전까지 표시) -->
 <div class="auth-loading" id="authLoading">접속 확인 중...</div>
@@ -862,6 +882,30 @@ function confirmReject(){
     batch.update(db.collection('users').doc(uid),{missions:missions,rejectReasons:rejectReasons});
     return batch.commit();
   }).catch(function(err){alert('오류: '+err.message)});
+}
+
+/* ── SW 업데이트 감지 ── */
+var _adminPendingWorker=null;
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
+    location.reload();
+  });
+  navigator.serviceWorker.register('sw.js').then(function(reg){
+    if(reg.waiting){_adminPendingWorker=reg.waiting;document.getElementById('admin-update-banner').classList.add('show');}
+    reg.addEventListener('updatefound',function(){
+      var nw=reg.installing;
+      nw.addEventListener('statechange',function(){
+        if(nw.state==='installed'&&navigator.serviceWorker.controller){
+          _adminPendingWorker=nw;
+          document.getElementById('admin-update-banner').classList.add('show');
+        }
+      });
+    });
+  });
+}
+function applyAdminUpdate(){
+  if(_adminPendingWorker){_adminPendingWorker.postMessage({type:'SKIP_WAITING'});}
+  else{location.reload();}
 }
 </script>
 </body>
