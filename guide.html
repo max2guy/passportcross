@@ -176,29 +176,32 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
   <div class="card">
     <div class="acc-head" onclick="toggle(this)" aria-expanded="false">
       <div class="acc-num">2</div>
-      <div class="acc-title">공동체 온도계 &amp; 은혜 나눔 피드</div>
+      <div class="acc-title">십자가의 길 &amp; 은혜 나눔 피드</div>
       <div class="acc-arrow">▼</div>
     </div>
     <div class="acc-body">
       <div class="acc-inner">
         <ul class="feat-list">
-          <li><strong>홈 화면 상단 온도계</strong>에서 우리 부서 전체의 미션 달성률을 확인하며 함께 고난에 동참합니다.</li>
+          <li>여권 탭 상단의 <strong>Community Progress</strong> 카드에서 우리 부서가 함께 완수한 미션 수를 <strong>OO보의 십자가 길</strong>로 표시합니다.</li>
+          <li>승인된 미션 1건 = 십자가의 길 1보. 부서 전체의 누적 완료 수가 실시간으로 쌓입니다.</li>
           <li><strong>[나눔] 탭</strong>에서 다른 지체들이 올린 은혜로운 인증 사진과 묵상 글을 실시간으로 확인합니다.</li>
         </ul>
-        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
-          <div class="hcard" style="margin-top:0;flex:1;min-width:140px">
-            <div class="hcard-icon">🌡️</div>
-            <div class="hcard-body">
-              <div class="hcard-title">Community Progress</div>
-              <div class="hcard-desc">부서별 달성률 바 + 완료 수 실시간 표시</div>
-            </div>
+        <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:16px;margin-top:14px">
+          <div style="font-size:10px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:8px">Community Progress</div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:10px">
+            <span style="font-size:32px;font-weight:700;color:var(--gold);line-height:1">42</span>
+            <span style="font-size:13px;color:var(--text-dim)">보의 십자가 길</span>
           </div>
-          <div class="hcard" style="margin-top:0;flex:1;min-width:140px">
-            <div class="hcard-icon">🕊️</div>
-            <div class="hcard-body">
-              <div class="hcard-title">나눔 피드</div>
-              <div class="hcard-desc">승인된 인증들이 카드 형태로 피드에 게시됩니다</div>
-            </div>
+          <div style="height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:8px">
+            <div style="height:100%;width:35%;background:linear-gradient(90deg,#7e2038,var(--gold));border-radius:3px"></div>
+          </div>
+          <div style="font-size:12px;color:var(--text-dim)">중고등부 공동체가 함께 걸어간 십자가의 길</div>
+        </div>
+        <div class="hcard">
+          <div class="hcard-icon">🕊️</div>
+          <div class="hcard-body">
+            <div class="hcard-title">나눔 피드</div>
+            <div class="hcard-desc">승인된 미션 인증들이 카드 형태로 실시간 피드에 게시됩니다.</div>
           </div>
         </div>
       </div>
