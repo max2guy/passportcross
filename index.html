@@ -799,7 +799,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.5.5</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.5.6</div>
       </div>
     </div>
   </div>
@@ -1052,7 +1052,7 @@ function initFCM(){
     var d=payload.data||{};
     toast(d.title||d.body||'알림');
   });
-  // 알림 권한 요청 → 토큰 발급 → Firestore 저장
+  // 알림 권한 요청 → 토큰 발급 → Firestore 저장 (set merge: 문서 없어도 안전)
   navigator.serviceWorker.ready.then(function(reg){
     return Notification.requestPermission().then(function(perm){
       if(perm!=='granted')return null;
@@ -1061,7 +1061,7 @@ function initFCM(){
   }).then(function(token){
     if(!token)return;
     var uid=getUID();
-    db.collection('users').doc(uid).update({fcmToken:token}).catch(function(){});
+    db.collection('users').doc(uid).set({fcmToken:token},{merge:true}).catch(function(){});
   }).catch(function(){});
 }
 
