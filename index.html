@@ -839,7 +839,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.6</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.7</div>
       </div>
     </div>
   </div>
@@ -1855,29 +1855,38 @@ function drawWallpaper(c,w,idx,fullRes){
   return document.fonts.ready.then(function(){
     return new Promise(function(resolve){
       function paintText(ctx,W,H){
-        // fs: 폰트 크기 기준 (W 기반), ys: y 위치 기준 (H 기반)
         var fs=W/1080, ys=H/1920;
+        // 텍스트 영역에만 페이드 밴드 (위아래 투명하게 페이드인/아웃)
+        function band(y1,y2,alpha){
+          var g=ctx.createLinearGradient(0,y1,0,y2);
+          g.addColorStop(0,'rgba(0,0,0,0)');
+          g.addColorStop(0.18,'rgba(0,0,0,'+alpha+')');
+          g.addColorStop(0.82,'rgba(0,0,0,'+alpha+')');
+          g.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.fillStyle=g;ctx.fillRect(0,y1,W,y2-y1);
+        }
+        var lines=w.text.split('\n');var lh=78*ys;var ty=1090*ys;
+        var verseY=ty+(lines.length-1)*lh+lh*0.5+55*ys;
+        ctx.shadowColor='transparent';ctx.shadowBlur=0;
+        band(68*ys,  220*ys,  0.55); // 헤더+부제
+        band(1038*ys,verseY+42*ys, 0.55); // 성경구절+출처
+        band(1784*ys,H,           0.45); // 교회명
+        // 텍스트
         ctx.textAlign='center';ctx.textBaseline='middle';
-        ctx.shadowColor='rgba(0,0,0,0.75)';ctx.shadowBlur=18;
-        // 헤더
-        ctx.fillStyle='rgba(197,165,90,0.90)';
+        ctx.shadowColor='rgba(0,0,0,0.55)';ctx.shadowBlur=10;
+        ctx.fillStyle='rgba(197,165,90,0.92)';
         ctx.font='700 '+(22*fs)+'px "Playfair Display",serif';
         ctx.fillText('✝  THE CROSS PASSPORT',W*.5,110*ys);
-        // 부제
-        ctx.fillStyle='rgba(200,196,188,0.70)';
+        ctx.fillStyle='rgba(200,196,188,0.75)';
         ctx.font='400 '+(24*fs)+'px "Noto Serif KR",serif';
         ctx.fillText(w.day+'요일  ·  '+w.theme,W*.5,185*ys);
-        // 성경 구절
-        ctx.fillStyle='rgba(237,233,224,0.95)';
+        ctx.fillStyle='rgba(237,233,224,0.97)';
         ctx.font='700 '+(52*fs)+'px "Noto Serif KR",serif';
-        var lines=w.text.split('\n');var lh=78*ys;var ty=1090*ys;
         lines.forEach(function(line,i){ctx.fillText(line,W*.5,ty+i*lh);});
-        // 출처
-        ctx.fillStyle='rgba(197,165,90,0.85)';
+        ctx.fillStyle='rgba(197,165,90,0.88)';
         ctx.font='italic 400 '+(28*fs)+'px "Playfair Display",serif';
-        ctx.fillText(w.verse,W*.5,ty+(lines.length-1)*lh+lh*0.5+55*ys);
-        // 교회명
-        ctx.fillStyle='rgba(154,150,142,0.45)';
+        ctx.fillText(w.verse,W*.5,verseY);
+        ctx.fillStyle='rgba(154,150,142,0.55)';
         ctx.font='400 '+(20*fs)+'px "Noto Serif KR",serif';
         ctx.fillText('연천장로교회  ·  2026 고난주간',W*.5,1820*ys);
         resolve();
