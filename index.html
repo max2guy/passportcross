@@ -401,6 +401,18 @@ html,body{
 .screen-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .screen-item{background:var(--bg2);border:1px solid rgba(197,165,90,.1);border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;transition:transform .2s}
 .screen-item:active{transform:scale(.96)}
+
+/* 배경화면 풀스크린 미리보기 */
+.wp-preview-overlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.wp-preview-overlay.show{opacity:1;visibility:visible}
+.wp-preview-img{max-width:min(360px,85vw);max-height:70vh;border-radius:14px;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.6);display:block}
+.wp-preview-bar{display:flex;align-items:center;justify-content:space-between;width:min(360px,85vw);padding:16px 0 0;gap:12px}
+.wp-preview-info{flex:1;min-width:0}
+.wp-preview-day{font-size:11px;color:var(--gold-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px}
+.wp-preview-theme{font-size:15px;font-weight:700;color:var(--text)}
+.wp-preview-btns{display:flex;gap:8px;flex-shrink:0}
+.wp-preview-close{padding:9px 14px;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:10px;color:rgba(255,255,255,.6);font-size:13px;cursor:pointer;-webkit-appearance:none}
+.wp-preview-dl{padding:9px 18px;background:var(--gold);border:none;border-radius:10px;color:var(--bg);font-size:13px;font-weight:700;cursor:pointer;-webkit-appearance:none}
 .screen-item canvas{width:100%;display:block;border-radius:var(--radius-sm) var(--radius-sm) 0 0}
 .si-footer{padding:8px 12px;display:flex;align-items:center;justify-content:space-between}
 .si-footer span{font-size:11px;color:var(--text-dim)}
@@ -839,7 +851,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.8</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.9</div>
       </div>
     </div>
   </div>
@@ -850,6 +862,20 @@ html,body{
     <button onclick="switchTab('tabScreen',this)"><span class="tab-icon">🖼️</span>배경화면</button>
     <button onclick="switchTab('tabMore',this)"><span class="tab-icon">⚙️</span>더보기</button>
   </nav>
+</div>
+
+<div class="wp-preview-overlay" id="wpPreviewOverlay" onclick="closeWpPreview(event)">
+  <canvas class="wp-preview-img" id="wpPreviewCanvas"></canvas>
+  <div class="wp-preview-bar">
+    <div class="wp-preview-info">
+      <div class="wp-preview-day" id="wpPreviewDay"></div>
+      <div class="wp-preview-theme" id="wpPreviewTheme"></div>
+    </div>
+    <div class="wp-preview-btns">
+      <button class="wp-preview-close" onclick="closeWpPreview()">✕</button>
+      <button class="wp-preview-dl" id="wpPreviewDlBtn" onclick="wpPreviewDownload()">저장</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="missionModal">
@@ -1930,7 +1956,7 @@ function renderScreenGrid(){
     var footer=document.createElement('div');footer.className='si-footer';
     footer.innerHTML='<span>'+w.day+'요일 · '+w.theme+'</span><span class="si-dl">저장</span>';
     item.appendChild(pc);item.appendChild(footer);
-    item.addEventListener('click',function(){downloadWallpaper(i)});
+    item.addEventListener('click',function(){openWpPreview(i)});
     grid.appendChild(item);
   });
 }
@@ -1959,6 +1985,30 @@ function fallbackDownload(canvas, filename, successMsg) {
     document.body.appendChild(link);link.click();document.body.removeChild(link);
     toast(successMsg);
   } catch(e){ toast('이미지를 길게 눌러 저장하세요'); }
+}
+
+var _wpPreviewIdx=-1;
+function openWpPreview(idx){
+  var w=WALLPAPERS[idx];
+  _wpPreviewIdx=idx;
+  var c=document.getElementById('wpPreviewCanvas');
+  // 썸네일 크기로 미리보기 (빠른 로딩)
+  c.width=540;c.height=960;
+  drawWallpaper(c,w,idx);
+  document.getElementById('wpPreviewDay').textContent=w.day+'요일';
+  document.getElementById('wpPreviewTheme').textContent=w.theme;
+  document.getElementById('wpPreviewOverlay').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function closeWpPreview(e){
+  if(e&&e.target!==document.getElementById('wpPreviewOverlay'))return;
+  document.getElementById('wpPreviewOverlay').classList.remove('show');
+  document.body.style.overflow='';
+  _wpPreviewIdx=-1;
+}
+function wpPreviewDownload(){
+  if(_wpPreviewIdx<0)return;
+  downloadWallpaper(_wpPreviewIdx);
 }
 
 function downloadWallpaper(idx){
