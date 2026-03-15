@@ -20,8 +20,8 @@ messaging.onBackgroundMessage(function(payload) {
   const d = payload.data || {};
   self.registration.showNotification(d.title || 'THE CROSS PASSPORT', {
     body: d.body || '',
-    icon: './icon-192.png',
-    badge: './icon-192.png',
+    icon: './notification-icon.svg',
+    badge: './notification-icon.svg',
     data: { url: self.location.origin + self.location.pathname.replace(/sw\.js$/, '') }
   });
 });
@@ -43,7 +43,7 @@ self.addEventListener('notificationclick', function(e) {
 });
 
 /* ===== 캐시 전략 ===== */
-const CACHE_NAME = 'passport-cross-v82';
+const CACHE_NAME = 'passport-cross-v83';
 const ASSETS = [
   './',
   './index.html',
