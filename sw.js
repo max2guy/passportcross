@@ -17,9 +17,9 @@ const messaging = firebase.messaging();
 
 // 백그라운드 수신 → 기기 시스템 알림으로 표시
 messaging.onBackgroundMessage(function(payload) {
-  const notif = payload.notification || {};
-  self.registration.showNotification(notif.title || 'THE CROSS PASSPORT', {
-    body: notif.body || '',
+  const d = payload.data || {};
+  self.registration.showNotification(d.title || 'THE CROSS PASSPORT', {
+    body: d.body || '',
     icon: './icon-192.png',
     badge: './icon-192.png',
     data: { url: self.location.origin + self.location.pathname.replace(/sw\.js$/, '') }
@@ -43,7 +43,7 @@ self.addEventListener('notificationclick', function(e) {
 });
 
 /* ===== 캐시 전략 ===== */
-const CACHE_NAME = 'passport-cross-v81';
+const CACHE_NAME = 'passport-cross-v82';
 const ASSETS = [
   './',
   './index.html',

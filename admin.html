@@ -408,8 +408,8 @@ function updateAdminFCMToken(user){
   var messaging=firebase.messaging();
   // 포그라운드(앱 열려있을 때) 수신 → alert 표시
   messaging.onMessage(function(payload){
-    var n=payload.notification||{};
-    var msg=(n.title?'['+n.title+'] ':'')+( n.body||'새 알림');
+    var d=payload.data||{};
+    var msg=(d.title?'['+d.title+'] ':'')+( d.body||'새 알림');
     if(window.confirm(msg+'\n\n확인을 누르면 페이지를 새로고침합니다.')){
       location.reload();
     }

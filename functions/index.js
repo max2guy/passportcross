@@ -80,7 +80,7 @@ exports.notifyAdminOnSubmission = functions
     }
 
     const message = {
-      notification: {
+      data: {
         title: '새 미션 제출 ✝',
         body: `${studentName}님이 [${missionName}]을 제출했습니다. 확인해주세요!`
       },
@@ -134,7 +134,7 @@ exports.notifyStudentOnApproval = functions
 
     const message = {
       token: fcmToken,
-      notification: {
+      data: {
         title: '미션 승인! ✝',
         body: `[${missionName}] 승인되었습니다. 여권에서 도장을 확인하세요!`
       }
