@@ -839,7 +839,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.3</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.6.4</div>
       </div>
     </div>
   </div>
@@ -1860,28 +1860,29 @@ function drawWallpaper(c,w,idx){
         var ov=ctx.createLinearGradient(0,0,0,H);
         ov.addColorStop(0,'rgba(13,15,20,0.35)');ov.addColorStop(1,'rgba(13,15,20,0.96)');
         ctx.fillStyle=ov;ctx.fillRect(0,0,W,H);
-        ctx.textAlign='center';ctx.textBaseline='alphabetic';
-        // 헤더 — Playfair Display
+        // textBaseline='middle' → y좌표가 항상 텍스트 정중앙 → 폰트 관계없이 정확히 정렬됨
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        // 헤더 — Playfair Display  (y=110s: 상단에서 110px)
         ctx.fillStyle='rgba(197,165,90,0.80)';
-        ctx.font='700 '+(22*s)+'px "Playfair Display", serif';
-        ctx.fillText('✝  THE CROSS PASSPORT',W*.5,136*s);
-        // 부제 — Noto Serif KR
+        ctx.font='700 '+(22*s)+'px "Playfair Display",serif';
+        ctx.fillText('✝  THE CROSS PASSPORT',W*.5,110*s);
+        // 부제 — Noto Serif KR  (y=185s)
         ctx.fillStyle='rgba(200,196,188,0.70)';
-        ctx.font='400 '+(24*s)+'px "Noto Serif KR", serif';
-        ctx.fillText(w.day+'요일  ·  '+w.theme,W*.5,222*s);
-        // 본문 성경 구절 — Noto Serif KR bold, 작은 크기
+        ctx.font='400 '+(24*s)+'px "Noto Serif KR",serif';
+        ctx.fillText(w.day+'요일  ·  '+w.theme,W*.5,185*s);
+        // 본문 성경 구절 — Noto Serif KR bold  (1행 y=1090s, 행간 78s)
         ctx.fillStyle='rgba(237,233,224,0.95)';
-        ctx.font='700 '+(52*s)+'px "Noto Serif KR", serif';
-        var lines=w.text.split('\n');var ty=H*.60;
-        lines.forEach(function(line,i){ctx.fillText(line,W*.5,ty+i*72*s);});
-        // 출처 구절 — Playfair Display
+        ctx.font='700 '+(52*s)+'px "Noto Serif KR",serif';
+        var lines=w.text.split('\n');var lh=78*s;var ty=1090*s;
+        lines.forEach(function(line,i){ctx.fillText(line,W*.5,ty+i*lh);});
+        // 출처 구절 — Playfair Display italic  (구절 마지막 행 아래 55s)
         ctx.fillStyle='rgba(197,165,90,0.85)';
-        ctx.font='400 '+(30*s)+'px "Playfair Display", serif';
-        ctx.fillText(w.verse,W*.5,ty+lines.length*72*s+62*s);
-        // 하단 교회명 — Noto Serif KR
+        ctx.font='italic 400 '+(28*s)+'px "Playfair Display",serif';
+        ctx.fillText(w.verse,W*.5,ty+(lines.length-1)*lh+lh*0.5+55*s);
+        // 하단 교회명 — Noto Serif KR  (y=1820s: 하단에서 100px)
         ctx.fillStyle='rgba(154,150,142,0.45)';
-        ctx.font='400 '+(22*s)+'px "Noto Serif KR", serif';
-        ctx.fillText('연천장로교회  ·  2026 고난주간',W*.5,H-120*s);
+        ctx.font='400 '+(20*s)+'px "Noto Serif KR",serif';
+        ctx.fillText('연천장로교회  ·  2026 고난주간',W*.5,1820*s);
         resolve();
       }
       if(w.bg){
