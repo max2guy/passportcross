@@ -818,6 +818,15 @@ html,body{
           <span class="mi-arrow">›</span>
         </div>
       </div>
+      <div id="installMoreSection">
+        <div class="more-section-title">앱 설치</div>
+        <div class="more-list">
+          <div class="more-item" id="installMoreItem" onclick="installFromMore()">
+            <div class="mi-left"><span class="mi-icon">📲</span><span class="mi-text">홈화면에 추가 (앱 설치)</span></div>
+            <span class="mi-arrow">›</span>
+          </div>
+        </div>
+      </div>
       <div class="more-section-title">설정</div>
       <div class="more-list">
         <div class="more-item" onclick="openNameEdit()">
@@ -870,7 +879,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.7.0</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.7.1</div>
       </div>
     </div>
   </div>
@@ -1377,6 +1386,23 @@ function dismissInstallBanner(){
 }
 // 페이지 로드 후 잠시 뒤 확인 (Android: beforeinstallprompt 이미 fired 됐을 경우 대비)
 setTimeout(maybeShowInstallBanner, 1500);
+// 더보기 탭 설치 버튼: standalone이면 숨김
+(function(){
+  if(isStandalone()){
+    var el=document.getElementById('installMoreSection');
+    if(el)el.style.display='none';
+  }
+})();
+function installFromMore(){
+  var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+  if(isIOS){
+    toast('Safari 하단 공유 버튼(📤) 탭\n→ 홈 화면에 추가 선택');
+  } else if(_deferredPrompt){
+    triggerInstall();
+  } else {
+    toast('브라우저 메뉴 → 홈 화면에 추가를 선택하세요');
+  }
+}
 
 function bootApp(){
   // Firestore에서 수정된 미션 불러오기 (name/content/howto만 덮어씀)
