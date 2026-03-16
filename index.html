@@ -2466,7 +2466,7 @@ function updateThermo(count){
   if(!el)return;
   el.style.display='';
   document.getElementById('thermoCount').textContent=count;
-  document.getElementById('thermoDesc').textContent='전체 공동체가 함께 걸어간 십자가의 길';
+  document.getElementById('thermoDesc').textContent='함께 걸어간 십자가의 길';
   // 진행 바: 예상 최대(40명×6=240)를 기준으로 시각화
   var pct=Math.min(100,Math.round(count/240*100));
   document.getElementById('thermoFill').style.width=pct+'%';
