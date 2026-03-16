@@ -18,32 +18,55 @@ const messaging = firebase.messaging();
 // 백그라운드 수신 → 기기 시스템 알림으로 표시
 messaging.onBackgroundMessage(function(payload) {
   const d = payload.data || {};
+  const base = self.location.origin + self.location.pathname.replace(/sw\.js$/, '');
+  // 관리자 대상 알림이면 admin.html?sub=submissionId 딥링크
+  let targetUrl = base;
+  if (d.targetUrl === 'admin') {
+    targetUrl = base + 'admin.html' + (d.submissionId ? '?sub=' + d.submissionId : '');
+  }
   self.registration.showNotification(d.title || 'THE CROSS PASSPORT', {
     body: d.body || '',
     icon: './notification-icon.svg',
     badge: './notification-icon.svg',
-    data: { url: self.location.origin + self.location.pathname.replace(/sw\.js$/, '') }
+    data: { url: targetUrl, submissionId: d.submissionId || '', targetUrl: d.targetUrl || '' }
   });
 });
 
-// 알림 탭 → 앱 열기 (이미 열려있으면 포커스, 없으면 새 창)
+// 알림 탭 → 앱 열기 (관리자 알림이면 admin.html 우선 탐색)
 self.addEventListener('notificationclick', function(e) {
   e.notification.close();
-  const target = (e.notification.data && e.notification.data.url) || self.location.origin;
+  const notifData = e.notification.data || {};
+  const target = notifData.url || self.location.origin;
+  const subId = notifData.submissionId || '';
+  const isAdmin = notifData.targetUrl === 'admin';
+
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(list) {
-      for (var i = 0; i < list.length; i++) {
-        if (list[i].url.startsWith(self.location.origin) && 'focus' in list[i]) {
-          return list[i].focus();
+      if (isAdmin) {
+        // admin.html 탭이 이미 열려있으면 포커스 + postMessage로 카드 하이라이트
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].url.includes('admin.html') && 'focus' in list[i]) {
+            list[i].focus();
+            if (subId) list[i].postMessage({ type: 'HIGHLIGHT_SUBMISSION', subId: subId });
+            return;
+          }
+        }
+      } else {
+        // 일반 앱 탭 포커스
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].url.startsWith(self.location.origin) && 'focus' in list[i]) {
+            return list[i].focus();
+          }
         }
       }
+      // 열려있는 탭 없으면 새 창으로 열기
       if (clients.openWindow) return clients.openWindow(target);
     })
   );
 });
 
 /* ===== 캐시 전략 ===== */
-const CACHE_NAME = 'passport-cross-v102';
+const CACHE_NAME = 'passport-cross-v103';
 const ASSETS = [
   './',
   './index.html',

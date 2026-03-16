@@ -140,7 +140,9 @@ exports.notifyAdminOnSubmission = functions
     const message = {
       data: {
         title: '새 미션 제출 ✝',
-        body: `${studentName}님이 [${missionName}]을 제출했습니다. 확인해주세요!`
+        body: `${studentName}님이 [${missionName}]을 제출했습니다. 확인해주세요!`,
+        submissionId: snap.id,
+        targetUrl: 'admin'
       },
       tokens: tokens
     };

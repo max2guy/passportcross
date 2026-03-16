@@ -574,6 +574,20 @@ html,body{
 ::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:2px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .fade-up{animation:fadeUp .5s ease forwards}
+/* 관리자 빠른 승인 sheet (index.html 포그라운드 알림) */
+#adminQuickSheet{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.7);align-items:flex-end;justify-content:center}
+#adminQuickSheet.show{display:flex}
+.aqs-box{width:100%;max-width:540px;background:var(--bg2);border-top:2px solid rgba(201,168,76,.4);border-radius:14px 14px 0 0;padding:24px 20px calc(var(--safe-bottom) + 24px)}
+.aqs-label{font-size:11px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px}
+.aqs-name{font-size:17px;font-weight:700;color:var(--text);margin-bottom:3px}
+.aqs-mission{font-size:13px;color:var(--gold-dim);margin-bottom:10px}
+.aqs-text{font-size:13px;color:var(--text);line-height:1.6;background:var(--bg3);border-radius:8px;padding:10px 12px;margin-bottom:10px;white-space:pre-wrap;word-break:break-word;max-height:100px;overflow-y:auto}
+.aqs-photo{width:100%;max-height:160px;object-fit:cover;border-radius:8px;margin-bottom:12px;display:block}
+.aqs-btns{display:flex;gap:8px}
+.aqs-approve{flex:1;padding:13px;background:#2a6b3a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer}
+.aqs-reject{flex:1;padding:13px;background:transparent;border:1px solid rgba(255,100,100,.4);color:#e05555;border-radius:8px;font-size:14px;cursor:pointer}
+.aqs-goto{padding:13px 14px;background:transparent;border:1px solid rgba(197,165,90,.25);border-radius:8px;color:var(--text-dim);font-size:12px;cursor:pointer;white-space:nowrap}
+.aqs-close{padding:13px 14px;background:transparent;border:1px solid rgba(197,165,90,.15);border-radius:8px;color:var(--text-dim);font-size:12px;cursor:pointer}
 
 /* ===== 반응형 ===== */
 
@@ -1014,6 +1028,23 @@ html,body{
   </div>
 </div>
 
+<!-- 관리자 빠른 승인 sheet (포그라운드 알림 수신 시) -->
+<div id="adminQuickSheet">
+  <div class="aqs-box">
+    <div class="aqs-label">새 미션 제출</div>
+    <div class="aqs-name" id="aqsName"></div>
+    <div class="aqs-mission" id="aqsMission"></div>
+    <div class="aqs-text" id="aqsText" style="display:none"></div>
+    <img class="aqs-photo" id="aqsPhoto" style="display:none" alt="제출 사진">
+    <div class="aqs-btns">
+      <button class="aqs-approve" onclick="aqsApprove()">승인</button>
+      <button class="aqs-reject" onclick="aqsRejectStart()">반려</button>
+      <button class="aqs-goto" onclick="goAdminPage()">관리자 페이지</button>
+      <button class="aqs-close" onclick="closeAQS()">닫기</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -1192,10 +1223,14 @@ function updateAdminFCMToken(user){
   if(!user||!user.email)return;
   if(!('Notification' in window)||!firebase.messaging.isSupported())return;
   var messaging=firebase.messaging();
-  // 포그라운드 수신 → 토스트
+  // 포그라운드 수신 → 빠른 승인 sheet
   messaging.onMessage(function(payload){
     var d=payload.data||{};
-    toast(d.title||d.body||'알림');
+    if(d.submissionId && d.targetUrl==='admin'){
+      showAdminQuickSheet(d.submissionId);
+    } else {
+      toast(d.title||d.body||'알림');
+    }
   });
   navigator.serviceWorker.ready.then(function(reg){
     return Notification.requestPermission().then(function(perm){
@@ -1207,6 +1242,73 @@ function updateAdminFCMToken(user){
     // merge:true → 문서 없어도 생성, 있으면 fcmToken만 추가/갱신
     db.collection('admins').doc(user.email).set({fcmToken:token},{merge:true}).catch(function(){});
   }).catch(function(){});
+}
+
+/* ── 관리자 빠른 승인 sheet (index.html 포그라운드) ── */
+var _aqsTarget={subId:null,uid:null,missionIdx:null};
+
+function showAdminQuickSheet(subId){
+  db.collection('submissions').doc(subId).get().then(function(doc){
+    if(!doc.exists)return;
+    var s=Object.assign({id:doc.id},doc.data());
+    if(s.status!=='pending')return; // 이미 처리된 제출은 무시
+    _aqsTarget={subId:s.id,uid:s.uid,missionIdx:s.missionIdx};
+    var groupLabel=s.group==='young'?'청년부':'중고등부';
+    document.getElementById('aqsName').textContent=s.userName+' · '+s.grade+' ('+groupLabel+')';
+    document.getElementById('aqsMission').textContent=(s.missionDay||'')+'요일 · '+(s.missionName||'');
+    var textEl=document.getElementById('aqsText');
+    if(s.text){textEl.textContent=s.text;textEl.style.display='';}else{textEl.style.display='none';}
+    var photoEl=document.getElementById('aqsPhoto');
+    if(s.photo){photoEl.src=s.photo;photoEl.style.display='';}else{photoEl.style.display='none';}
+    document.getElementById('adminQuickSheet').classList.add('show');
+  }).catch(function(){});
+}
+
+function closeAQS(){
+  document.getElementById('adminQuickSheet').classList.remove('show');
+  _aqsTarget={subId:null,uid:null,missionIdx:null};
+}
+
+function aqsApprove(){
+  if(!_aqsTarget.subId||!auth.currentUser)return;
+  var adminEmail=auth.currentUser.email;
+  var batch=db.batch();
+  batch.update(db.collection('submissions').doc(_aqsTarget.subId),{
+    status:'approved',approvedBy:adminEmail,
+    approvedAt:firebase.firestore.FieldValue.serverTimestamp()
+  });
+  db.collection('users').doc(_aqsTarget.uid).get().then(function(doc){
+    if(!doc.exists)return;
+    var missions=doc.data().missions||[0,0,0,0,0,0];
+    missions[_aqsTarget.missionIdx]=2;
+    batch.update(db.collection('users').doc(_aqsTarget.uid),{missions:missions});
+    return batch.commit();
+  }).then(function(){toast('승인 완료!');})
+  .catch(function(err){toast('오류: '+err.message);});
+  closeAQS();
+}
+
+function aqsRejectStart(){
+  if(!_aqsTarget.subId)return;
+  var reason=prompt('반려 사유를 입력하세요 (학생에게 표시됩니다):');
+  if(reason===null)return; // 취소
+  var adminEmail=auth.currentUser?auth.currentUser.email:'';
+  var batch=db.batch();
+  batch.update(db.collection('submissions').doc(_aqsTarget.subId),{
+    status:'rejected',rejectReason:reason,approvedBy:adminEmail,
+    approvedAt:firebase.firestore.FieldValue.serverTimestamp()
+  });
+  db.collection('users').doc(_aqsTarget.uid).get().then(function(doc){
+    if(!doc.exists)return;
+    var missions=doc.data().missions||[0,0,0,0,0,0];
+    var rejectReasons=doc.data().rejectReasons||['','','','','',''];
+    missions[_aqsTarget.missionIdx]=3;
+    rejectReasons[_aqsTarget.missionIdx]=reason;
+    batch.update(db.collection('users').doc(_aqsTarget.uid),{missions:missions,rejectReasons:rejectReasons});
+    return batch.commit();
+  }).then(function(){toast('반려 처리 완료');})
+  .catch(function(err){toast('오류: '+err.message);});
+  closeAQS();
 }
 
 /* ===== 교사/임원 관리자 기능 ===== */
