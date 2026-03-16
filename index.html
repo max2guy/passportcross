@@ -687,10 +687,12 @@ html,body{
   background:var(--bg2);border-bottom:1px solid rgba(197,165,90,.1);flex-shrink:0;
 }
 #adminPanel .topbar-row1{display:flex;align-items:center;justify-content:space-between;gap:8px}
-#adminPanel .topbar-left{display:flex;flex-direction:column;gap:2px;min-width:0}
+#adminPanel .topbar-center{flex:1;text-align:center;min-width:0;padding:0 4px}
 #adminPanel .topbar-title{font-size:15px;font-weight:700;color:var(--gold);letter-spacing:1px;white-space:nowrap}
-#adminPanel .topbar-email{font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
-#adminPanel .topbar-right{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+#adminPanel .topbar-email{font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#adminPanel .ap-back-btn{flex-shrink:0}
+#adminPanel .topbar-right{display:flex;align-items:center;gap:5px;justify-content:flex-end;overflow-x:auto;scrollbar-width:none;padding-bottom:1px}
+#adminPanel .topbar-right::-webkit-scrollbar{display:none}
 #adminPanel .topbar-btn{
   padding:6px 11px;background:transparent;
   border:1px solid rgba(197,165,90,.25);border-radius:8px;
@@ -1195,7 +1197,8 @@ html,body{
 <div id="adminPanel">
   <div class="topbar">
     <div class="topbar-row1">
-      <div class="topbar-left">
+      <button class="topbar-btn ap-back-btn" onclick="closeAdminPanel()">← 여권으로</button>
+      <div class="topbar-center">
         <div class="topbar-title">관리자 패널</div>
         <div class="topbar-email" id="apAdminEmail"></div>
       </div>
@@ -1206,7 +1209,6 @@ html,body{
       <button class="topbar-btn" onclick="apToggleCompletions()" id="apCompletionsBtn">완료자</button>
       <button class="topbar-btn" onclick="apToggleLockPanel()" id="apLockBtn">🔒 잠금</button>
       <button class="topbar-btn" onclick="apToggleMissionEdit()" id="apMissionEditBtn">미션 편집</button>
-      <button class="topbar-btn" onclick="closeAdminPanel()">← 여권으로</button>
     </div>
   </div>
   <div class="ap-scroll">
