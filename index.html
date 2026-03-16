@@ -1059,26 +1059,20 @@ html,body{
         </div>
       </div>
 
-      <!-- 로그인 상태: 관리자 메뉴 (기본 숨김) -->
+      <!-- 로그인 상태: 관리자 상태 표시 (기본 숨김) -->
       <div id="adminMenu" style="display:none">
         <div class="more-list">
-          <div class="more-item" onclick="goAdminPage()">
-            <div class="mi-left"><span class="mi-icon">📋</span><span class="mi-text">관리자 페이지 (도장찍기) 이동</span></div>
-            <span class="mi-arrow">›</span>
-          </div>
-          <!-- 최고관리자(max2guy@gmail.com) 전용: 새 관리자 추가 -->
-          <div class="more-item" id="addTeacherBtn" style="display:none" onclick="addTeacherAdmin()">
-            <div class="mi-left"><span class="mi-icon">➕</span><span class="mi-text">새 관리자 추가</span></div>
-            <span class="mi-arrow">›</span>
-          </div>
-          <div class="more-item" onclick="adminLogout()">
+          <div class="more-item">
             <div class="mi-left">
-              <span class="mi-icon">🚪</span>
+              <span class="mi-icon">✅</span>
               <div>
-                <div class="mi-text">로그아웃</div>
+                <div class="mi-text">관리자 로그인됨</div>
                 <div id="adminLoggedInEmail" style="font-size:11px;color:var(--text-dim);margin-top:2px"></div>
               </div>
             </div>
+          </div>
+          <div class="more-item" onclick="adminLogout()">
+            <div class="mi-left"><span class="mi-icon">🚪</span><span class="mi-text">로그아웃</span></div>
             <span class="mi-arrow">›</span>
           </div>
         </div>
@@ -1663,7 +1657,6 @@ function checkAdminRole(user){
 function updateAdminUI(user){
   var loginSection=document.getElementById('adminLoginSection');
   var menu=document.getElementById('adminMenu');
-  var addBtn=document.getElementById('addTeacherBtn');
   var emailEl=document.getElementById('adminLoggedInEmail');
   var adminTab=document.getElementById('tabAdminBtn');
   if(!user){
@@ -1677,8 +1670,6 @@ function updateAdminUI(user){
     if(menu)menu.style.display='';
     if(adminTab)adminTab.style.display='';
     if(emailEl)emailEl.textContent=user.email;
-    // 최고 관리자만 "새 관리자 추가" 버튼 노출
-    if(addBtn)addBtn.style.display=(user.email===MASTER_EMAIL?'':'none');
     // 교사 FCM 토큰 갱신 (로그인 직후 또는 페이지 재진입 시)
     updateAdminFCMToken(user);
   }
