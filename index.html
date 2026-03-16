@@ -793,6 +793,33 @@ html,body{
 #adminPanel .comp-time .comp-clock{font-size:11px;color:var(--text-dim);margin-top:2px}
 @keyframes apSubHL{0%{box-shadow:0 0 0 0 rgba(201,168,76,.9)}50%{box-shadow:0 0 0 10px rgba(201,168,76,.2)}100%{box-shadow:0 0 0 0 rgba(201,168,76,0)}}
 #adminPanel .sub-card.highlight{border-color:var(--gold)!important;animation:apSubHL 1s ease 3}
+/* 계정 관리 서브패널 */
+#apAccountsPanel{display:none;padding:0 16px calc(var(--safe-bottom)+40px)}
+#apAccountsPanel.show{display:block}
+#apAccountsPanel .acc-section{background:var(--bg2);border:1px solid rgba(197,165,90,.12);border-radius:12px;padding:20px;margin-bottom:16px;margin-top:16px}
+#apAccountsPanel .acc-section-title{font-size:10px;color:var(--gold-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
+#apAccountsPanel .admin-card{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border-radius:8px;padding:12px 14px;margin-bottom:8px;gap:8px}
+#apAccountsPanel .admin-card:last-child{margin-bottom:0}
+#apAccountsPanel .admin-info{font-size:13px;color:var(--text);min-width:0;flex:1}
+#apAccountsPanel .admin-email{display:block;font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#apAccountsPanel .admin-actions{display:flex;gap:6px;flex-shrink:0}
+#apAccountsPanel .btn-sm{padding:6px 10px;border-radius:8px;font-size:11px;cursor:pointer;-webkit-appearance:none;appearance:none;white-space:nowrap}
+#apAccountsPanel .btn-sm.gold{background:transparent;border:1px solid rgba(197,165,90,.3);color:var(--gold-dim)}
+#apAccountsPanel .btn-sm.red{background:transparent;border:1px solid rgba(255,100,100,.3);color:#e05555}
+#apAccountsPanel .acc-field{margin-bottom:12px}
+#apAccountsPanel .acc-field label{display:block;font-size:11px;color:var(--gold-dim);margin-bottom:5px;letter-spacing:.5px}
+#apAccountsPanel .acc-field input{width:100%;padding:10px 12px;background:var(--bg3);border:1px solid rgba(197,165,90,.15);border-radius:8px;color:var(--text);font-size:14px;outline:none;-webkit-appearance:none;appearance:none}
+#apAccountsPanel .acc-field input:focus{border-color:var(--gold-dim)}
+#apAccountsPanel .btn-acc-add{width:100%;padding:12px;background:var(--gold);color:var(--bg);font-size:14px;font-weight:700;border:none;border-radius:8px;cursor:pointer;-webkit-appearance:none;appearance:none;margin-top:4px}
+#apAccountsPanel .btn-acc-add:active{opacity:.8}
+#apAccountsPanel .acc-msg{font-size:13px;text-align:center;margin-top:10px;min-height:18px}
+#apAccountsPanel .acc-msg.ok{color:#3a8a50}
+#apAccountsPanel .acc-msg.err{color:#e05555}
+#apAccountsPanel .invite-row{display:flex;align-items:center;gap:10px;background:var(--bg3);border-radius:8px;padding:12px 14px}
+#apAccountsPanel .invite-label{font-size:12px;color:var(--text-dim);flex:1}
+#apAccountsPanel .invite-code{font-size:14px;font-weight:700;color:var(--gold);font-family:monospace;letter-spacing:2px}
+#apAccountsPanel .btn-copy{padding:6px 12px;border-radius:8px;font-size:11px;cursor:pointer;background:transparent;border:1px solid rgba(197,165,90,.3);color:var(--gold-dim);-webkit-appearance:none;appearance:none}
+#apAccountsPanel .ap-empty{text-align:center;color:var(--text-dim);padding:20px 0;font-size:13px}
 #adminRejectOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9700;align-items:center;justify-content:center;padding:20px}
 #adminRejectOverlay.show{display:flex}
 #adminRejectOverlay .reject-box{width:100%;max-width:380px;background:var(--bg2);border:1px solid rgba(197,165,90,.2);border-radius:12px;padding:24px}
@@ -1205,7 +1232,7 @@ html,body{
       <button class="topbar-btn danger" onclick="apDoLogout()">로그아웃</button>
     </div>
     <div class="topbar-right">
-      <button class="topbar-btn" id="apAccountsBtn" style="display:none" onclick="location.href='admin-accounts.html'">계정 관리</button>
+      <button class="topbar-btn" id="apAccountsBtn" style="display:none" onclick="apToggleAccounts()">계정 관리</button>
       <button class="topbar-btn" onclick="apToggleCompletions()" id="apCompletionsBtn">완료자</button>
       <button class="topbar-btn" onclick="apToggleLockPanel()" id="apLockBtn">🔒 잠금</button>
       <button class="topbar-btn" onclick="apToggleMissionEdit()" id="apMissionEditBtn">미션 편집</button>
@@ -1259,6 +1286,30 @@ html,body{
           <button class="me-tab" onclick="apSwitchMissionGroup('young',this)">청년부</button>
         </div>
         <div id="apMissionEditList"></div>
+      </div>
+
+      <!-- 계정 관리 서브패널 -->
+      <div id="apAccountsPanel">
+        <div class="acc-section">
+          <div class="acc-section-title">관리자 계정 목록</div>
+          <div id="apAdminList"><div class="ap-empty">불러오는 중...</div></div>
+        </div>
+        <div class="acc-section">
+          <div class="acc-section-title">초대 코드</div>
+          <div class="invite-row">
+            <span class="invite-label">신규 관리자 가입용 코드</span>
+            <span class="invite-code" id="apInviteCode">cross2026</span>
+            <button class="btn-copy" onclick="apCopyInviteCode()">복사</button>
+          </div>
+        </div>
+        <div class="acc-section">
+          <div class="acc-section-title">관리자 추가</div>
+          <div class="acc-field"><label>이름</label><input id="apNewName" type="text" placeholder="이름 입력"></div>
+          <div class="acc-field"><label>이메일</label><input id="apNewEmail" type="email" placeholder="이메일 입력" autocomplete="off"></div>
+          <div class="acc-field"><label>임시 비밀번호 (6자 이상)</label><input id="apNewPw" type="password" placeholder="임시 비밀번호"></div>
+          <button class="btn-acc-add" onclick="apAddAdmin()">계정 추가</button>
+          <div class="acc-msg" id="apAddMsg"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1670,10 +1721,11 @@ function closeAdminPanel(){
   document.getElementById('adminPanel').classList.remove('open');
   if(apUnsubscribe){apUnsubscribe();apUnsubscribe=null;}
   if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
-  apLockPanelVisible=false;apMissionEditVisible=false;apCompletionsVisible=false;
+  apLockPanelVisible=false;apMissionEditVisible=false;apCompletionsVisible=false;apAccountsVisible=false;
   document.getElementById('apLockPanel').classList.remove('show');
   document.getElementById('apMissionEditPanel').classList.remove('show');
   document.getElementById('apCompletionsPanel').classList.remove('show');
+  document.getElementById('apAccountsPanel').classList.remove('show');
 }
 
 function apDoLogout(){auth.signOut();}
@@ -1833,6 +1885,7 @@ function apToggleLockPanel(){
     apMissionEditVisible=false;document.getElementById('apMissionEditPanel').classList.remove('show');document.getElementById('apMissionEditBtn').textContent='미션 편집';
     apCompletionsVisible=false;document.getElementById('apCompletionsPanel').classList.remove('show');document.getElementById('apCompletionsBtn').style.cssText='';
     if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
+    apAccountsVisible=false;document.getElementById('apAccountsPanel').classList.remove('show');document.getElementById('apAccountsBtn').style.cssText='';
     document.getElementById('apSubList').style.display='none';
     document.querySelector('#adminPanel .filter-bar').style.display='none';
     document.getElementById('apSectionLabel').style.display='none';
@@ -1865,6 +1918,103 @@ function apSaveLocks(){
     .then(function(){apRenderLockGrid()}).catch(function(e){toast('저장 실패: '+e.message)});
 }
 
+/* 계정 관리 서브패널 */
+var apAccountsVisible=false;
+var AP_INVITE_CODE='cross2026';
+var AP_FIREBASE_CONFIG={apiKey:"AIzaSyCxCyx8-wtwVNmDzOUuVKdJ4kfFcw2VBpY",authDomain:"passport-cross.firebaseapp.com",projectId:"passport-cross",storageBucket:"passport-cross.firebasestorage.app",messagingSenderId:"68059868627",appId:"1:68059868627:web:9191ca01a05edaf055d326"};
+
+function apToggleAccounts(){
+  apAccountsVisible=!apAccountsVisible;
+  document.getElementById('apAccountsPanel').classList.toggle('show',apAccountsVisible);
+  var btn=document.getElementById('apAccountsBtn');
+  btn.style.borderColor=apAccountsVisible?'var(--gold)':'';btn.style.color=apAccountsVisible?'var(--gold)':'';
+  if(apAccountsVisible){
+    // 다른 패널 모두 닫기
+    apLockPanelVisible=false;document.getElementById('apLockPanel').classList.remove('show');document.getElementById('apLockBtn').style.cssText='';
+    apMissionEditVisible=false;document.getElementById('apMissionEditPanel').classList.remove('show');document.getElementById('apMissionEditBtn').textContent='미션 편집';
+    apCompletionsVisible=false;document.getElementById('apCompletionsPanel').classList.remove('show');document.getElementById('apCompletionsBtn').style.cssText='';
+    if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
+    document.getElementById('apSubList').style.display='none';
+    document.querySelector('#adminPanel .filter-bar').style.display='none';
+    document.getElementById('apSectionLabel').style.display='none';
+    apLoadAdminList();
+  } else {
+    document.getElementById('apSubList').style.display='';
+    document.querySelector('#adminPanel .filter-bar').style.display='';
+    document.getElementById('apSectionLabel').style.display='';
+  }
+}
+
+function apLoadAdminList(){
+  var list=document.getElementById('apAdminList');
+  list.innerHTML='<div class="ap-empty">불러오는 중...</div>';
+  db.collection('admins').get().then(function(snap){
+    if(snap.empty){list.innerHTML='<div class="ap-empty">등록된 관리자가 없습니다</div>';return}
+    var html='';
+    snap.forEach(function(doc){
+      var d=doc.data();
+      if(doc.id===MASTER_EMAIL||d.email===MASTER_EMAIL||!d.name)return;
+      html+='<div class="admin-card">'
+        +'<div class="admin-info">'+apEsc(d.name)+'<span class="admin-email">'+apEsc(d.email||doc.id)+'</span></div>'
+        +'<div class="admin-actions">'
+          +'<button class="btn-sm gold" onclick="apResetPassword(\''+apEscA(d.email||doc.id)+'\')">비번 재설정</button>'
+          +'<button class="btn-sm red" onclick="apDeleteAdmin(\''+apEscA(doc.id)+'\',\''+apEscA(d.name)+'\')">삭제</button>'
+        +'</div></div>';
+    });
+    list.innerHTML=html||'<div class="ap-empty">등록된 관리자가 없습니다</div>';
+  }).catch(function(e){list.innerHTML='<div class="ap-empty" style="color:#e05555">오류: '+e.code+'</div>'});
+}
+
+function apDeleteAdmin(uid,name){
+  if(!confirm('['+name+'] 계정을 삭제하시겠습니까?'))return;
+  db.collection('admins').doc(uid).delete()
+    .then(function(){apLoadAdminList();toast(name+' 삭제 완료')})
+    .catch(function(e){toast('삭제 실패: '+e.message)});
+}
+
+function apResetPassword(email){
+  if(!confirm(email+'\n\n위 계정으로 비밀번호 재설정 메일을 발송하시겠습니까?'))return;
+  auth.sendPasswordResetEmail(email)
+    .then(function(){toast('재설정 메일 발송 완료')})
+    .catch(function(e){toast('발송 실패: '+e.message)});
+}
+
+function apAddAdmin(){
+  var name=document.getElementById('apNewName').value.trim();
+  var email=document.getElementById('apNewEmail').value.trim();
+  var pw=document.getElementById('apNewPw').value;
+  var msg=document.getElementById('apAddMsg');
+  msg.textContent='';msg.className='acc-msg';
+  if(!name||!email||!pw){msg.className='acc-msg err';msg.textContent='모든 항목을 입력하세요';return}
+  if(pw.length<6){msg.className='acc-msg err';msg.textContent='비밀번호는 6자 이상이어야 합니다';return}
+  // secondary 앱 인스턴스로 계정 생성 (현재 마스터 세션 유지)
+  var appName='apSecondary_'+Date.now();
+  var secondary=firebase.initializeApp(AP_FIREBASE_CONFIG,appName);
+  secondary.auth().createUserWithEmailAndPassword(email,pw).then(function(cred){
+    return cred.user.updateProfile({displayName:name}).then(function(){
+      return db.collection('admins').doc(cred.user.uid).set({name:name,email:email,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    }).then(function(){return secondary.auth().signOut()});
+  }).then(function(){
+    secondary.delete();
+    msg.className='acc-msg ok';msg.textContent='✓ '+name+' 계정이 추가되었습니다';
+    document.getElementById('apNewName').value='';
+    document.getElementById('apNewEmail').value='';
+    document.getElementById('apNewPw').value='';
+    apLoadAdminList();
+  }).catch(function(e){
+    secondary.delete().catch(function(){});
+    var errMsg=e.code==='auth/email-already-in-use'?'이미 사용 중인 이메일입니다':e.message;
+    msg.className='acc-msg err';msg.textContent=errMsg;
+  });
+}
+
+function apCopyInviteCode(){
+  navigator.clipboard.writeText(AP_INVITE_CODE).then(function(){
+    var btn=document.querySelector('#apAccountsPanel .btn-copy');
+    if(btn){btn.textContent='복사됨!';setTimeout(function(){btn.textContent='복사'},1500);}
+  }).catch(function(){toast('초대 코드: '+AP_INVITE_CODE)});
+}
+
 /* 완료자 패널 */
 function apToggleCompletions(){
   apCompletionsVisible=!apCompletionsVisible;
@@ -1873,6 +2023,7 @@ function apToggleCompletions(){
   btn.style.borderColor=apCompletionsVisible?'var(--gold)':'';btn.style.color=apCompletionsVisible?'var(--gold)':'';
   if(apCompletionsVisible){
     apMissionEditVisible=false;document.getElementById('apMissionEditPanel').classList.remove('show');document.getElementById('apMissionEditBtn').textContent='미션 편집';
+    apAccountsVisible=false;document.getElementById('apAccountsPanel').classList.remove('show');document.getElementById('apAccountsBtn').style.cssText='';
     document.getElementById('apSubList').style.display='none';
     document.querySelector('#adminPanel .filter-bar').style.display='none';
     document.getElementById('apSectionLabel').style.display='none';
@@ -1917,6 +2068,7 @@ function apToggleMissionEdit(){
     apCompletionsVisible=false;document.getElementById('apCompletionsPanel').classList.remove('show');
     document.getElementById('apCompletionsBtn').style.cssText='';
     if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
+    apAccountsVisible=false;document.getElementById('apAccountsPanel').classList.remove('show');document.getElementById('apAccountsBtn').style.cssText='';
     apLoadMissionEditor();
   }
 }
