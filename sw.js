@@ -43,9 +43,9 @@ self.addEventListener('notificationclick', function(e) {
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(list) {
       if (isAdmin) {
-        // admin.html 탭이 이미 열려있으면 포커스 + postMessage로 카드 하이라이트
+        // admin.html 또는 index.html 탭에 포커스 + postMessage로 카드 하이라이트
         for (var i = 0; i < list.length; i++) {
-          if (list[i].url.includes('admin.html') && 'focus' in list[i]) {
+          if ((list[i].url.includes('admin.html') || list[i].url.includes('index.html') || list[i].url === self.location.origin + '/') && 'focus' in list[i]) {
             list[i].focus();
             if (subId) list[i].postMessage({ type: 'HIGHLIGHT_SUBMISSION', subId: subId });
             return;
@@ -66,7 +66,7 @@ self.addEventListener('notificationclick', function(e) {
 });
 
 /* ===== 캐시 전략 ===== */
-const CACHE_NAME = 'passport-cross-v103';
+const CACHE_NAME = 'passport-cross-v104';
 const ASSETS = [
   './',
   './index.html',

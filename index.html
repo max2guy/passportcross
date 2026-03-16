@@ -669,6 +669,169 @@ html,body{
   .tab-content{padding:0 36px 28px}
   .header-cross{font-size:28px}
 }
+
+/* ===== 관리자 패널 (통합 오버레이) ===== */
+#adminPanel{
+  position:fixed;inset:0;z-index:9500;
+  background:var(--bg);
+  transform:translateX(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+#adminPanel.open{transform:translateX(0)}
+#adminPanel .ap-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#adminPanel .topbar{
+  display:flex;flex-direction:column;gap:8px;
+  padding:calc(var(--safe-top)+12px) 16px 12px;
+  background:var(--bg2);border-bottom:1px solid rgba(197,165,90,.1);flex-shrink:0;
+}
+#adminPanel .topbar-row1{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#adminPanel .topbar-left{display:flex;flex-direction:column;gap:2px;min-width:0}
+#adminPanel .topbar-title{font-size:15px;font-weight:700;color:var(--gold);letter-spacing:1px;white-space:nowrap}
+#adminPanel .topbar-email{font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
+#adminPanel .topbar-right{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+#adminPanel .topbar-btn{
+  padding:6px 11px;background:transparent;
+  border:1px solid rgba(197,165,90,.25);border-radius:8px;
+  color:var(--text-dim);font-size:12px;cursor:pointer;white-space:nowrap;
+  -webkit-appearance:none;appearance:none;transition:border-color .2s,color .2s;
+}
+#adminPanel .topbar-btn:active{border-color:var(--gold-dim);color:var(--gold)}
+#adminPanel .topbar-btn.danger{border-color:rgba(255,100,100,.3);color:#e05555}
+#adminPanel .main-content{width:100%;max-width:900px;margin:0 auto}
+#adminPanel .stats-bar{display:flex;gap:10px;padding:16px 16px 0}
+#adminPanel .stat-box{flex:1;background:var(--bg2);border-radius:8px;padding:12px 10px;text-align:center;min-width:0}
+#adminPanel .stat-num{font-size:24px;font-weight:700;color:var(--gold);line-height:1}
+#adminPanel .stat-label{font-size:10px;color:var(--text-dim);margin-top:4px;white-space:nowrap}
+#adminPanel .filter-bar{display:flex;gap:6px;padding:14px 16px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#adminPanel .filter-bar::-webkit-scrollbar{display:none}
+#adminPanel .filter-btn{
+  padding:6px 12px;border-radius:20px;border:1px solid rgba(197,165,90,.2);background:transparent;
+  color:var(--text-dim);font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;
+  transition:all .2s;-webkit-appearance:none;appearance:none;
+}
+#adminPanel .filter-btn.active{background:rgba(197,165,90,.15);border-color:var(--gold);color:var(--gold)}
+#adminPanel .section-title{font-size:11px;color:var(--text-dim);letter-spacing:1px;padding:4px 16px 10px;text-transform:uppercase}
+#adminPanel .sub-list{padding:0 16px calc(var(--safe-bottom)+40px);display:flex;flex-direction:column;gap:10px}
+#adminPanel .sub-card{background:var(--bg2);border:1px solid rgba(197,165,90,.1);border-radius:12px;padding:16px}
+#adminPanel .sub-card.approved{border-color:rgba(42,107,58,.4);opacity:.75}
+#adminPanel .sub-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px}
+#adminPanel .sub-name{font-size:15px;font-weight:700;color:var(--text)}
+#adminPanel .sub-meta{font-size:11px;color:var(--text-dim);margin-top:2px}
+#adminPanel .sub-badge{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0}
+#adminPanel .sub-badge.youth{background:rgba(107,29,42,.4);color:var(--gold-bright)}
+#adminPanel .sub-badge.young{background:rgba(197,165,90,.15);color:var(--gold)}
+#adminPanel .sub-mission{font-size:13px;color:var(--gold-dim);margin-bottom:8px;font-weight:600}
+#adminPanel .sub-text{font-size:13px;color:var(--text);line-height:1.6;background:var(--bg3);border-radius:8px;padding:10px 12px;margin-bottom:10px;white-space:pre-wrap;word-break:break-word}
+#adminPanel .sub-photo{width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-bottom:10px;display:block}
+#adminPanel .sub-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#adminPanel .sub-time{font-size:11px;color:var(--text-dim);flex-shrink:0}
+#adminPanel .sub-actions{display:flex;gap:6px;flex-wrap:wrap}
+#adminPanel .btn-approve{padding:9px 18px;background:#2a6b3a;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;-webkit-appearance:none;appearance:none}
+#adminPanel .btn-approve:active{background:#3a8a50}
+#adminPanel .btn-reject{padding:9px 14px;background:transparent;border:1px solid rgba(255,100,100,.3);color:#e05555;border-radius:8px;font-size:13px;cursor:pointer;-webkit-appearance:none;appearance:none}
+#adminPanel .status-approved{font-size:12px;color:#3a8a50;font-weight:700}
+#adminPanel .status-rejected{font-size:12px;color:#e05555;font-weight:700}
+#adminPanel .btn-del-sub{padding:7px 10px;background:transparent;border:1px solid rgba(255,100,100,.2);color:#e05555;border-radius:8px;font-size:11px;cursor:pointer;-webkit-appearance:none;appearance:none}
+#adminPanel .ap-empty{text-align:center;color:var(--text-dim);padding:60px 20px;font-size:14px}
+#adminPanel .ap-loading{text-align:center;color:var(--text-dim);padding:60px 20px;font-size:14px}
+#adminPanel .reset-section{padding:16px 16px 20px;display:none;border-bottom:1px solid rgba(197,165,90,.08)}
+#adminPanel .reset-section.show{display:block}
+#adminPanel .reset-title{font-size:10px;color:var(--gold-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+#adminPanel .reset-btns{display:flex;gap:8px}
+#adminPanel .btn-danger{flex:1;padding:11px 10px;background:transparent;border:1px solid rgba(255,100,100,.3);color:#e05555;border-radius:8px;font-size:12px;cursor:pointer;text-align:center;word-break:keep-all;line-height:1.5;-webkit-appearance:none;appearance:none}
+#adminPanel .btn-danger:active{background:rgba(255,100,100,.08)}
+#adminPanel .mission-edit-panel{display:none;padding:0 16px 32px}
+#adminPanel .mission-edit-panel.show{display:block}
+#adminPanel .me-tabs{display:flex;gap:8px;margin-bottom:16px;padding-top:16px}
+#adminPanel .me-tab{padding:7px 18px;border-radius:20px;border:1px solid rgba(197,165,90,.2);background:transparent;color:var(--text-dim);font-size:13px;cursor:pointer;-webkit-appearance:none;appearance:none}
+#adminPanel .me-tab.active{background:rgba(197,165,90,.15);border-color:var(--gold);color:var(--gold)}
+#adminPanel .me-card{background:var(--bg2);border:1px solid rgba(197,165,90,.1);border-radius:12px;margin-bottom:12px;overflow:hidden}
+#adminPanel .me-card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;gap:8px}
+#adminPanel .me-card-day{font-size:13px;font-weight:700;color:var(--gold-dim);flex-shrink:0}
+#adminPanel .me-card-name{font-size:13px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#adminPanel .me-toggle{font-size:18px;color:var(--text-dim);flex-shrink:0}
+#adminPanel .me-card-body{display:none;padding:0 16px 16px;border-top:1px solid rgba(197,165,90,.08)}
+#adminPanel .me-card-body.open{display:block}
+#adminPanel .me-field{margin-top:12px}
+#adminPanel .me-field label{display:block;font-size:11px;color:var(--gold-dim);margin-bottom:5px;letter-spacing:.5px}
+#adminPanel .me-field input,#adminPanel .me-field textarea{width:100%;padding:10px 12px;background:var(--bg3);border:1px solid rgba(197,165,90,.15);border-radius:8px;color:var(--text);font-size:13px;outline:none;font-family:inherit;-webkit-appearance:none;appearance:none}
+#adminPanel .me-field textarea{resize:vertical;min-height:70px}
+#adminPanel .me-field input:focus,#adminPanel .me-field textarea:focus{border-color:var(--gold-dim)}
+#adminPanel .btn-save-mission{margin-top:12px;padding:10px 20px;background:var(--gold);color:var(--bg);font-size:13px;font-weight:700;border:none;border-radius:8px;cursor:pointer;-webkit-appearance:none;appearance:none}
+#adminPanel .me-saved{font-size:12px;color:#3a8a50;margin-left:10px;display:none}
+#adminPanel .lock-panel{display:none;padding:16px 16px 32px}
+#adminPanel .lock-panel.show{display:block}
+#adminPanel .lock-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-top:8px;margin-bottom:12px}
+#adminPanel .lock-panel-title{font-size:10px;color:var(--gold-dim);letter-spacing:1.5px;text-transform:uppercase}
+#adminPanel .lock-all-btns{display:flex;gap:6px}
+#adminPanel .btn-lock-all{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;-webkit-appearance:none;appearance:none}
+#adminPanel .btn-lock-all.do-lock{background:transparent;border:1px solid rgba(224,85,85,.4);color:#e05555}
+#adminPanel .btn-lock-all.do-unlock{background:transparent;border:1px solid rgba(42,107,58,.4);color:#3a8a50}
+#adminPanel .btn-lock-all:active{opacity:.6}
+#adminPanel .lock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#adminPanel .lock-cell{background:var(--bg2);border:1px solid rgba(197,165,90,.12);border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;user-select:none;-webkit-tap-highlight-color:transparent}
+#adminPanel .lock-cell.locked{border-color:rgba(224,85,85,.45);background:rgba(224,85,85,.05)}
+#adminPanel .lock-cell .lc-day{font-size:17px;font-weight:700;color:var(--gold);margin-bottom:6px}
+#adminPanel .lock-cell .lc-icon{font-size:24px;line-height:1;margin-bottom:6px}
+#adminPanel .lock-cell .lc-status{font-size:11px;font-weight:700}
+#adminPanel .lock-cell.locked .lc-status{color:#e05555}
+#adminPanel .lock-cell:not(.locked) .lc-status{color:#3a8a50}
+#adminPanel .completions-panel{display:none;padding:0 16px calc(var(--safe-bottom)+40px)}
+#adminPanel .completions-panel.show{display:block}
+#adminPanel .comp-header{display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px}
+#adminPanel .comp-title{font-size:11px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase}
+#adminPanel .comp-count{font-size:12px;color:var(--gold)}
+#adminPanel .comp-card{background:var(--bg2);border:1px solid rgba(197,165,90,.1);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+#adminPanel .comp-info .comp-name{font-size:15px;font-weight:700;color:var(--text)}
+#adminPanel .comp-info .comp-meta{font-size:12px;color:var(--text-dim);margin-top:3px}
+#adminPanel .comp-time{text-align:right;flex-shrink:0}
+#adminPanel .comp-time .comp-date{font-size:12px;color:var(--gold-dim)}
+#adminPanel .comp-time .comp-clock{font-size:11px;color:var(--text-dim);margin-top:2px}
+@keyframes apSubHL{0%{box-shadow:0 0 0 0 rgba(201,168,76,.9)}50%{box-shadow:0 0 0 10px rgba(201,168,76,.2)}100%{box-shadow:0 0 0 0 rgba(201,168,76,0)}}
+#adminPanel .sub-card.highlight{border-color:var(--gold)!important;animation:apSubHL 1s ease 3}
+#adminRejectOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9700;align-items:center;justify-content:center;padding:20px}
+#adminRejectOverlay.show{display:flex}
+#adminRejectOverlay .reject-box{width:100%;max-width:380px;background:var(--bg2);border:1px solid rgba(197,165,90,.2);border-radius:12px;padding:24px}
+#adminRejectOverlay .reject-box h4{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+#adminRejectOverlay .reject-box p{font-size:13px;color:var(--text-dim);margin-bottom:14px}
+#adminRejectOverlay .reject-box textarea{width:100%;padding:10px 12px;background:var(--bg3);border:1px solid rgba(197,165,90,.15);border-radius:8px;color:var(--text);font-size:14px;outline:none;font-family:inherit;resize:none;min-height:80px;-webkit-appearance:none;appearance:none}
+#adminRejectOverlay .reject-btns{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
+#adminRejectOverlay .reject-cancel{padding:9px 16px;background:transparent;border:1px solid rgba(197,165,90,.2);border-radius:8px;color:var(--text-dim);font-size:13px;cursor:pointer;-webkit-appearance:none;appearance:none}
+#adminRejectOverlay .reject-confirm{padding:9px 18px;background:transparent;border:1px solid rgba(255,100,100,.4);border-radius:8px;color:#e05555;font-size:13px;font-weight:700;cursor:pointer;-webkit-appearance:none;appearance:none}
+@media(min-width:600px){
+  #adminPanel .topbar{flex-direction:row;align-items:center;padding:calc(var(--safe-top)+14px) 20px 14px}
+  #adminPanel .topbar-row1{flex:1;min-width:0}
+  #adminPanel .topbar-right{flex-wrap:nowrap}
+}
+@media(max-width:390px){
+  #adminPanel .topbar-btn{padding:6px 9px;font-size:11px}
+  #adminPanel .topbar-title{font-size:14px}
+  #adminPanel .stat-num{font-size:20px}
+  #adminPanel .btn-approve{padding:9px 14px}
+}
+@media(min-width:768px){
+  #adminPanel .topbar{padding:calc(var(--safe-top)+16px) 32px 16px;gap:10px}
+  #adminPanel .stats-bar{padding:20px 32px 0;gap:16px}
+  #adminPanel .stat-num{font-size:28px}
+  #adminPanel .filter-bar{padding:16px 32px 10px;gap:8px}
+  #adminPanel .section-title{padding:8px 32px 12px}
+  #adminPanel .sub-list{padding:0 32px calc(var(--safe-bottom)+40px);gap:14px}
+  #adminPanel .sub-card{padding:20px}
+  #adminPanel .sub-photo{max-height:300px}
+  #adminPanel .reset-section{padding:20px 32px 24px}
+  #adminPanel .mission-edit-panel{padding:0 32px 40px}
+}
+@media(min-width:1024px){
+  #adminPanel .main-content{max-width:1100px}
+  #adminPanel .sub-list{display:grid;grid-template-columns:repeat(2,1fr)}
+  #adminPanel .filter-bar{padding:16px 40px 10px}
+  #adminPanel .sub-list{padding:0 40px calc(var(--safe-bottom)+40px)}
+  #adminPanel .stats-bar{padding:20px 40px 0}
+  #adminPanel .section-title{padding:8px 40px 12px}
+  #adminPanel .lock-grid{grid-template-columns:repeat(6,1fr)}
+}
 </style>
 </head>
 <body>
@@ -1024,6 +1187,90 @@ html,body{
     <div class="ne-btns">
       <button style="background:var(--bg3);color:var(--text-dim)" onclick="closeNameEdit()">취소</button>
       <button style="background:var(--gold);color:var(--bg);font-weight:700" onclick="saveName()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 관리자 패널 (통합 SPA 오버레이) -->
+<div id="adminPanel">
+  <div class="topbar">
+    <div class="topbar-row1">
+      <div class="topbar-left">
+        <div class="topbar-title">관리자 패널</div>
+        <div class="topbar-email" id="apAdminEmail"></div>
+      </div>
+      <button class="topbar-btn danger" onclick="apDoLogout()">로그아웃</button>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-btn" id="apAccountsBtn" style="display:none" onclick="location.href='admin-accounts.html'">계정 관리</button>
+      <button class="topbar-btn" onclick="apToggleCompletions()" id="apCompletionsBtn">완료자</button>
+      <button class="topbar-btn" onclick="apToggleLockPanel()" id="apLockBtn">🔒 잠금</button>
+      <button class="topbar-btn" onclick="apToggleMissionEdit()" id="apMissionEditBtn">미션 편집</button>
+      <button class="topbar-btn" onclick="closeAdminPanel()">← 여권으로</button>
+    </div>
+  </div>
+  <div class="ap-scroll">
+    <div class="main-content">
+      <div class="reset-section" id="apResetSection">
+        <div class="reset-title">데이터 관리</div>
+        <div class="reset-btns">
+          <button class="btn-danger" onclick="apResetApproved()">승인 내역 삭제<br><small style="opacity:.6;font-size:10px">승인 제출 삭제 + 미션 초기화</small></button>
+          <button class="btn-danger" onclick="apResetAll()">전체 미션 리셋<br><small style="opacity:.6;font-size:10px">전체 삭제 + 학생 초기화</small></button>
+        </div>
+      </div>
+      <div class="stats-bar">
+        <div class="stat-box"><div class="stat-num" id="apStatTotal">-</div><div class="stat-label">전체 제출</div></div>
+        <div class="stat-box"><div class="stat-num" id="apStatPending">-</div><div class="stat-label">대기중</div></div>
+        <div class="stat-box"><div class="stat-num" id="apStatApproved">-</div><div class="stat-label">승인완료</div></div>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn" data-filter="all" onclick="apSetFilter('all',this)">전체</button>
+        <button class="filter-btn active" data-filter="pending" onclick="apSetFilter('pending',this)">대기중</button>
+        <button class="filter-btn" data-filter="approved" onclick="apSetFilter('approved',this)">승인완료</button>
+        <button class="filter-btn" data-filter="youth" onclick="apSetFilter('youth',this)">중고등부</button>
+        <button class="filter-btn" data-filter="young" onclick="apSetFilter('young',this)">청년부</button>
+      </div>
+      <div class="section-title" id="apSectionLabel">대기중인 제출</div>
+      <div class="sub-list" id="apSubList"><div class="ap-loading">불러오는 중...</div></div>
+      <div class="lock-panel" id="apLockPanel">
+        <div class="lock-top">
+          <div class="lock-panel-title">미션 잠금 관리</div>
+          <div class="lock-all-btns">
+            <button class="btn-lock-all do-lock" onclick="apSetAllLocks(-1)">전체 잠금</button>
+            <button class="btn-lock-all do-unlock" onclick="apSetAllLocks(1)">전체 열기</button>
+            <button class="btn-lock-all" style="border:1px solid rgba(197,165,90,.3);color:var(--gold-dim)" onclick="apSetAllLocks(0)">전체 자동</button>
+          </div>
+        </div>
+        <div class="lock-grid" id="apLockGrid"></div>
+        <div style="margin-top:14px;font-size:11px;color:var(--text-dim);line-height:1.6">⚙ 자동 — 날짜 기준 자동 오픈 &nbsp;|&nbsp; 🔓 열림 — 날짜 무관 강제 오픈 &nbsp;|&nbsp; 🔒 잠금 — 날짜 무관 강제 잠금</div>
+      </div>
+      <div class="completions-panel" id="apCompletionsPanel">
+        <div class="comp-header">
+          <div class="comp-title">미션 완료자 목록</div>
+          <div class="comp-count" id="apCompCount"></div>
+        </div>
+        <div id="apCompList"><div class="ap-loading">불러오는 중...</div></div>
+      </div>
+      <div class="mission-edit-panel" id="apMissionEditPanel">
+        <div class="me-tabs">
+          <button class="me-tab active" onclick="apSwitchMissionGroup('youth',this)">중고등부</button>
+          <button class="me-tab" onclick="apSwitchMissionGroup('young',this)">청년부</button>
+        </div>
+        <div id="apMissionEditList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 관리자 반려 모달 (adminPanel 위 z-index) -->
+<div id="adminRejectOverlay">
+  <div class="reject-box">
+    <h4>미션 반려</h4>
+    <p>반려 사유를 입력하세요 (학생에게 표시됩니다)</p>
+    <textarea id="apRejectInput" placeholder="예: 사진이 미션 내용과 맞지 않습니다."></textarea>
+    <div class="reject-btns">
+      <button class="reject-cancel" onclick="apCloseReject()">취소</button>
+      <button class="reject-confirm" onclick="apConfirmReject()">반려 확정</button>
     </div>
   </div>
 </div>
@@ -1389,9 +1636,356 @@ function adminLogout(){
   auth.signOut();
 }
 
-/** 관리자 페이지(admin.html)로 이동 */
+/** 관리자 패널 열기 (SPA 오버레이, 페이지 이동 없음) */
 function goAdminPage(){
-  window.location.href='admin.html';
+  openAdminPanel();
+}
+
+function openAdminPanel(){
+  var user=auth.currentUser;
+  if(!user||!user.email)return;
+  var panel=document.getElementById('adminPanel');
+  document.getElementById('apAdminEmail').textContent=user.email;
+  if(user.email===MASTER_EMAIL){
+    document.getElementById('apResetSection').classList.add('show');
+    document.getElementById('apAccountsBtn').style.display='';
+  }
+  panel.classList.add('open');
+  apStartListener();
+  // SW postMessage 수신 (백그라운드 알림 탭 클릭 시)
+  if(!window._apSwMsgBound){
+    window._apSwMsgBound=true;
+    navigator.serviceWorker&&navigator.serviceWorker.addEventListener('message',function(e){
+      if(e.data&&e.data.type==='HIGHLIGHT_SUBMISSION'&&e.data.subId){
+        openAdminPanel();
+        setTimeout(function(){apHighlightCard(e.data.subId)},400);
+      }
+    });
+  }
+}
+
+function closeAdminPanel(){
+  document.getElementById('adminPanel').classList.remove('open');
+  if(apUnsubscribe){apUnsubscribe();apUnsubscribe=null;}
+  if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
+  apLockPanelVisible=false;apMissionEditVisible=false;apCompletionsVisible=false;
+  document.getElementById('apLockPanel').classList.remove('show');
+  document.getElementById('apMissionEditPanel').classList.remove('show');
+  document.getElementById('apCompletionsPanel').classList.remove('show');
+}
+
+function apDoLogout(){auth.signOut();}
+
+/* ===== 관리자 패널 JS ===== */
+var apAllSubmissions=[],apCurrentFilter='pending',apUnsubscribe=null,apUnsubCompletions=null;
+var apLockPanelVisible=false,apMissionEditVisible=false,apCompletionsVisible=false;
+var apOverrides=[0,0,0,0,0,0],apCurrentMissionGroup='youth',apEditableMissions={youth:[],young:[]};
+var apRejectTarget={subId:null,uid:null,missionIdx:null};
+var AP_LOCK_DAYS=['월','화','수','목','금','토'];
+
+function apStartListener(){
+  if(apUnsubscribe)apUnsubscribe();
+  document.getElementById('apSubList').innerHTML='<div class="ap-loading">불러오는 중...</div>';
+  apUnsubscribe=db.collection('submissions').onSnapshot(function(snap){
+    apAllSubmissions=[];
+    snap.forEach(function(doc){apAllSubmissions.push(Object.assign({id:doc.id},doc.data()))});
+    apAllSubmissions.sort(function(a,b){
+      return (b.submittedAt?b.submittedAt.seconds:0)-(a.submittedAt?a.submittedAt.seconds:0);
+    });
+    apUpdateStats();apRenderList();
+  },function(err){
+    document.getElementById('apSubList').innerHTML='<div class="ap-empty" style="color:#e05555">오류: '+err.code+'</div>';
+  });
+}
+
+function apUpdateStats(){
+  var p=apAllSubmissions.filter(function(s){return s.status==='pending'}).length;
+  var a=apAllSubmissions.filter(function(s){return s.status==='approved'}).length;
+  document.getElementById('apStatTotal').textContent=apAllSubmissions.length;
+  document.getElementById('apStatPending').textContent=p;
+  document.getElementById('apStatApproved').textContent=a;
+}
+
+function apSetFilter(filter,btn){
+  apCurrentFilter=filter;
+  document.querySelectorAll('#adminPanel .filter-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  var labels={pending:'대기중인 제출',all:'전체 제출',youth:'중고등부 제출',young:'청년부 제출',approved:'승인완료 제출'};
+  document.getElementById('apSectionLabel').textContent=labels[filter]||'제출 목록';
+  apRenderList();
+}
+
+function apRenderList(){
+  var filtered=apAllSubmissions.filter(function(s){
+    if(apCurrentFilter==='pending')return s.status==='pending';
+    if(apCurrentFilter==='approved')return s.status==='approved';
+    if(apCurrentFilter==='youth')return s.group==='youth';
+    if(apCurrentFilter==='young')return s.group==='young';
+    return true;
+  });
+  var list=document.getElementById('apSubList');
+  if(filtered.length===0){list.innerHTML='<div class="ap-empty">제출 내역이 없습니다</div>';return}
+  list.innerHTML='';
+  filtered.forEach(function(s){
+    var card=document.createElement('div');
+    card.id='apsub-'+s.id;
+    card.className='sub-card'+(s.status==='approved'?' approved':'');
+    var time=s.submittedAt?new Date(s.submittedAt.seconds*1000).toLocaleString('ko-KR'):'';
+    var badge=s.status==='approved'?'<span class="status-approved">✓ 승인완료</span>':s.status==='rejected'?'<span class="status-rejected">✗ 반려</span>':'';
+    var del='<button class="btn-del-sub" onclick="apDeleteSub(\''+s.id+'\',\''+s.uid+'\','+s.missionIdx+')">삭제</button>';
+    var actions=s.status==='pending'
+      ?'<div class="sub-actions"><button class="btn-approve" onclick="apApproveSub(\''+s.id+'\',\''+s.uid+'\','+s.missionIdx+')">승인</button><button class="btn-reject" onclick="apRejectSub(\''+s.id+'\',\''+s.uid+'\','+s.missionIdx+')">반려</button>'+del+'</div>'
+      :'<div class="sub-actions">'+badge+del+'</div>';
+    var groupLabel=s.group==='young'?'청년부':'중고등부';
+    card.innerHTML=
+      '<div class="sub-header"><div><div class="sub-name">'+s.userName+'</div><div class="sub-meta">'+s.grade+' · '+groupLabel+'</div></div><span class="sub-badge '+(s.group||'')+'">'+groupLabel+'</span></div>'+
+      '<div class="sub-mission">'+(s.missionDay||'')+'요일 · '+(s.missionName||'')+'</div>'+
+      (s.text?'<div class="sub-text">'+apEsc(s.text)+'</div>':'')+
+      (s.photo?'<img class="sub-photo" src="'+s.photo+'" alt="제출 사진">':'')+
+      '<div class="sub-footer"><span class="sub-time">'+time+'</span>'+actions+'</div>';
+    list.appendChild(card);
+  });
+}
+
+function apEsc(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function apEscA(str){return str.replace(/"/g,'&quot;')}
+
+function apApproveSub(subId,uid,missionIdx){
+  if(!auth.currentUser)return;
+  if(uid===auth.currentUser.uid){toast('본인 제출은 직접 승인할 수 없습니다.');return;}
+  var batch=db.batch();
+  batch.update(db.collection('submissions').doc(subId),{status:'approved',approvedBy:auth.currentUser.email,approvedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  db.collection('users').doc(uid).get().then(function(doc){
+    if(!doc.exists)return;
+    var m=doc.data().missions||[0,0,0,0,0,0];m[missionIdx]=2;
+    batch.update(db.collection('users').doc(uid),{missions:m});
+    return batch.commit();
+  }).catch(function(e){toast('오류: '+e.message)});
+}
+
+function apRejectSub(subId,uid,missionIdx){
+  apRejectTarget={subId:subId,uid:uid,missionIdx:missionIdx};
+  document.getElementById('apRejectInput').value='';
+  document.getElementById('adminRejectOverlay').classList.add('show');
+}
+function apCloseReject(){
+  document.getElementById('adminRejectOverlay').classList.remove('show');
+  apRejectTarget={subId:null,uid:null,missionIdx:null};
+}
+function apConfirmReject(){
+  var reason=document.getElementById('apRejectInput').value.trim();
+  var t=apRejectTarget;apCloseReject();
+  var batch=db.batch();
+  batch.update(db.collection('submissions').doc(t.subId),{status:'rejected',rejectReason:reason,approvedBy:auth.currentUser?auth.currentUser.email:'',approvedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  db.collection('users').doc(t.uid).get().then(function(doc){
+    if(!doc.exists)return;
+    var m=doc.data().missions||[0,0,0,0,0,0];var rr=doc.data().rejectReasons||['','','','','',''];
+    m[t.missionIdx]=3;rr[t.missionIdx]=reason;
+    batch.update(db.collection('users').doc(t.uid),{missions:m,rejectReasons:rr});
+    return batch.commit();
+  }).catch(function(e){toast('오류: '+e.message)});
+}
+
+function apDeleteSub(subId,uid,missionIdx){
+  if(!confirm('이 제출 내역을 삭제하시겠습니까?'))return;
+  db.collection('submissions').doc(subId).delete().then(function(){
+    return db.collection('users').doc(uid).get();
+  }).then(function(doc){
+    if(!doc.exists)return;
+    var m=doc.data().missions||[0,0,0,0,0,0];m[missionIdx]=0;
+    return db.collection('users').doc(uid).update({missions:m});
+  }).catch(function(e){toast('삭제 실패: '+e.message)});
+}
+
+function apResetApproved(){
+  if(!confirm('승인된 제출 내역을 모두 삭제하고 해당 미션을 초기화합니까?'))return;
+  var list=apAllSubmissions.filter(function(s){return s.status==='approved'});
+  if(!list.length){toast('삭제할 승인 내역이 없습니다');return}
+  Promise.all(list.map(function(s){
+    return db.collection('submissions').doc(s.id).delete().then(function(){
+      return db.collection('users').doc(s.uid).get().then(function(doc){
+        if(!doc.exists)return;
+        var m=doc.data().missions||[0,0,0,0,0,0];m[s.missionIdx]=0;
+        return db.collection('users').doc(s.uid).update({missions:m});
+      });
+    });
+  })).then(function(){toast(list.length+'개 승인 내역 삭제 완료')}).catch(function(e){toast('오류: '+e.message)});
+}
+
+function apResetAll(){
+  if(!confirm('⚠️ 전체 초기화\n\n모든 제출 + 전 학생 미션 초기화\n\n되돌릴 수 없습니다. 계속하시겠습니까?'))return;
+  if(!confirm('정말로 전체 초기화 하시겠습니까?'))return;
+  var p1=apAllSubmissions.map(function(s){return db.collection('submissions').doc(s.id).delete()});
+  var p2=db.collection('completions').get().then(function(snap){var d=[];snap.forEach(function(doc){d.push(db.collection('completions').doc(doc.id).delete())});return Promise.all(d)});
+  var p3=db.collection('users').get().then(function(snap){var u=[];snap.forEach(function(doc){u.push(db.collection('users').doc(doc.id).update({missions:[0,0,0,0,0,0],records:['','','','','',''],photos:['','','','','',''],rejectReasons:['','','','','',''],giftRequested:false}))});return Promise.all(u)});
+  Promise.all(p1.concat([p2,p3])).then(function(){toast('전체 초기화 완료')}).catch(function(e){toast('오류: '+e.message)});
+}
+
+/* 잠금 패널 */
+function apToggleLockPanel(){
+  apLockPanelVisible=!apLockPanelVisible;
+  document.getElementById('apLockPanel').classList.toggle('show',apLockPanelVisible);
+  var btn=document.getElementById('apLockBtn');
+  btn.style.borderColor=apLockPanelVisible?'var(--gold)':'';btn.style.color=apLockPanelVisible?'var(--gold)':'';
+  if(apLockPanelVisible){
+    apMissionEditVisible=false;document.getElementById('apMissionEditPanel').classList.remove('show');document.getElementById('apMissionEditBtn').textContent='미션 편집';
+    apCompletionsVisible=false;document.getElementById('apCompletionsPanel').classList.remove('show');document.getElementById('apCompletionsBtn').style.cssText='';
+    if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
+    document.getElementById('apSubList').style.display='none';
+    document.querySelector('#adminPanel .filter-bar').style.display='none';
+    document.getElementById('apSectionLabel').style.display='none';
+    apLoadLockPanel();
+  } else {
+    document.getElementById('apSubList').style.display='';
+    document.querySelector('#adminPanel .filter-bar').style.display='';
+    document.getElementById('apSectionLabel').style.display='';
+  }
+}
+function apLoadLockPanel(){
+  db.collection('missionData').doc('config').get().then(function(doc){
+    apOverrides=(doc.exists&&Array.isArray(doc.data().overrides))?doc.data().overrides:[0,0,0,0,0,0];
+    apRenderLockGrid();
+  }).catch(function(){apRenderLockGrid()});
+}
+function apRenderLockGrid(){
+  var grid=document.getElementById('apLockGrid');grid.innerHTML='';
+  AP_LOCK_DAYS.forEach(function(day,i){
+    var v=apOverrides[i]||0,cell=document.createElement('div');
+    cell.className='lock-cell'+(v===-1?' locked':'');
+    cell.innerHTML='<div class="lc-day">'+day+'</div><div class="lc-icon">'+(v===1?'🔓':v===-1?'🔒':'⚙')+'</div><div class="lc-status">'+(v===1?'열림':v===-1?'잠금':'자동')+'</div>';
+    cell.onclick=function(){apCycleLock(i)};grid.appendChild(cell);
+  });
+}
+function apCycleLock(i){var c=apOverrides[i]||0;apOverrides[i]=c===0?1:c===1?-1:0;apSaveLocks()}
+function apSetAllLocks(v){apOverrides=[v,v,v,v,v,v];apSaveLocks()}
+function apSaveLocks(){
+  db.collection('missionData').doc('config').set({overrides:apOverrides},{merge:true})
+    .then(function(){apRenderLockGrid()}).catch(function(e){toast('저장 실패: '+e.message)});
+}
+
+/* 완료자 패널 */
+function apToggleCompletions(){
+  apCompletionsVisible=!apCompletionsVisible;
+  document.getElementById('apCompletionsPanel').classList.toggle('show',apCompletionsVisible);
+  var btn=document.getElementById('apCompletionsBtn');
+  btn.style.borderColor=apCompletionsVisible?'var(--gold)':'';btn.style.color=apCompletionsVisible?'var(--gold)':'';
+  if(apCompletionsVisible){
+    apMissionEditVisible=false;document.getElementById('apMissionEditPanel').classList.remove('show');document.getElementById('apMissionEditBtn').textContent='미션 편집';
+    document.getElementById('apSubList').style.display='none';
+    document.querySelector('#adminPanel .filter-bar').style.display='none';
+    document.getElementById('apSectionLabel').style.display='none';
+    apLoadCompletions();
+  } else {
+    document.getElementById('apSubList').style.display='';
+    document.querySelector('#adminPanel .filter-bar').style.display='';
+    document.getElementById('apSectionLabel').style.display='';
+    if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
+  }
+}
+function apLoadCompletions(){
+  var list=document.getElementById('apCompList');
+  list.innerHTML='<div class="ap-loading">불러오는 중...</div>';
+  if(apUnsubCompletions)apUnsubCompletions();
+  apUnsubCompletions=db.collection('completions').onSnapshot(function(snap){
+    var items=[];snap.forEach(function(doc){items.push(Object.assign({id:doc.id},doc.data()))});
+    items.sort(function(a,b){return (a.giftRequestedAt?a.giftRequestedAt.seconds:0)-(b.giftRequestedAt?b.giftRequestedAt.seconds:0)});
+    document.getElementById('apCompCount').textContent=items.length+'명';
+    if(!items.length){list.innerHTML='<div class="ap-empty">아직 완료자가 없습니다</div>';return}
+    list.innerHTML='';
+    items.forEach(function(item,idx){
+      var card=document.createElement('div');card.className='comp-card';
+      var dt=item.giftRequestedAt?new Date(item.giftRequestedAt.seconds*1000):null;
+      var groupLabel=item.group==='young'?'청년부':'중고등부';
+      card.innerHTML='<div class="comp-info"><div class="comp-name">'+(idx+1)+'. '+item.userName+'</div><div class="comp-meta">'+item.grade+' · '+groupLabel+'</div></div>'
+        +'<div class="comp-time"><div class="comp-date">'+(dt?dt.toLocaleDateString('ko-KR',{month:'long',day:'numeric'}):'')+' </div><div class="comp-clock">'+(dt?dt.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):'')+' </div></div>';
+      list.appendChild(card);
+    });
+  },function(err){list.innerHTML='<div class="ap-empty" style="color:#e05555">오류: '+err.code+'</div>'});
+}
+
+/* 미션 편집 패널 */
+function apToggleMissionEdit(){
+  apMissionEditVisible=!apMissionEditVisible;
+  document.getElementById('apMissionEditPanel').classList.toggle('show',apMissionEditVisible);
+  document.getElementById('apMissionEditBtn').textContent=apMissionEditVisible?'제출 목록':'미션 편집';
+  document.getElementById('apSubList').style.display=apMissionEditVisible?'none':'';
+  document.querySelector('#adminPanel .filter-bar').style.display=apMissionEditVisible?'none':'';
+  document.getElementById('apSectionLabel').style.display=apMissionEditVisible?'none':'';
+  if(apMissionEditVisible){
+    apCompletionsVisible=false;document.getElementById('apCompletionsPanel').classList.remove('show');
+    document.getElementById('apCompletionsBtn').style.cssText='';
+    if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
+    apLoadMissionEditor();
+  }
+}
+function apSwitchMissionGroup(group,btn){
+  apCurrentMissionGroup=group;
+  document.querySelectorAll('#adminPanel .me-tab').forEach(function(t){t.classList.remove('active')});
+  btn.classList.add('active');apRenderMissionEditor();
+}
+function apLoadMissionEditor(){
+  db.collection('missionData').get().then(function(snap){
+    apEditableMissions.youth=DEFAULT_MISSIONS_YOUTH.map(function(m){return Object.assign({},m)});
+    apEditableMissions.young=DEFAULT_MISSIONS_YOUNG.map(function(m){return Object.assign({},m)});
+    snap.forEach(function(doc){if(doc.data().missions)apEditableMissions[doc.id]=doc.data().missions});
+    apRenderMissionEditor();
+  }).catch(function(){
+    apEditableMissions.youth=DEFAULT_MISSIONS_YOUTH.map(function(m){return Object.assign({},m)});
+    apEditableMissions.young=DEFAULT_MISSIONS_YOUNG.map(function(m){return Object.assign({},m)});
+    apRenderMissionEditor();
+  });
+}
+function apRenderMissionEditor(){
+  var missions=apEditableMissions[apCurrentMissionGroup];
+  var el=document.getElementById('apMissionEditList');el.innerHTML='';
+  missions.forEach(function(m,i){
+    var card=document.createElement('div');card.className='me-card';
+    card.innerHTML=
+      '<div class="me-card-header" onclick="apToggleMeCard('+i+')">'
+        +'<span class="me-card-day">'+m.day+'('+m.date+')</span>'
+        +'<span class="me-card-name">'+m.name+'</span>'
+        +'<span class="me-toggle" id="apme-toggle-'+i+'">＋</span>'
+      +'</div>'
+      +'<div class="me-card-body" id="apme-body-'+i+'">'
+        +'<div class="me-field"><label>미션 이름</label><input id="apme-name-'+i+'" value="'+apEscA(m.name)+'"></div>'
+        +'<div class="me-field"><label>미션 내용</label><textarea id="apme-content-'+i+'">'+apEsc(m.content)+'</textarea></div>'
+        +'<div class="me-field"><label>인증 방법</label><textarea id="apme-howto-'+i+'">'+apEsc(m.howto)+'</textarea></div>'
+        +'<button class="btn-save-mission" onclick="apSaveMission('+i+')">저장</button>'
+        +'<span class="me-saved" id="apme-saved-'+i+'">✓ 저장됨</span>'
+      +'</div>';
+    el.appendChild(card);
+  });
+}
+function apToggleMeCard(i){
+  var body=document.getElementById('apme-body-'+i),toggle=document.getElementById('apme-toggle-'+i);
+  toggle.textContent=body.classList.toggle('open')?'－':'＋';
+}
+function apSaveMission(i){
+  var name=document.getElementById('apme-name-'+i).value.trim();
+  var content=document.getElementById('apme-content-'+i).value.trim();
+  var howto=document.getElementById('apme-howto-'+i).value.trim();
+  if(!name||!content||!howto){toast('모든 필드를 입력하세요');return}
+  apEditableMissions[apCurrentMissionGroup][i].name=name;
+  apEditableMissions[apCurrentMissionGroup][i].content=content;
+  apEditableMissions[apCurrentMissionGroup][i].howto=howto;
+  db.collection('missionData').doc(apCurrentMissionGroup).set({missions:apEditableMissions[apCurrentMissionGroup]})
+    .then(function(){var s=document.getElementById('apme-saved-'+i);s.style.display='inline';setTimeout(function(){s.style.display='none'},2000)})
+    .catch(function(e){toast('저장 실패: '+e.message)});
+}
+
+/* 딥링크 하이라이트 (알림 클릭 시) */
+function apHighlightCard(subId){
+  var card=document.getElementById('apsub-'+subId);
+  if(!card){
+    if(apCurrentFilter!=='all')apSetFilter('all',document.querySelector('#adminPanel [data-filter="all"]'));
+    card=document.getElementById('apsub-'+subId);
+  }
+  if(!card)return false;
+  card.classList.remove('highlight');void card.offsetWidth;card.classList.add('highlight');
+  var scrollEl=document.querySelector('#adminPanel .ap-scroll');
+  if(scrollEl)scrollEl.scrollTo({top:card.offsetTop-100,behavior:'smooth'});
+  setTimeout(function(){card.classList.remove('highlight')},3500);
+  return true;
 }
 
 /**
