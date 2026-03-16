@@ -684,13 +684,15 @@ html,body{
 #adminPanel .ap-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #adminPanel .topbar{
   display:flex;flex-direction:column;align-items:center;gap:6px;
-  padding:calc(var(--safe-top)+12px) 60px 12px;
+  padding:calc(var(--safe-top)+12px) 16px 12px;
   background:var(--bg2);border-bottom:1px solid rgba(197,165,90,.1);flex-shrink:0;
-  position:relative;
+}
+#adminPanel .topbar-head{
+  width:100%;display:flex;align-items:center;justify-content:center;position:relative;
 }
 #adminPanel .topbar-title{font-size:15px;font-weight:700;color:var(--gold);letter-spacing:1px;white-space:nowrap;text-align:center}
+#adminPanel .ap-logout-corner{position:absolute;right:0;top:50%;transform:translateY(-50%)}
 #adminPanel .topbar-email{font-size:11px;color:var(--text-dim);white-space:nowrap;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-#adminPanel .ap-logout-corner{position:absolute;top:calc(var(--safe-top)+10px);right:12px}
 #adminPanel .topbar-right{display:flex;align-items:center;gap:5px;justify-content:center;flex-wrap:wrap}
 #adminPanel .topbar-btn{
   padding:6px 11px;background:transparent;
@@ -829,7 +831,7 @@ html,body{
 #adminRejectOverlay .reject-cancel{padding:9px 16px;background:transparent;border:1px solid rgba(197,165,90,.2);border-radius:8px;color:var(--text-dim);font-size:13px;cursor:pointer;-webkit-appearance:none;appearance:none}
 #adminRejectOverlay .reject-confirm{padding:9px 18px;background:transparent;border:1px solid rgba(255,100,100,.4);border-radius:8px;color:#e05555;font-size:13px;font-weight:700;cursor:pointer;-webkit-appearance:none;appearance:none}
 @media(min-width:600px){
-  #adminPanel .topbar{padding:calc(var(--safe-top)+14px) 70px 14px}
+  #adminPanel .topbar{padding:calc(var(--safe-top)+14px) 20px 14px}
   #adminPanel .topbar-right{flex-wrap:nowrap}
 }
 @media(max-width:390px){
@@ -839,7 +841,7 @@ html,body{
   #adminPanel .btn-approve{padding:9px 14px}
 }
 @media(min-width:768px){
-  #adminPanel .topbar{padding:calc(var(--safe-top)+16px) 80px 16px;gap:8px}
+  #adminPanel .topbar{padding:calc(var(--safe-top)+16px) 32px 16px;gap:8px}
   #adminPanel .stats-bar{padding:20px 32px 0;gap:16px}
   #adminPanel .stat-num{font-size:28px}
   #adminPanel .filter-bar{padding:16px 32px 10px;gap:8px}
@@ -1221,8 +1223,10 @@ html,body{
 <!-- 관리자 패널 (통합 SPA 오버레이) -->
 <div id="adminPanel">
   <div class="topbar">
-    <button class="topbar-btn danger ap-logout-corner" onclick="apDoLogout()">로그아웃</button>
-    <div class="topbar-title">관리자 패널</div>
+    <div class="topbar-head">
+      <div class="topbar-title">관리자 패널</div>
+      <button class="topbar-btn danger ap-logout-corner" onclick="apDoLogout()">로그아웃</button>
+    </div>
     <div class="topbar-email" id="apAdminEmail"></div>
     <div class="topbar-right">
       <button class="topbar-btn" onclick="closeAdminPanel()">← 여권으로</button>
