@@ -571,9 +571,8 @@ html,body{
 .name-edit-box input{width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--bg3);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:15px;outline:none;margin-bottom:16px}
 .name-edit-box .ne-btns{display:flex;gap:8px}
 .name-edit-box .ne-btns button{flex:1;padding:12px;border:none;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:14px;cursor:pointer}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:2px}
+*{scrollbar-width:none}
+*::-webkit-scrollbar{display:none}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .fade-up{animation:fadeUp .5s ease forwards}
 /* 관리자 빠른 승인 sheet (index.html 포그라운드 알림) */
