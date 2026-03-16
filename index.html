@@ -1740,6 +1740,7 @@ function goAdminPage(){
   openAdminPanel();
 }
 
+var _adminPanelPushed=false;
 function openAdminPanel(){
   var user=auth.currentUser;
   if(!user||!user.email)return;
@@ -1750,6 +1751,7 @@ function openAdminPanel(){
     document.getElementById('apAccountsBtn').style.display='';
   }
   panel.classList.add('open');
+  if(!_adminPanelPushed){_adminPanelPushed=true;history.pushState({adminPanel:true},'');}
   apStartListener();
   // SW postMessage 수신 (백그라운드 알림 탭 클릭 시)
   if(!window._apSwMsgBound){
@@ -1772,6 +1774,7 @@ function closeAdminPanel(){
   document.getElementById('apMissionEditPanel').classList.remove('show');
   document.getElementById('apCompletionsPanel').classList.remove('show');
   document.getElementById('apAccountsPanel').classList.remove('show');
+  if(_adminPanelPushed){_adminPanelPushed=false;history.back();}
 }
 
 function apDoLogout(){auth.signOut();}
@@ -2693,6 +2696,17 @@ var _overlayDepth=0;
 function pushOverlay(){_overlayDepth++;history.pushState({overlay:_overlayDepth},'')}
 function popOverlay(){if(_overlayDepth>0){_overlayDepth--;history.back()}}
 window.addEventListener('popstate',function(){
+  // 관리자 패널이 열려있으면 먼저 닫기 (history.back 없이)
+  if(_adminPanelPushed){
+    _adminPanelPushed=false;
+    var panel=document.getElementById('adminPanel');
+    panel.classList.remove('open');
+    if(apUnsubscribe){apUnsubscribe();apUnsubscribe=null;}
+    if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
+    apLockPanelVisible=false;apMissionEditVisible=false;apCompletionsVisible=false;apAccountsVisible=false;
+    ['apLockPanel','apMissionEditPanel','apCompletionsPanel','apAccountsPanel'].forEach(function(id){document.getElementById(id).classList.remove('show');});
+    return;
+  }
   if(_overlayDepth>0){_overlayDepth--;}
   ['missionModal','certOverlay','nameEditOverlay'].forEach(function(id){document.getElementById(id).classList.remove('show');});
 });
