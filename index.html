@@ -1390,34 +1390,34 @@ firebase.initializeApp(firebaseConfig);
 var db=firebase.firestore();
 var auth=firebase.auth();
 
-// 익명 로그인 후 앱 초기화
 // LOCAL persistence 명시 → PWA/브라우저 닫혀도 세션 유지
+// signInAnonymously는 onAuthStateChanged에서만 호출 (startup race condition 방지)
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(){});
+
 var appReady=false;
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-  .then(function(){ return auth.signInAnonymously(); })
-  .then(function(){ if(!appReady){appReady=true;bootApp();} })
-  .catch(function(){ if(!appReady){appReady=true;bootApp();} });
-// 3초 안에 auth 안 되면 강제 실행
-setTimeout(function(){if(!appReady){appReady=true;bootApp();}},3000);
 
 /* ===== 교사/임원 로그인 상태 감지 =====
- * - Google 로그인 상태면 권한 확인 후 관리자 메뉴 표시
- * - 익명 or 완전 비로그인 상태면 관리자 메뉴 숨김
- * - 비로그인(null) 상태면 익명 세션 즉시 복구 (학생 앱 보호)
+ * onAuthStateChanged 최초 발동 시 bootApp() 호출 (auth 확정 후 앱 시작)
+ * startup에서 signInAnonymously()를 즉시 호출하면 Google 세션 복원 전에 덮어쓸 수 있어 제거
+ * - Google 재진입 시: onAuthStateChanged(googleUser) → checkAdminRole → 관리자 유지
+ * - 신규/익명: onAuthStateChanged(null) → signInAnonymously → 다시 발동
  */
 auth.onAuthStateChanged(function(user){
+  if(!appReady){appReady=true;bootApp();}
   if(user && !user.isAnonymous && user.email){
-    // Google(또는 이메일) 로그인 상태 → 교사 권한 확인
+    // Google 로그인 상태 → 교사 권한 확인
     checkAdminRole(user);
   } else {
-    // 익명 or 완전 비로그인
+    // 익명 or 비로그인
     updateAdminUI(null);
     if(!user){
-      // 완전 로그아웃 상태 → 익명 세션 복구 (학생 앱이 auth 없이 멈추지 않도록)
+      // 완전 비로그인 → 익명 세션 복구
       auth.signInAnonymously().catch(function(){});
     }
   }
 });
+// 4초 안에 onAuthStateChanged 미발동 시 강제 앱 시작 (안전망)
+setTimeout(function(){if(!appReady){appReady=true;bootApp();}},4000);
 
 function getUID(){
   var user=auth.currentUser;
