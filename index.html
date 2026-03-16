@@ -1096,6 +1096,7 @@ html,body{
     <button onclick="switchTab('tabFeed',this)"><span class="tab-icon">🕊️</span>나눔</button>
     <button onclick="switchTab('tabScreen',this)"><span class="tab-icon">🖼️</span>배경화면</button>
     <button onclick="switchTab('tabMore',this)"><span class="tab-icon">⚙️</span>더보기</button>
+    <button id="tabAdminBtn" style="display:none" onclick="openAdminPanel()"><span class="tab-icon">🔑</span>관리자</button>
   </nav>
 </div>
 
@@ -1664,14 +1665,17 @@ function updateAdminUI(user){
   var menu=document.getElementById('adminMenu');
   var addBtn=document.getElementById('addTeacherBtn');
   var emailEl=document.getElementById('adminLoggedInEmail');
+  var adminTab=document.getElementById('tabAdminBtn');
   if(!user){
     // 로그아웃 상태
     if(loginSection)loginSection.style.display='';
     if(menu)menu.style.display='none';
+    if(adminTab)adminTab.style.display='none';
   } else {
     // 로그인 상태
     if(loginSection)loginSection.style.display='none';
     if(menu)menu.style.display='';
+    if(adminTab)adminTab.style.display='';
     if(emailEl)emailEl.textContent=user.email;
     // 최고 관리자만 "새 관리자 추가" 버튼 노출
     if(addBtn)addBtn.style.display=(user.email===MASTER_EMAIL?'':'none');
