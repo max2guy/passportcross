@@ -1339,6 +1339,20 @@ html,body{
   </div>
 </div>
 
+<!-- 초대코드 입력 모달 -->
+<div id="inviteModal" style="display:none;position:fixed;inset:0;z-index:9800;background:rgba(0,0,0,.75);align-items:center;justify-content:center;padding:20px">
+  <div style="width:100%;max-width:340px;background:var(--bg2);border-radius:var(--radius);padding:28px 24px;border:1px solid rgba(197,165,90,.2)">
+    <div style="font-size:16px;font-weight:700;color:var(--gold);text-align:center;margin-bottom:6px">초대코드 입력</div>
+    <div style="font-size:13px;color:var(--text-dim);text-align:center;margin-bottom:20px" id="inviteModalEmail"></div>
+    <input id="inviteCodeInput" type="text" placeholder="초대코드를 입력하세요" onkeydown="if(event.key==='Enter')confirmInviteCode()"
+      style="width:100%;padding:12px 14px;background:var(--bg3);border:1px solid rgba(197,165,90,.2);border-radius:var(--radius-sm);color:var(--text);font-size:15px;font-family:var(--font-body);outline:none;-webkit-appearance:none;appearance:none;margin-bottom:14px">
+    <div style="display:flex;gap:10px">
+      <button onclick="cancelInviteCode()" style="flex:1;padding:12px;background:transparent;border:1px solid rgba(197,165,90,.2);border-radius:var(--radius-sm);color:var(--text-dim);font-size:14px;font-family:var(--font-body);cursor:pointer">취소</button>
+      <button onclick="confirmInviteCode()" style="flex:1;padding:12px;background:rgba(197,165,90,.12);border:1px solid rgba(197,165,90,.35);border-radius:var(--radius-sm);color:var(--gold);font-size:14px;font-weight:700;font-family:var(--font-body);cursor:pointer">확인</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -1640,14 +1654,52 @@ function checkAdminRole(user){
         updateAdminUI(user);
         toast('교사 로그인 완료');
       } else {
-        alert('권한이 없습니다.\n관리자에게 이메일 등록을 요청하세요.');
-        auth.signOut(); // → onAuthStateChanged(null) → 익명 세션 자동 복구
+        showInviteCodeModal(user);
       }
     })
     .catch(function(err){
-      alert('권한 확인 중 오류: '+err.message);
+      toast('권한 확인 중 오류: '+err.message);
       auth.signOut();
     });
+}
+
+var _inviteUser=null;
+function showInviteCodeModal(user){
+  _inviteUser=user;
+  document.getElementById('inviteModalEmail').textContent=user.email;
+  document.getElementById('inviteCodeInput').value='';
+  var modal=document.getElementById('inviteModal');
+  modal.style.display='flex';
+  setTimeout(function(){document.getElementById('inviteCodeInput').focus();},100);
+}
+function cancelInviteCode(){
+  document.getElementById('inviteModal').style.display='none';
+  _inviteUser=null;
+  auth.signOut();
+}
+function confirmInviteCode(){
+  var code=document.getElementById('inviteCodeInput').value.trim();
+  if(code!==AP_INVITE_CODE){
+    toast('초대코드가 올바르지 않습니다');
+    return;
+  }
+  var user=_inviteUser;
+  document.getElementById('inviteModal').style.display='none';
+  _inviteUser=null;
+  // admins 컬렉션에 자동 등록
+  db.collection('admins').doc(user.email).set({
+    email:user.email,
+    name:user.displayName||user.email,
+    addedAt:firebase.firestore.FieldValue.serverTimestamp()
+  },{merge:true})
+  .then(function(){
+    updateAdminUI(user);
+    toast('✅ 교사 등록 완료! 환영합니다');
+  })
+  .catch(function(err){
+    toast('등록 실패: '+err.message);
+    auth.signOut();
+  });
 }
 
 /**
