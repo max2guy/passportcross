@@ -184,7 +184,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
         <ul class="feat-list">
           <li>여권 탭 상단의 <strong>Community Progress</strong> 카드에서 우리 부서가 함께 완수한 미션 수를 <strong>OO보의 십자가 길</strong>로 표시합니다.</li>
           <li>승인된 미션 1건 = 십자가의 길 1보. 부서 전체의 누적 완료 수가 실시간으로 쌓입니다.</li>
-          <li><strong>[나눔] 탭</strong>에서 다른 지체들이 올린 은혜로운 인증 사진과 묵상 글을 실시간으로 확인합니다.</li>
+          <li><strong>[나눔] 탭</strong>에서 중고등부 · 청년부 전체 지체들이 올린 은혜로운 인증 사진과 묵상 글을 실시간으로 확인합니다.</li>
         </ul>
         <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:16px;margin-top:14px">
           <div style="font-size:10px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:8px">Community Progress</div>
@@ -195,13 +195,13 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
           <div style="height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:8px">
             <div style="height:100%;width:35%;background:linear-gradient(90deg,#7e2038,var(--gold));border-radius:3px"></div>
           </div>
-          <div style="font-size:12px;color:var(--text-dim)">중고등부 공동체가 함께 걸어간 십자가의 길</div>
+          <div style="font-size:12px;color:var(--text-dim)">중고등부 · 청년부 공동체가 함께 걸어간 십자가의 길</div>
         </div>
         <div class="hcard">
           <div class="hcard-icon">🕊️</div>
           <div class="hcard-body">
-            <div class="hcard-title">나눔 피드</div>
-            <div class="hcard-desc">승인된 미션 인증들이 카드 형태로 실시간 피드에 게시됩니다.</div>
+            <div class="hcard-title">나눔 피드 — 통합 표시</div>
+            <div class="hcard-desc">승인된 미션 인증들이 카드 형태로 실시간 피드에 게시됩니다. 중고등부와 청년부 제출이 함께 표시됩니다.</div>
           </div>
         </div>
       </div>
@@ -258,6 +258,17 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
             <div class="step-num">A</div>
             <div class="step-text"><strong>안드로이드 (Chrome)</strong> — 우측 상단 메뉴(⋮) 탭 → <strong>'홈 화면에 추가'</strong> 또는 설치 배너 탭</div>
           </div>
+          <div class="step">
+            <div class="step-num">+</div>
+            <div class="step-text"><strong>더보기 탭</strong> — 앱 내 [더보기] 탭에서 <strong>앱 설치 버튼</strong>을 탭해도 설치 가능합니다.</div>
+          </div>
+        </div>
+        <div class="hcard" style="margin-top:14px">
+          <div class="hcard-icon">🏷️</div>
+          <div class="hcard-body">
+            <div class="hcard-title">설치 권유 배너</div>
+            <div class="hcard-desc">브라우저로 접속 시 화면 하단에 설치 권유 배너가 자동으로 표시됩니다. 배너를 탭해도 바로 설치할 수 있습니다.</div>
+          </div>
         </div>
       </div>
     </div>
@@ -289,13 +300,20 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
             <div class="notif-time">실시간</div>
             <div class="notif-emoji">✝️</div>
             <div class="notif-title">미션 승인 완료</div>
-            <div class="notif-body">교사가 내 미션을 승인하면 즉시 알림이 옵니다.</div>
+            <div class="notif-body">교사가 내 미션을 승인하면 즉시 알림이 옵니다. 알림을 탭하면 해당 미션으로 바로 이동합니다.</div>
           </div>
           <div class="notif-card">
             <div class="notif-time">실시간 · 교사용</div>
             <div class="notif-emoji">📋</div>
             <div class="notif-title">새 미션 제출</div>
-            <div class="notif-body">학생이 미션을 제출하면 교사에게 즉시 알림이 옵니다.</div>
+            <div class="notif-body">학생이 미션을 제출하면 교사에게 즉시 알림이 옵니다. 알림에서 <strong>바로 승인/반려</strong>도 가능합니다.</div>
+          </div>
+        </div>
+        <div class="hcard" style="margin-top:10px">
+          <div class="hcard-icon">🔗</div>
+          <div class="hcard-body">
+            <div class="hcard-title">알림 딥링크</div>
+            <div class="hcard-desc">모든 알림은 딥링크를 포함합니다. 알림을 탭하면 앱이 열리며 해당 제출 화면으로 즉시 이동합니다.</div>
           </div>
         </div>
       </div>
@@ -319,14 +337,16 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
       <div class="acc-inner">
         <ul class="feat-list">
           <li>일반 학생과 <strong>동일한 링크</strong>로 접속합니다.</li>
-          <li><strong>[더보기] 탭</strong>에서 교사 이메일/비밀번호로 로그인하면 숨겨진 관리자 메뉴가 열립니다.</li>
-          <li>계정이 없다면 초대 코드 입력 후 직접 가입할 수 있습니다.</li>
+          <li><strong>[더보기] 탭</strong>에서 교사 이메일/비밀번호로 로그인하면 하단 탭바에 <strong>[관리자] 탭</strong>이 자동으로 표시됩니다.</li>
+          <li>관리자 탭을 탭하거나, 화면 오른쪽 끝에서 <strong>왼쪽으로 스와이프</strong>하면 관리자 패널이 열립니다.</li>
+          <li>모든 관리자 기능이 <strong>별도 페이지 이동 없이 즉시 슬라이드 전환</strong>으로 이동합니다(SPA).</li>
+          <li>계정이 없다면 <strong>초대 코드 입력</strong>으로 교사 계정이 자동 등록됩니다.</li>
         </ul>
         <div class="hcard">
           <div class="hcard-icon">🔑</div>
           <div class="hcard-body">
-            <div class="hcard-title">초대 코드 필요</div>
-            <div class="hcard-desc">관리자 가입 시 마스터 계정에서 발급된 초대 코드가 필요합니다. 담당 교역자에게 문의하세요.</div>
+            <div class="hcard-title">초대 코드로 자동 등록</div>
+            <div class="hcard-desc">마스터 계정에서 발급된 초대 코드를 입력하면 교사 계정으로 즉시 자동 등록됩니다. 담당 교역자에게 코드를 받으세요.</div>
           </div>
         </div>
       </div>
@@ -345,10 +365,18 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
           <li>[대기중인 제출] 목록에서 학생들의 미션을 확인합니다.</li>
           <li><strong style="color:#5fcb78">승인(초록)</strong> 처리 시 학생에게 즉시 푸시 알림이 발송되고 여권에 도장이 찍힙니다.</li>
           <li><strong style="color:#e06070">반려(빨강)</strong> 처리 시 사유를 입력하면 학생이 다시 제출할 수 있습니다.</li>
+          <li>학생 제출 알림에서 <strong>빠른 승인/반려 버튼</strong>을 탭하면 앱을 열지 않고도 즉시 처리할 수 있습니다.</li>
         </ul>
         <div style="display:flex;gap:8px;margin-top:14px">
           <div style="flex:1;background:rgba(42,107,58,0.2);border:1px solid rgba(95,203,120,0.2);border-radius:var(--radius-sm);padding:12px;text-align:center;font-size:13px;color:#5fcb78;font-weight:700">✓ 승인</div>
           <div style="flex:1;background:rgba(180,50,60,0.2);border:1px solid rgba(224,96,112,0.2);border-radius:var(--radius-sm);padding:12px;text-align:center;font-size:13px;color:#e06070;font-weight:700">✕ 반려 + 사유 입력</div>
+        </div>
+        <div class="hcard" style="margin-top:10px">
+          <div class="hcard-icon">⚡</div>
+          <div class="hcard-body">
+            <div class="hcard-title">빠른 승인 (알림에서 바로 처리)</div>
+            <div class="hcard-desc">새 제출 푸시 알림에 표시되는 버튼으로, 앱을 열지 않고도 알림 화면에서 즉시 승인 또는 반려할 수 있습니다.</div>
+          </div>
         </div>
       </div>
     </div>
@@ -386,6 +414,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
       <div class="acc-inner">
         <ul class="feat-list">
           <li>교사 계정 <strong>추가 / 삭제</strong> 및 초대 코드 발급</li>
+          <li>계정 관리 화면이 <strong>관리자 패널 내부 서브뷰</strong>로 통합되어, 별도 페이지 이동 없이 바로 접근됩니다.</li>
           <li>전체 학생 데이터 초기화 등 <strong>핵심 권한</strong>은 마스터 계정에만 부여됩니다.</li>
         </ul>
         <div class="master-row">
@@ -402,7 +431,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
   <div class="divider"></div>
   <div class="footer">
     <span>THE CROSS PASSPORT</span><br>
-    연천장로교회 · 2026 고난주간 · 3.30 — 4.4
+    연천장로교회 · 2026 고난주간 · 3.30 — 4.4<br>
+    <span style="font-family:'Noto Sans KR',sans-serif;font-size:11px;opacity:.5;color:var(--text-dim)">Guide v2.7.6 · 2026.03.17</span>
   </div>
 </div>
 
