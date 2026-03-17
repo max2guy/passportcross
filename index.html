@@ -1580,20 +1580,21 @@ function closeAQS(){
 function aqsApprove(){
   if(!_aqsTarget.subId||!auth.currentUser)return;
   var adminEmail=auth.currentUser.email;
+  var subId=_aqsTarget.subId,uid=_aqsTarget.uid,missionIdx=_aqsTarget.missionIdx;
+  closeAQS();
   var batch=db.batch();
-  batch.update(db.collection('submissions').doc(_aqsTarget.subId),{
+  batch.update(db.collection('submissions').doc(subId),{
     status:'approved',approvedBy:adminEmail,
     approvedAt:firebase.firestore.FieldValue.serverTimestamp()
   });
-  db.collection('users').doc(_aqsTarget.uid).get().then(function(doc){
+  db.collection('users').doc(uid).get().then(function(doc){
     if(!doc.exists)return;
     var missions=doc.data().missions||[0,0,0,0,0,0];
-    missions[_aqsTarget.missionIdx]=2;
-    batch.update(db.collection('users').doc(_aqsTarget.uid),{missions:missions});
+    missions[missionIdx]=2;
+    batch.update(db.collection('users').doc(uid),{missions:missions});
     return batch.commit();
   }).then(function(){toast('승인 완료!');})
   .catch(function(err){toast('오류: '+err.message);});
-  closeAQS();
 }
 
 function aqsRejectStart(){
@@ -1601,22 +1602,23 @@ function aqsRejectStart(){
   var reason=prompt('반려 사유를 입력하세요 (학생에게 표시됩니다):');
   if(reason===null)return; // 취소
   var adminEmail=auth.currentUser?auth.currentUser.email:'';
+  var subId=_aqsTarget.subId,uid=_aqsTarget.uid,missionIdx=_aqsTarget.missionIdx;
+  closeAQS();
   var batch=db.batch();
-  batch.update(db.collection('submissions').doc(_aqsTarget.subId),{
+  batch.update(db.collection('submissions').doc(subId),{
     status:'rejected',rejectReason:reason,approvedBy:adminEmail,
     approvedAt:firebase.firestore.FieldValue.serverTimestamp()
   });
-  db.collection('users').doc(_aqsTarget.uid).get().then(function(doc){
+  db.collection('users').doc(uid).get().then(function(doc){
     if(!doc.exists)return;
     var missions=doc.data().missions||[0,0,0,0,0,0];
     var rejectReasons=doc.data().rejectReasons||['','','','','',''];
-    missions[_aqsTarget.missionIdx]=3;
-    rejectReasons[_aqsTarget.missionIdx]=reason;
-    batch.update(db.collection('users').doc(_aqsTarget.uid),{missions:missions,rejectReasons:rejectReasons});
+    missions[missionIdx]=3;
+    rejectReasons[missionIdx]=reason;
+    batch.update(db.collection('users').doc(uid),{missions:missions,rejectReasons:rejectReasons});
     return batch.commit();
   }).then(function(){toast('반려 처리 완료');})
   .catch(function(err){toast('오류: '+err.message);});
-  closeAQS();
 }
 
 /* ===== 교사/임원 관리자 기능 ===== */
