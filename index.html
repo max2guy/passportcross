@@ -1067,7 +1067,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.9.1</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.9.2</div>
       </div>
     </div>
   </div>
@@ -1212,7 +1212,7 @@ html,body{
           <button class="btn-danger" onclick="apResetAll()">전체 미션 리셋<br><small style="opacity:.6;font-size:10px">전체 삭제 + 학생 초기화</small></button>
         </div>
       </div>
-      <div class="stats-bar">
+      <div class="stats-bar" id="apStatsBar">
         <div class="stat-box"><div class="stat-num" id="apStatTotal">-</div><div class="stat-label">전체 제출</div></div>
         <div class="stat-box"><div class="stat-num" id="apStatPending">-</div><div class="stat-label">대기중</div></div>
         <div class="stat-box"><div class="stat-num" id="apStatApproved">-</div><div class="stat-label">승인완료</div></div>
@@ -1915,13 +1915,13 @@ function apToggleLockPanel(){
     apCompletionsVisible=false;document.getElementById('apCompletionsPanel').classList.remove('show');
     if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
     apAccountsVisible=false;document.getElementById('apAccountsPanel').classList.remove('show');
-    document.getElementById('apSubList').style.display='none';
+    document.getElementById('apSubList').style.display='none';document.getElementById('apStatsBar').style.display='none';
     document.querySelector('#adminPanel .filter-bar').style.display='none';
     document.getElementById('apSectionLabel').style.display='none';
     apLoadLockPanel();
   } else {
     apSetActiveBtn(null);
-    document.getElementById('apSubList').style.display='';
+    document.getElementById('apSubList').style.display='';document.getElementById('apStatsBar').style.display='';
     document.querySelector('#adminPanel .filter-bar').style.display='';
     document.getElementById('apSectionLabel').style.display='';
   }
@@ -1962,13 +1962,13 @@ function apToggleAccounts(){
     apMissionEditVisible=false;document.getElementById('apMissionEditPanel').classList.remove('show');
     apCompletionsVisible=false;document.getElementById('apCompletionsPanel').classList.remove('show');
     if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
-    document.getElementById('apSubList').style.display='none';
+    document.getElementById('apSubList').style.display='none';document.getElementById('apStatsBar').style.display='none';
     document.querySelector('#adminPanel .filter-bar').style.display='none';
     document.getElementById('apSectionLabel').style.display='none';
     apLoadAdminList();
   } else {
     apSetActiveBtn(null);
-    document.getElementById('apSubList').style.display='';
+    document.getElementById('apSubList').style.display='';document.getElementById('apStatsBar').style.display='';
     document.querySelector('#adminPanel .filter-bar').style.display='';
     document.getElementById('apSectionLabel').style.display='';
   }
@@ -2053,13 +2053,13 @@ function apToggleCompletions(){
     apMissionEditVisible=false;document.getElementById('apMissionEditPanel').classList.remove('show');
     apAccountsVisible=false;document.getElementById('apAccountsPanel').classList.remove('show');
     apLockPanelVisible=false;document.getElementById('apLockPanel').classList.remove('show');
-    document.getElementById('apSubList').style.display='none';
+    document.getElementById('apSubList').style.display='none';document.getElementById('apStatsBar').style.display='none';
     document.querySelector('#adminPanel .filter-bar').style.display='none';
     document.getElementById('apSectionLabel').style.display='none';
     apLoadCompletions();
   } else {
     apSetActiveBtn(null);
-    document.getElementById('apSubList').style.display='';
+    document.getElementById('apSubList').style.display='';document.getElementById('apStatsBar').style.display='';
     document.querySelector('#adminPanel .filter-bar').style.display='';
     document.getElementById('apSectionLabel').style.display='';
     if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
@@ -2102,7 +2102,7 @@ function apShowSubList(){
   if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
   apAccountsVisible=false;document.getElementById('apAccountsPanel').classList.remove('show');
   apLockPanelVisible=false;document.getElementById('apLockPanel').classList.remove('show');
-  document.getElementById('apSubList').style.display='';
+  document.getElementById('apSubList').style.display='';document.getElementById('apStatsBar').style.display='';
   document.querySelector('#adminPanel .filter-bar').style.display='';
   document.getElementById('apSectionLabel').style.display='';
   apSetActiveBtn('apSubListBtn');
@@ -2113,6 +2113,7 @@ function apToggleMissionEdit(){
   apMissionEditVisible=!apMissionEditVisible;
   document.getElementById('apMissionEditPanel').classList.toggle('show',apMissionEditVisible);
   document.getElementById('apSubList').style.display=apMissionEditVisible?'none':'';
+  document.getElementById('apStatsBar').style.display=apMissionEditVisible?'none':'';
   document.querySelector('#adminPanel .filter-bar').style.display=apMissionEditVisible?'none':'';
   document.getElementById('apSectionLabel').style.display=apMissionEditVisible?'none':'';
   if(apMissionEditVisible){
