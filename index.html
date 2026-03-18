@@ -1080,7 +1080,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.8.2</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.8.3</div>
       </div>
     </div>
   </div>
@@ -2130,13 +2130,13 @@ function apSwitchMissionGroup(group,btn){
 }
 function apLoadMissionEditor(){
   db.collection('missionData').get().then(function(snap){
-    apEditableMissions.youth=DEFAULT_MISSIONS_YOUTH.map(function(m){return Object.assign({},m)});
-    apEditableMissions.young=DEFAULT_MISSIONS_YOUNG.map(function(m){return Object.assign({},m)});
+    apEditableMissions.youth=MISSIONS_YOUTH.map(function(m){return Object.assign({},m)});
+    apEditableMissions.young=MISSIONS_YOUNG.map(function(m){return Object.assign({},m)});
     snap.forEach(function(doc){if(doc.data().missions)apEditableMissions[doc.id]=doc.data().missions});
     apRenderMissionEditor();
   }).catch(function(){
-    apEditableMissions.youth=DEFAULT_MISSIONS_YOUTH.map(function(m){return Object.assign({},m)});
-    apEditableMissions.young=DEFAULT_MISSIONS_YOUNG.map(function(m){return Object.assign({},m)});
+    apEditableMissions.youth=MISSIONS_YOUTH.map(function(m){return Object.assign({},m)});
+    apEditableMissions.young=MISSIONS_YOUNG.map(function(m){return Object.assign({},m)});
     apRenderMissionEditor();
   });
 }
