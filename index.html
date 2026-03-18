@@ -987,22 +987,7 @@ html,body{
       <div class="screen-section badge-section">
         <h3>Profile Badge</h3>
         <div class="badge-card" id="badgeCard">
-          <div class="badge-preview">
-            <svg viewBox="0 0 64 64" width="40" height="40" xmlns="http://www.w3.org/2000/svg">
-              <!-- phone body -->
-              <rect x="18" y="9" width="28" height="46" rx="5" ry="5" fill="#e8e4dc" opacity=".93"/>
-              <!-- screen -->
-              <rect x="22" y="16" width="20" height="30" rx="2.5" ry="2.5" fill="#3a0a14"/>
-              <!-- cross vertical on screen -->
-              <rect x="30" y="18" width="4" height="26" rx="2" ry="2" fill="#c5a55a"/>
-              <!-- cross horizontal on screen -->
-              <rect x="23" y="27" width="18" height="4" rx="2" ry="2" fill="#c5a55a"/>
-              <!-- home bar -->
-              <rect x="26" y="50" width="12" height="2.5" rx="1.25" ry="1.25" fill="#c5a55a" opacity=".7"/>
-              <!-- gold ring glow -->
-              <circle cx="32" cy="32" r="31" fill="none" stroke="#c5a55a" stroke-width="1" opacity=".35"/>
-            </svg>
-          </div>
+          <div class="badge-preview"><img src="./media-fast-badge.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
           <div class="badge-info">
             <h4>미디어 금식 배지</h4>
             <p>프로필 이미지로 사용하세요</p>
@@ -3075,75 +3060,10 @@ function downloadWallpaper(idx){
 }
 
 document.getElementById('badgeCard').addEventListener('click',function(){
-  var c=document.createElement('canvas');c.width=512;c.height=512;var ctx=c.getContext('2d');
-
-  // --- 배경 원 (방사형 그라디언트) ---
-  var bg=ctx.createRadialGradient(210,200,0,256,256,256);
-  bg.addColorStop(0,'#7d2234');bg.addColorStop(1,'#3a0a14');
-  ctx.fillStyle=bg;ctx.beginPath();ctx.arc(256,256,256,0,Math.PI*2);ctx.fill();
-
-  // --- 외곽 골드 링 ---
-  ctx.strokeStyle='#c5a55a';ctx.lineWidth=7;
-  ctx.beginPath();ctx.arc(256,256,241,0,Math.PI*2);ctx.stroke();
-  ctx.strokeStyle='rgba(197,165,90,0.25)';ctx.lineWidth=2;
-  ctx.beginPath();ctx.arc(256,256,228,0,Math.PI*2);ctx.stroke();
-
-  // --- 내부 미묘한 광원 ---
-  var glow=ctx.createRadialGradient(256,200,0,256,256,180);
-  glow.addColorStop(0,'rgba(232,210,128,0.12)');glow.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(256,256,256,0,Math.PI*2);ctx.fill();
-
-  // --- 폰 본체 (크림색 라운드렉트) ---
-  function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
-
-  // 폰 그림자
-  ctx.save();ctx.shadowColor='rgba(0,0,0,0.55)';ctx.shadowBlur=24;ctx.shadowOffsetY=8;
-  ctx.fillStyle='#e8e4dc';rr(ctx,168,94,176,310,22);ctx.fill();ctx.restore();
-
-  // 폰 본체
-  ctx.fillStyle='#e8e4dc';rr(ctx,168,94,176,310,22);ctx.fill();
-  // 폰 테두리 (연한 골드)
-  ctx.strokeStyle='rgba(197,165,90,0.4)';ctx.lineWidth=2;rr(ctx,168,94,176,310,22);ctx.stroke();
-
-  // 스피커 그릴
-  ctx.fillStyle='rgba(107,29,42,0.3)';rr(ctx,226,108,60,8,4);ctx.fill();
-
-  // --- 스크린 ---
-  ctx.fillStyle='#280810';rr(ctx,184,126,144,218,10);ctx.fill();
-  // 스크린 미묘한 광택
-  var sg=ctx.createLinearGradient(184,126,328,126);
-  sg.addColorStop(0,'rgba(255,255,255,0.06)');sg.addColorStop(1,'rgba(255,255,255,0)');
-  ctx.fillStyle=sg;rr(ctx,184,126,144,218,10);ctx.fill();
-
-  // --- 스크린 위 십자가 (골드, 라운드 끝) ---
-  // 수직 바
-  ctx.fillStyle='#c5a55a';rr(ctx,244,140,24,190,12);ctx.fill();
-  // 수평 바
-  ctx.fillStyle='#c5a55a';rr(ctx,190,212,132,24,12);ctx.fill();
-  // 골드 글로우
-  ctx.save();ctx.globalCompositeOperation='lighter';
-  var cg=ctx.createRadialGradient(256,235,0,256,235,80);
-  cg.addColorStop(0,'rgba(197,165,90,0.18)');cg.addColorStop(1,'rgba(197,165,90,0)');
-  ctx.fillStyle=cg;ctx.beginPath();ctx.arc(256,235,80,0,Math.PI*2);ctx.fill();ctx.restore();
-
-  // 홈 바
-  ctx.fillStyle='rgba(197,165,90,0.6)';rr(ctx,226,354,60,10,5);ctx.fill();
-
-  // --- 텍스트 영역 ---
-  // "미디어 금식" 타이틀
-  ctx.fillStyle='#e8d280';
-  ctx.font='bold 46px sans-serif';
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=8;
-  ctx.fillText('미디어 금식',256,444);
-
-  // "THE CROSS PASSPORT"
-  ctx.fillStyle='rgba(197,165,90,0.7)';
-  ctx.font='18px sans-serif';
-  ctx.shadowBlur=0;
-  ctx.fillText('THE CROSS PASSPORT',256,476);
-
-  saveCanvasAsPng(c,'media_fast_badge.png','배지가 저장되었습니다');
+  var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+  if(isIOS){toast('아이폰은 이미지를 꾹~ 눌러서\n[사진 앱에 저장]을 선택해주세요.');return;}
+  var a=document.createElement('a');a.href='./media-fast-badge.png';a.download='media_fast_badge.png';a.click();
+  toast('배지가 저장되었습니다');
 });
 
 function showCertificate(){
