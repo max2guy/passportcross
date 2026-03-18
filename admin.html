@@ -484,11 +484,22 @@ function updateAdminFCMToken(user){
   if(!user||!user.email)return;
   if(!('Notification' in window)||!firebase.messaging.isSupported())return;
   var messaging=firebase.messaging();
-  // 포그라운드(앱 열려있을 때) 수신 → 빠른 승인 bottom sheet
+  // 포그라운드(앱 열려있을 때) 수신 → 시스템 알림 강제 표시 + 빠른 승인 sheet
   messaging.onMessage(function(payload){
     var d=payload.data||{};
+    // SW를 통해 시스템 알림 강제 호출 (탭 활성화 상태에서도 상단 바 알림 울림)
+    navigator.serviceWorker.ready.then(function(reg){
+      reg.showNotification(d.title||'THE CROSS PASSPORT',{
+        body:d.body||'',
+        icon:'./notification-icon.svg',
+        badge:'./notification-icon.svg',
+        data:{submissionId:d.submissionId||'',targetUrl:d.targetUrl||''}
+      });
+    }).catch(function(){});
     if(d.submissionId && d.targetUrl==='admin'){
       showQASheet(d.submissionId);
+    } else {
+      toast(d.title||d.body||'알림');
     }
   });
   // sw.js 등록 (미등록 시 navigator.serviceWorker.ready가 영원히 pending되는 문제 방지)
@@ -502,7 +513,11 @@ function updateAdminFCMToken(user){
     });
   }).then(function(token){
     if(!token)return;
-    db.collection('admins').doc(user.email).set({fcmToken:token},{merge:true}).catch(function(){});
+    // arrayUnion: 기존 토큰 유지한 채 이 기기 토큰 추가
+    db.collection('admins').doc(user.email).set(
+      {fcmTokens:firebase.firestore.FieldValue.arrayUnion(token)},
+      {merge:true}
+    ).catch(function(){});
   }).catch(function(){});
 }
 

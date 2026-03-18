@@ -7,6 +7,12 @@
  * Schedule 4: 매일 PM 07:00 KST → 당일 미션 미제출 학생에게 "완료하셨나요?" 푸시
  *
  * 배포: firebase deploy --only functions
+ *
+ * [변경사항]
+ * - fcmToken(string) → fcmTokens(array) 구조 대응 (하위 호환 유지)
+ * - sendEachForMulticast에 try/catch 추가 → 전체 API 실패 시에도 안전 처리
+ * - 만료 토큰 자동 삭제: FieldValue.delete() → arrayRemove(token) 로 변경
+ * - sendToUsers / sendToAdmins 분리로 도미노 실패 방지
  */
 
 const functions = require('firebase-functions');
@@ -26,6 +32,7 @@ const MISSIONS_META = [
   { day: '금', theme: '다 이루었다', verse: '요한복음 19:30' },
   { day: '토', theme: '부활의 소망', verse: '시편 130:5'    }
 ];
+
 // 행사 시작일 (KST 기준)
 const EVENT_START = new Date('2026-03-30T00:00:00+09:00');
 
@@ -35,75 +42,135 @@ function getDayIndex() {
   return (diffDays >= 0 && diffDays <= 5) ? diffDays : -1;
 }
 
-/* users 컬렉션에서 FCM 토큰 전체 수집 */
+/* 만료 토큰 에러 코드 */
+const EXPIRED_CODES = [
+  'messaging/invalid-registration-token',
+  'messaging/registration-token-not-registered'
+];
+
+/**
+ * 문서 데이터에서 FCM 토큰 배열 추출
+ * - fcmTokens(array) 우선, 없으면 fcmToken(string) 하위 호환
+ */
+function extractTokens(docData) {
+  const arr = docData.fcmTokens;
+  if (Array.isArray(arr) && arr.length) return arr.filter(Boolean);
+  const single = docData.fcmToken;
+  if (single) return [single];
+  return [];
+}
+
+/**
+ * users 컬렉션에서 모든 FCM 토큰 수집
+ * @returns {{ tokens: string[], tokenToUid: Object }}
+ */
 async function getAllUserTokens() {
   const snap = await db.collection('users').get();
-  const tokens = [], uidByIdx = {};
+  const tokens = [];
+  const tokenToUid = {}; // token → uid (만료 토큰 삭제용)
   snap.forEach(function(doc) {
-    const t = doc.data().fcmToken;
-    if (t) { uidByIdx[tokens.length] = doc.id; tokens.push(t); }
+    extractTokens(doc.data()).forEach(function(t) {
+      if (!tokenToUid[t]) { // 중복 제거
+        tokenToUid[t] = doc.id;
+        tokens.push(t);
+      }
+    });
   });
-  return { tokens, uidByIdx };
+  return { tokens, tokenToUid };
 }
 
-/* users 컬렉션에서 당일 미션 미제출(0) 학생 토큰만 수집 */
+/**
+ * users 컬렉션에서 당일 미션 미제출(0) 또는 반려(3) 학생 토큰만 수집
+ */
 async function getIncompleteUserTokens(dayIdx) {
   const snap = await db.collection('users').get();
-  const tokens = [], uidByIdx = {};
+  const tokens = [];
+  const tokenToUid = {};
   snap.forEach(function(doc) {
     const d = doc.data();
-    const t = d.fcmToken;
     const missions = d.missions || [];
-    // 0 = 미제출, 3 = 반려(재제출 필요) → 알림 대상
-    if (t && (missions[dayIdx] === 0 || missions[dayIdx] === 3 || missions[dayIdx] === undefined)) {
-      uidByIdx[tokens.length] = doc.id; tokens.push(t);
+    // 0 = 미제출, 3 = 반려(재제출 필요), undefined = 데이터 없음 → 알림 대상
+    if (missions[dayIdx] === 0 || missions[dayIdx] === 3 || missions[dayIdx] === undefined) {
+      extractTokens(d).forEach(function(t) {
+        if (!tokenToUid[t]) {
+          tokenToUid[t] = doc.id;
+          tokens.push(t);
+        }
+      });
     }
   });
-  return { tokens, uidByIdx };
+  return { tokens, tokenToUid };
 }
 
-/* 멀티캐스트 발송 + 만료 토큰 정리 (users 컬렉션) */
-async function sendToUsers(tokens, uidByIdx, title, body) {
+/**
+ * 멀티캐스트 발송 + 만료 토큰 자동 삭제 (users 컬렉션)
+ * - API 자체 실패 시 try/catch로 안전 처리 (다른 발송에 영향 없음)
+ * - 개별 토큰 실패는 responses 배열로 독립 처리
+ * - 만료 토큰은 arrayRemove로 삭제 (다른 기기 토큰 보존)
+ */
+async function sendToUsers(tokens, tokenToUid, title, body) {
   if (!tokens.length) return;
-  const res = await messaging.sendEachForMulticast({ data: { title, body }, tokens });
-  console.log(`발송 성공: ${res.successCount}, 실패: ${res.failureCount}`);
-  const EXPIRED = ['messaging/invalid-registration-token','messaging/registration-token-not-registered'];
+
+  let res;
+  try {
+    res = await messaging.sendEachForMulticast({ data: { title, body }, tokens });
+  } catch (err) {
+    console.error('sendEachForMulticast 전체 실패 (users):', err.message);
+    return;
+  }
+
+  console.log(`users 발송 성공: ${res.successCount}, 실패: ${res.failureCount}`);
+
   const deletes = [];
   res.responses.forEach(function(r, i) {
-    if (!r.success && r.error && EXPIRED.includes(r.error.code) && uidByIdx[i]) {
-      deletes.push(db.collection('users').doc(uidByIdx[i])
-        .update({ fcmToken: admin.firestore.FieldValue.delete() }).catch(function(){}));
+    if (!r.success && r.error && EXPIRED_CODES.includes(r.error.code)) {
+      const uid = tokenToUid[tokens[i]];
+      const expiredToken = tokens[i];
+      if (uid) {
+        console.log(`만료 토큰 삭제 (users): uid=${uid}`);
+        deletes.push(
+          db.collection('users').doc(uid)
+            .update({ fcmTokens: admin.firestore.FieldValue.arrayRemove(expiredToken) })
+            .catch(function() {})
+        );
+      }
     }
   });
   await Promise.all(deletes);
 }
 
-/* ─────────────────────────────────────────────
- * 유틸: 만료된 FCM 토큰을 Firestore에서 삭제
- * tokens: 발송한 토큰 배열
- * responses: sendEachForMulticast 응답 배열
- * collectionName: 'admins' | 'users'
- * docIdFn: (index) => 해당 토큰을 가진 문서 ID를 반환하는 함수
- * ───────────────────────────────────────────── */
-async function cleanupExpiredTokens(tokens, responses, collectionName, docIdFn) {
-  const EXPIRED_CODES = [
-    'messaging/invalid-registration-token',
-    'messaging/registration-token-not-registered'
-  ];
-  const deletePromises = [];
-  responses.forEach(function(res, idx) {
-    if (!res.success && res.error && EXPIRED_CODES.includes(res.error.code)) {
-      const docId = docIdFn(idx);
-      if (docId) {
-        deletePromises.push(
-          db.collection(collectionName).doc(docId)
-            .update({ fcmToken: admin.firestore.FieldValue.delete() })
-            .catch(function() {}) // 실패해도 무시
+/**
+ * 멀티캐스트 발송 + 만료 토큰 자동 삭제 (admins 컬렉션)
+ */
+async function sendToAdmins(tokens, tokenToEmail, messagePayload) {
+  if (!tokens.length) return;
+
+  let res;
+  try {
+    res = await messaging.sendEachForMulticast(messagePayload);
+  } catch (err) {
+    console.error('sendEachForMulticast 전체 실패 (admins):', err.message);
+    return;
+  }
+
+  console.log(`admins 발송 성공: ${res.successCount}, 실패: ${res.failureCount}`);
+
+  const deletes = [];
+  res.responses.forEach(function(r, i) {
+    if (!r.success && r.error && EXPIRED_CODES.includes(r.error.code)) {
+      const email = tokenToEmail[tokens[i]];
+      const expiredToken = tokens[i];
+      if (email) {
+        console.log(`만료 토큰 삭제 (admins): email=${email}`);
+        deletes.push(
+          db.collection('admins').doc(email)
+            .update({ fcmTokens: admin.firestore.FieldValue.arrayRemove(expiredToken) })
+            .catch(function() {})
         );
       }
     }
   });
-  await Promise.all(deletePromises);
+  await Promise.all(deletes);
 }
 
 /* ─────────────────────────────────────────────
@@ -111,7 +178,7 @@ async function cleanupExpiredTokens(tokens, responses, collectionName, docIdFn) 
  * submissions 새 문서 생성 시 모든 교사에게 푸시
  * ───────────────────────────────────────────── */
 exports.notifyAdminOnSubmission = functions
-  .region('asia-northeast3') // 서울 리전 (선택 사항)
+  .region('asia-northeast3')
   .firestore
   .document('submissions/{subId}')
   .onCreate(async function(snap) {
@@ -119,25 +186,25 @@ exports.notifyAdminOnSubmission = functions
     const studentName = data.userName || '학생';
     const missionName = data.missionName || '미션';
 
-    // admins 컬렉션 전체 조회 → fcmToken 수집
+    // admins 컬렉션 전체 조회 → fcmTokens 배열 수집 (fcmToken 단일 필드 하위 호환)
     const adminsSnap = await db.collection('admins').get();
-
     const tokens = [];
-    const emailByIndex = {}; // 만료 토큰 삭제용: 인덱스 → 이메일 매핑
+    const tokenToEmail = {};
     adminsSnap.forEach(function(doc) {
-      const token = doc.data().fcmToken;
-      if (token) {
-        emailByIndex[tokens.length] = doc.id; // doc.id = 이메일
-        tokens.push(token);
-      }
+      extractTokens(doc.data()).forEach(function(t) {
+        if (!tokenToEmail[t]) {
+          tokenToEmail[t] = doc.id; // doc.id = 이메일
+          tokens.push(t);
+        }
+      });
     });
 
-    if (tokens.length === 0) {
-      console.log('등록된 FCM 토큰이 없습니다.');
+    if (!tokens.length) {
+      console.log('등록된 관리자 FCM 토큰 없음');
       return null;
     }
 
-    const message = {
+    const messagePayload = {
       data: {
         title: '새 미션 제출 ✝',
         body: `${studentName}님이 [${missionName}]을 제출했습니다. 확인해주세요!`,
@@ -147,23 +214,14 @@ exports.notifyAdminOnSubmission = functions
       tokens: tokens
     };
 
-    const response = await messaging.sendEachForMulticast(message);
-    console.log(`발송 성공: ${response.successCount}, 실패: ${response.failureCount}`);
-
-    // 만료 토큰 정리
-    await cleanupExpiredTokens(
-      tokens,
-      response.responses,
-      'admins',
-      function(idx) { return emailByIndex[idx]; }
-    );
-
+    await sendToAdmins(tokens, tokenToEmail, messagePayload);
     return null;
   });
 
 /* ─────────────────────────────────────────────
  * Trigger 2: 관리자 → 학생
  * submissions 문서 status가 'approved'로 변경될 때 해당 학생에게 푸시
+ * - 학생의 모든 기기(fcmTokens 배열)로 전송
  * ───────────────────────────────────────────── */
 exports.notifyStudentOnApproval = functions
   .region('asia-northeast3')
@@ -180,42 +238,46 @@ exports.notifyStudentOnApproval = functions
     const uid = after.uid;
     if (!uid) return null;
 
-    // 학생 문서에서 FCM 토큰 조회
     const userDoc = await db.collection('users').doc(uid).get();
     if (!userDoc.exists) return null;
 
-    const fcmToken = userDoc.data().fcmToken;
-    if (!fcmToken) {
+    const tokens = extractTokens(userDoc.data());
+    if (!tokens.length) {
       console.log(`학생 ${uid}의 FCM 토큰 없음`);
       return null;
     }
 
     const missionName = after.missionName || '미션';
-
-    const message = {
-      token: fcmToken,
+    const messagePayload = {
       data: {
         title: '미션 승인! ✝',
         body: `[${missionName}] 승인되었습니다. 여권에서 도장을 확인하세요!`
-      }
+      },
+      tokens: tokens
     };
 
+    let res;
     try {
-      await messaging.send(message);
-      console.log(`학생 ${uid} 알림 발송 완료`);
+      res = await messaging.sendEachForMulticast(messagePayload);
+      console.log(`학생 ${uid} 알림 (성공:${res.successCount}, 실패:${res.failureCount})`);
     } catch (err) {
-      // 만료 토큰이면 Firestore에서 삭제
-      const EXPIRED_CODES = [
-        'messaging/invalid-registration-token',
-        'messaging/registration-token-not-registered'
-      ];
-      if (EXPIRED_CODES.includes(err.errorInfo && err.errorInfo.code)) {
-        await db.collection('users').doc(uid)
-          .update({ fcmToken: admin.firestore.FieldValue.delete() })
-          .catch(function() {});
-      }
-      console.error('학생 알림 발송 실패:', err.message);
+      console.error(`학생 ${uid} 알림 전체 실패:`, err.message);
+      return null;
     }
+
+    // 만료 토큰 정리 (arrayRemove로 해당 토큰만 삭제, 다른 기기 토큰 보존)
+    const deletes = [];
+    res.responses.forEach(function(r, i) {
+      if (!r.success && r.error && EXPIRED_CODES.includes(r.error.code)) {
+        console.log(`학생 만료 토큰 삭제: uid=${uid}`);
+        deletes.push(
+          db.collection('users').doc(uid)
+            .update({ fcmTokens: admin.firestore.FieldValue.arrayRemove(tokens[i]) })
+            .catch(function() {})
+        );
+      }
+    });
+    await Promise.all(deletes);
 
     return null;
   });
@@ -231,9 +293,9 @@ exports.morningPush = functions
     const dayIdx = getDayIndex();
     if (dayIdx < 0) { console.log('행사 기간 아님'); return null; }
     const m = MISSIONS_META[dayIdx];
-    const { tokens, uidByIdx } = await getAllUserTokens();
+    const { tokens, tokenToUid } = await getAllUserTokens();
     await sendToUsers(
-      tokens, uidByIdx,
+      tokens, tokenToUid,
       '☀️ 오늘의 미션이 도착했습니다',
       m.day + '요일 · ' + m.theme + ' — ' + m.verse + ' 오늘의 미션을 확인하세요 →'
     );
@@ -250,9 +312,9 @@ exports.eveningPush = functions
   .onRun(async function() {
     const dayIdx = getDayIndex();
     if (dayIdx < 0) { console.log('행사 기간 아님'); return null; }
-    const { tokens, uidByIdx } = await getIncompleteUserTokens(dayIdx);
+    const { tokens, tokenToUid } = await getIncompleteUserTokens(dayIdx);
     await sendToUsers(
-      tokens, uidByIdx,
+      tokens, tokenToUid,
       '🌙 오늘 미션, 완료하셨나요?',
       '아직 인증을 올리지 않으셨습니다. 실천한 내용을 기록해 주세요.'
     );
