@@ -770,7 +770,7 @@ html,body{
 #adminPanel .lock-cell:not(.locked) .lc-status{color:#3a8a50}
 #adminPanel .completions-panel{display:none;padding:0 16px calc(var(--safe-bottom)+40px)}
 #adminPanel .completions-panel.show{display:block}
-#adminPanel .comp-header{display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px}
+#adminPanel .comp-header{display:flex;align-items:center;gap:8px;padding:14px 0 10px}
 #adminPanel .comp-title{font-size:11px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase}
 #adminPanel .comp-count{font-size:12px;color:var(--gold)}
 #adminPanel .comp-card{background:var(--bg2);border:1px solid rgba(197,165,90,.1);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -1066,7 +1066,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.8.8</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.8.9</div>
       </div>
     </div>
   </div>
@@ -1195,6 +1195,7 @@ html,body{
     <div class="topbar-email" id="apAdminEmail"></div>
     <div class="topbar-right">
       <button class="topbar-btn" onclick="closeAdminPanel()">← 여권으로</button>
+      <button class="topbar-btn" id="apSubListBtn" onclick="apShowSubList()">제출 목록</button>
       <button class="topbar-btn" id="apAccountsBtn" style="display:none" onclick="apToggleAccounts()">계정관리</button>
       <button class="topbar-btn" onclick="apToggleCompletions()" id="apCompletionsBtn">완료자</button>
       <button class="topbar-btn" onclick="apToggleLockPanel()" id="apLockBtn">🔒 잠금</button>
@@ -1910,7 +1911,7 @@ function apToggleLockPanel(){
   var btn=document.getElementById('apLockBtn');
   btn.style.borderColor=apLockPanelVisible?'var(--gold)':'';btn.style.color=apLockPanelVisible?'var(--gold)':'';
   if(apLockPanelVisible){
-    apMissionEditVisible=false;document.getElementById('apMissionEditPanel').classList.remove('show');document.getElementById('apMissionEditBtn').textContent='미션 편집';
+    apMissionEditVisible=false;document.getElementById('apMissionEditPanel').classList.remove('show');
     apCompletionsVisible=false;document.getElementById('apCompletionsPanel').classList.remove('show');document.getElementById('apCompletionsBtn').style.cssText='';
     if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
     apAccountsVisible=false;document.getElementById('apAccountsPanel').classList.remove('show');document.getElementById('apAccountsBtn').style.cssText='';
@@ -1959,7 +1960,7 @@ function apToggleAccounts(){
   if(apAccountsVisible){
     // 다른 패널 모두 닫기
     apLockPanelVisible=false;document.getElementById('apLockPanel').classList.remove('show');document.getElementById('apLockBtn').style.cssText='';
-    apMissionEditVisible=false;document.getElementById('apMissionEditPanel').classList.remove('show');document.getElementById('apMissionEditBtn').textContent='미션 편집';
+    apMissionEditVisible=false;document.getElementById('apMissionEditPanel').classList.remove('show');
     apCompletionsVisible=false;document.getElementById('apCompletionsPanel').classList.remove('show');document.getElementById('apCompletionsBtn').style.cssText='';
     if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
     document.getElementById('apSubList').style.display='none';
@@ -2050,7 +2051,7 @@ function apToggleCompletions(){
   var btn=document.getElementById('apCompletionsBtn');
   btn.style.borderColor=apCompletionsVisible?'var(--gold)':'';btn.style.color=apCompletionsVisible?'var(--gold)':'';
   if(apCompletionsVisible){
-    apMissionEditVisible=false;document.getElementById('apMissionEditPanel').classList.remove('show');document.getElementById('apMissionEditBtn').textContent='미션 편집';
+    apMissionEditVisible=false;document.getElementById('apMissionEditPanel').classList.remove('show');
     apAccountsVisible=false;document.getElementById('apAccountsPanel').classList.remove('show');document.getElementById('apAccountsBtn').style.cssText='';
     document.getElementById('apSubList').style.display='none';
     document.querySelector('#adminPanel .filter-bar').style.display='none';
@@ -2084,15 +2085,37 @@ function apLoadCompletions(){
   },function(err){list.innerHTML='<div class="ap-empty" style="color:#e05555">오류: '+err.code+'</div>'});
 }
 
+/* 제출 목록 보기 */
+function apShowSubList(){
+  apMissionEditVisible=false;
+  document.getElementById('apMissionEditPanel').classList.remove('show');
+  document.getElementById('apMissionEditBtn').style.cssText='';
+  apCompletionsVisible=false;
+  document.getElementById('apCompletionsPanel').classList.remove('show');
+  document.getElementById('apCompletionsBtn').style.cssText='';
+  if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
+  apAccountsVisible=false;
+  document.getElementById('apAccountsPanel').classList.remove('show');
+  document.getElementById('apAccountsBtn').style.cssText='';
+  document.getElementById('apSubList').style.display='';
+  document.querySelector('#adminPanel .filter-bar').style.display='';
+  document.getElementById('apSectionLabel').style.display='';
+  var btn=document.getElementById('apSubListBtn');
+  btn.style.borderColor='var(--gold)';btn.style.color='var(--gold)';
+}
+
 /* 미션 편집 패널 */
 function apToggleMissionEdit(){
   apMissionEditVisible=!apMissionEditVisible;
   document.getElementById('apMissionEditPanel').classList.toggle('show',apMissionEditVisible);
-  document.getElementById('apMissionEditBtn').textContent=apMissionEditVisible?'제출 목록':'미션 편집';
+  var editBtn=document.getElementById('apMissionEditBtn');
+  editBtn.style.borderColor=apMissionEditVisible?'var(--gold)':'';
+  editBtn.style.color=apMissionEditVisible?'var(--gold)':'';
   document.getElementById('apSubList').style.display=apMissionEditVisible?'none':'';
   document.querySelector('#adminPanel .filter-bar').style.display=apMissionEditVisible?'none':'';
   document.getElementById('apSectionLabel').style.display=apMissionEditVisible?'none':'';
   if(apMissionEditVisible){
+    document.getElementById('apSubListBtn').style.cssText='';
     apCompletionsVisible=false;document.getElementById('apCompletionsPanel').classList.remove('show');
     document.getElementById('apCompletionsBtn').style.cssText='';
     if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
