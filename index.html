@@ -382,20 +382,6 @@ html,body{
 .btn-submit-mission:disabled{opacity:.4;pointer-events:none}
 .btn-submit-mission.done-btn{background:var(--bg3);color:var(--text-dim);pointer-events:none}
 
-/* PIN */
-.pin-overlay{position:fixed;inset:0;z-index:8800;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
-.pin-overlay.show{opacity:1;visibility:visible}
-.pin-box{background:var(--bg2);border-radius:var(--radius);padding:28px 24px;width:90%;max-width:320px;text-align:center}
-.pin-box h3{font-family:var(--font-display);font-size:20px;color:var(--gold);margin-bottom:6px}
-.pin-box .pin-desc{font-size:12px;color:var(--text-dim);margin-bottom:20px}
-.pin-inputs{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
-.pin-inputs input{width:48px;height:56px;text-align:center;background:var(--bg);border:1px solid var(--bg3);border-radius:var(--radius-sm);color:var(--gold);font-family:var(--font-mono);font-size:24px;outline:none;-webkit-appearance:none}
-.pin-inputs input:focus{border-color:var(--gold-dim)}
-.pin-error{font-size:12px;color:#e05555;margin-bottom:12px;min-height:16px}
-.pin-btns{display:flex;gap:8px}
-.pin-btns button{flex:1;padding:12px;border:none;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:14px;font-weight:500;cursor:pointer}
-.pin-cancel{background:var(--bg3);color:var(--text-dim)}
-.pin-confirm{background:var(--gold);color:var(--bg);font-weight:700}
 
 /* SCREEN */
 .screen-section{margin-bottom:28px}
@@ -1080,7 +1066,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.8.3</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.8.4</div>
       </div>
     </div>
   </div>
@@ -1161,23 +1147,6 @@ html,body{
   </div>
 </div>
 
-<div class="pin-overlay" id="pinOverlay">
-  <div class="pin-box">
-    <h3>인증</h3>
-    <div class="pin-desc" id="pinDesc">관리자 PIN을 입력하세요</div>
-    <div class="pin-inputs">
-      <input type="tel" maxlength="1" class="pin-digit" data-idx="0" inputmode="numeric">
-      <input type="tel" maxlength="1" class="pin-digit" data-idx="1" inputmode="numeric">
-      <input type="tel" maxlength="1" class="pin-digit" data-idx="2" inputmode="numeric">
-      <input type="tel" maxlength="1" class="pin-digit" data-idx="3" inputmode="numeric">
-    </div>
-    <div class="pin-error" id="pinError"></div>
-    <div class="pin-btns">
-      <button class="pin-cancel" onclick="closePinModal()">취소</button>
-      <button class="pin-confirm" onclick="verifyPin()">확인</button>
-    </div>
-  </div>
-</div>
 
 <div class="cert-overlay" id="certOverlay">
   <div class="cert-card" id="certCard">
@@ -1372,7 +1341,7 @@ var MISSIONS_YOUTH = [
    verseText:'예수께서 이르시되 네 마음을 다하고 목숨을 다하고 뜻을 다하여 주 너의 하나님을 사랑하라 하셨으니 이것이 크고 첫째 되는 계명이요 둘째도 그와 같으니 네 이웃을 네 자신 같이 사랑하라 하셨으니',
    name:'📱 디지털 효도',emoji:'📱',
    content:'폰 내려놓고 부모님과 10분 대화 및 포옹',
-   howto:'👨‍👩‍👧 부모님 확인 체크 (교사/부모 PIN 승인)',verifyType:'parent'},
+   howto:'📸 부모님과 함께 찍은 인증샷을 업로드하세요',verifyType:'photo'},
   {day:'수',date:'4/1',theme:'향유 옥합',verse:'마태복음 26:6-13',
    verseText:'예수께서 베다니 나병환자 시몬의 집에 계실 때에 한 여자가 매우 귀한 향유 한 옥합을 가지고 나아와서 식사하시는 예수의 머리에 부으니',
    name:'💰 옥합 저금',emoji:'💰',
@@ -2769,42 +2738,6 @@ function submitMission(){
   });
 }
 
-function openPinModal(idx){
-  pinTargetIdx=idx;
-  var data=getData();
-  var desc=data&&data.group==='young'?'리더/임원 PIN을 입력하세요':'교사/부모 PIN을 입력하세요';
-  document.getElementById('pinDesc').textContent=desc;
-  document.getElementById('pinError').textContent='';
-  document.querySelectorAll('.pin-digit').forEach(function(d){d.value=''});
-  document.getElementById('pinOverlay').classList.add('show');
-  setTimeout(function(){document.querySelector('.pin-digit[data-idx="0"]').focus()},300);
-}
-
-function closePinModal(){document.getElementById('pinOverlay').classList.remove('show');pinTargetIdx=-1}
-
-document.querySelectorAll('.pin-digit').forEach(function(input,i,all){
-  input.addEventListener('input',function(e){if(e.target.value&&i<3)all[i+1].focus()});
-  input.addEventListener('keydown',function(e){if(e.key==='Backspace'&&!input.value&&i>0)all[i-1].focus()});
-});
-
-function verifyPin(){
-  var digits=Array.from(document.querySelectorAll('.pin-digit')).map(function(d){return d.value}).join('');
-  if(digits.length<4){document.getElementById('pinError').textContent='4자리를 모두 입력해주세요';return}
-  if(digits!==PIN_CODE){
-    document.getElementById('pinError').textContent='PIN이 올바르지 않습니다';
-    document.querySelectorAll('.pin-digit').forEach(function(d){d.value=''});
-    document.querySelector('.pin-digit[data-idx="0"]').focus();return;
-  }
-  var data=getData();if(!data)return;
-  if(pinTargetIdx===-1){
-    var count=0;data.missions.forEach(function(s,i){if(s===1){data.missions[i]=2;count++}});
-    saveData(data);closePinModal();refreshUI(data);
-    toast(count>0?count+'개 미션 승인 완료!':'승인할 미션이 없습니다');checkComplete(data);
-  }else{
-    data.missions[pinTargetIdx]=2;saveData(data);closePinModal();refreshUI(data);
-    toast('스탬프가 찍혔습니다! ✝');checkComplete(data);
-  }
-}
 
 function checkComplete(data){
   if(data.missions.every(function(s){return s===2})){
@@ -2995,28 +2928,30 @@ function renderScreenGrid(){
 
 // ── 이미지 저장 공통 함수 ──
 // iPhone/iPad(iPadOS 13+ 포함): Web Share API → 공유 시트 → "이미지 저장" → 사진 앱
-// Android/PC: <a download> 직접 저장
-var _isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-               (/Mac/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 function saveCanvasAsPng(canvas, filename, successMsg) {
-  if(_isApple && navigator.share){
-    canvas.toBlob(function(blob){
-      var file=new File([blob],filename,{type:'image/png'});
-      navigator.share({files:[file]})
-        .then(function(){ toast(successMsg); })
-        .catch(function(e){ if(e.name!=='AbortError') fallbackDownload(canvas,filename,successMsg); });
-    },'image/png');
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+  if (isIOS) {
+    var imgData = canvas.toDataURL('image/png');
+    var w = window.open('about:blank');
+    if (w) {
+      w.document.write('<img src="' + imgData + '" style="width:100%;"><br><br><h2 style="text-align:center; font-family:sans-serif; color:#333;">이미지를 꾹 눌러서<br>[사진 앱에 저장]을 선택하세요</h2>');
+    } else {
+      toast('팝업 차단을 해제하거나, 이미지를 꾹 눌러 저장하세요.');
+    }
   } else {
-    fallbackDownload(canvas,filename,successMsg);
+    try {
+      var link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast(successMsg);
+    } catch(e) {
+      toast('이미지를 길게 눌러 저장하세요');
+    }
   }
-}
-function fallbackDownload(canvas, filename, successMsg) {
-  try{
-    var link=document.createElement('a');link.download=filename;
-    link.href=canvas.toDataURL('image/png');
-    document.body.appendChild(link);link.click();document.body.removeChild(link);
-    toast(successMsg);
-  } catch(e){ toast('이미지를 길게 눌러 저장하세요'); }
 }
 
 var _wpPreviewIdx=-1;
