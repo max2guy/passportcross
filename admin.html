@@ -891,6 +891,7 @@ function toggleMeCard(i){
   toggle.textContent=open?'－':'＋';
 }
 
+function escHtml(str){str=str||'';return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function escAttr(str){str=str||'';return str.replace(/"/g,'&quot;')}
 
 function saveMission(i){
