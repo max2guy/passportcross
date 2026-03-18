@@ -636,7 +636,7 @@ function renderList(){
   });
 }
 
-function escHtml(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function escHtml(str){str=str||'';return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
 // ===== 미션 편집 =====
 var currentMissionGroup='youth';
@@ -830,7 +830,8 @@ function loadMissionEditor(){
     editableMissions.youth=DEFAULT_MISSIONS_YOUTH.map(function(m){return Object.assign({},m)});
     editableMissions.young=DEFAULT_MISSIONS_YOUNG.map(function(m){return Object.assign({},m)});
     snap.forEach(function(doc){
-      if(doc.data().missions){editableMissions[doc.id]=doc.data().missions;}
+      var m=doc.data().missions;
+      if(Array.isArray(m) && m.length>0){editableMissions[doc.id]=m;}
     });
     renderMissionEditor();
   }).catch(function(){
@@ -871,7 +872,7 @@ function toggleMeCard(i){
   toggle.textContent=open?'－':'＋';
 }
 
-function escAttr(str){return str.replace(/"/g,'&quot;')}
+function escAttr(str){str=str||'';return str.replace(/"/g,'&quot;')}
 
 function saveMission(i){
   var name=document.getElementById('me-name-'+i).value.trim();
