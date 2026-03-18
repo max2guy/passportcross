@@ -1066,7 +1066,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.8.4</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.8.5</div>
       </div>
     </div>
   </div>
@@ -2930,26 +2930,62 @@ function renderScreenGrid(){
 // iPhone/iPad(iPadOS 13+ 포함): Web Share API → 공유 시트 → "이미지 저장" → 사진 앱
 function saveCanvasAsPng(canvas, filename, successMsg) {
   var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  var imgData = canvas.toDataURL('image/png');
 
   if (isIOS) {
-    var imgData = canvas.toDataURL('image/png');
-    var w = window.open('about:blank');
-    if (w) {
-      w.document.write('<img src="' + imgData + '" style="width:100%;"><br><br><h2 style="text-align:center; font-family:sans-serif; color:#333;">이미지를 꾹 눌러서<br>[사진 앱에 저장]을 선택하세요</h2>');
-    } else {
-      toast('팝업 차단을 해제하거나, 이미지를 꾹 눌러 저장하세요.');
-    }
+    // 팝업 차단을 완벽히 회피하는 앱 내 레이어(모달) 생성
+    var overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0'; overlay.style.left = '0';
+    overlay.style.width = '100%'; overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0,0,0,0.85)';
+    overlay.style.zIndex = '9999';
+    overlay.style.display = 'flex';
+    overlay.style.flexDirection = 'column';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.backdropFilter = 'blur(5px)';
+
+    var closeBtn = document.createElement('div');
+    closeBtn.innerHTML = '✕ 닫기';
+    closeBtn.style.color = '#fff';
+    closeBtn.style.padding = '20px';
+    closeBtn.style.alignSelf = 'flex-end';
+    closeBtn.style.fontSize = '18px';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.onclick = function() { document.body.removeChild(overlay); };
+
+    var title = document.createElement('div');
+    title.innerHTML = '👇 이미지를 꾹 눌러서 [사진 앱에 저장] 하세요 👇';
+    title.style.color = '#c9a84c';
+    title.style.marginBottom = '20px';
+    title.style.fontWeight = 'bold';
+    title.style.fontSize = '16px';
+
+    var img = document.createElement('img');
+    img.src = imgData;
+    img.style.maxWidth = '85%';
+    img.style.maxHeight = '70%';
+    img.style.borderRadius = '12px';
+    img.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+
+    overlay.appendChild(closeBtn);
+    overlay.appendChild(title);
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+
   } else {
+    // 안드로이드 및 PC는 즉시 쾌적하게 다운로드
     try {
       var link = document.createElement('a');
       link.download = filename;
-      link.href = canvas.toDataURL('image/png');
+      link.href = imgData;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       toast(successMsg);
     } catch(e) {
-      toast('이미지를 길게 눌러 저장하세요');
+      toast('이미지 저장에 실패했습니다.');
     }
   }
 }
