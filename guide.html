@@ -63,8 +63,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 
 /* FEATURE LIST */
 .feat-list{list-style:none;display:flex;flex-direction:column;gap:10px}
-.feat-list li{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--text-dim);line-height:1.65}
-.feat-list li::before{content:'✝';color:var(--gold);font-size:11px;margin-top:3px;flex-shrink:0}
+.feat-list li{display:block;position:relative;padding-left:20px;font-size:14px;color:var(--text-dim);line-height:1.65}
+.feat-list li::before{content:'✝';color:var(--gold);font-size:11px;position:absolute;left:0;top:4px}
 .feat-list li strong{color:var(--text)}
 
 /* HIGHLIGHT CARD */
