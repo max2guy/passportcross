@@ -826,46 +826,62 @@ function switchMissionGroup(group,btn){
 }
 
 function loadMissionEditor(){
-  // 기본값 즉시 렌더링 (Firestore 응답 전에 먼저 보여줌)
+  // 항상 기본값으로 초기화
   editableMissions.youth=DEFAULT_MISSIONS_YOUTH.map(function(m){return Object.assign({},m)});
   editableMissions.young=DEFAULT_MISSIONS_YOUNG.map(function(m){return Object.assign({},m)});
   renderMissionEditor();
-  // Firestore에서 편집된 데이터 덮어쓰기 (검증 통과 시만)
+  // Firestore 데이터로 덮어쓰기 (모든 항목 검증 통과 시만)
   db.collection('missionData').get().then(function(snap){
-    var updated=false;
     snap.forEach(function(doc){
+      if(doc.id!=='youth' && doc.id!=='young')return;
       var m=doc.data().missions;
-      if(Array.isArray(m) && m.length>0 && m[0] && m[0].name && m[0].content && m[0].howto){
-        editableMissions[doc.id]=m;
-        updated=true;
-      }
+      if(!Array.isArray(m)||m.length<1)return;
+      // 모든 항목에 필수 필드가 문자열인지 검증
+      var allValid=m.every(function(item){
+        return item && typeof item.name==='string' && typeof item.content==='string' && typeof item.howto==='string';
+      });
+      if(!allValid)return;
+      editableMissions[doc.id]=m;
     });
-    if(updated)renderMissionEditor();
+    // 렌더링 실패 시 기본값으로 롤백
+    try{renderMissionEditor();}catch(e){
+      editableMissions.youth=DEFAULT_MISSIONS_YOUTH.map(function(m){return Object.assign({},m)});
+      editableMissions.young=DEFAULT_MISSIONS_YOUNG.map(function(m){return Object.assign({},m)});
+      renderMissionEditor();
+    }
   }).catch(function(){});
 }
 
 function renderMissionEditor(){
-  var missions=editableMissions[currentMissionGroup];
+  var missions=editableMissions[currentMissionGroup]||[];
   var el=document.getElementById('missionEditList');
-  el.innerHTML='';
+  if(!el)return;
+  var html='';
   missions.forEach(function(m,i){
-    var card=document.createElement('div');
-    card.className='me-card';
-    card.innerHTML=
-      '<div class="me-card-header" onclick="toggleMeCard('+i+')">'
-        +'<span class="me-card-day">'+m.day+'('+m.date+')</span>'
-        +'<span class="me-card-name">'+m.name+'</span>'
-        +'<span class="me-toggle" id="me-toggle-'+i+'">＋</span>'
-      +'</div>'
-      +'<div class="me-card-body" id="me-body-'+i+'">'
-        +'<div class="me-field"><label>미션 이름</label><input id="me-name-'+i+'" value="'+escAttr(m.name)+'"></div>'
-        +'<div class="me-field"><label>미션 내용</label><textarea id="me-content-'+i+'">'+escHtml(m.content)+'</textarea></div>'
-        +'<div class="me-field"><label>인증 방법</label><textarea id="me-howto-'+i+'">'+escHtml(m.howto)+'</textarea></div>'
-        +'<button class="btn-save-mission" onclick="saveMission('+i+')">저장</button>'
-        +'<span class="me-saved" id="me-saved-'+i+'">✓ 저장됨</span>'
+    if(!m)return;
+    var day=escHtml(String(m.day||''));
+    var date=escHtml(String(m.date||''));
+    var name=escHtml(String(m.name||''));
+    var content=escHtml(String(m.content||''));
+    var howto=escHtml(String(m.howto||''));
+    var nameAttr=escAttr(String(m.name||''));
+    html+=
+      '<div class="me-card">'
+        +'<div class="me-card-header" onclick="toggleMeCard('+i+')">'
+          +'<span class="me-card-day">'+day+'('+date+')</span>'
+          +'<span class="me-card-name">'+name+'</span>'
+          +'<span class="me-toggle" id="me-toggle-'+i+'">＋</span>'
+        +'</div>'
+        +'<div class="me-card-body" id="me-body-'+i+'">'
+          +'<div class="me-field"><label>미션 이름</label><input id="me-name-'+i+'" value="'+nameAttr+'"></div>'
+          +'<div class="me-field"><label>미션 내용</label><textarea id="me-content-'+i+'">'+content+'</textarea></div>'
+          +'<div class="me-field"><label>인증 방법</label><textarea id="me-howto-'+i+'">'+howto+'</textarea></div>'
+          +'<button class="btn-save-mission" onclick="saveMission('+i+')">저장</button>'
+          +'<span class="me-saved" id="me-saved-'+i+'">✓ 저장됨</span>'
+        +'</div>'
       +'</div>';
-    el.appendChild(card);
   });
+  el.innerHTML=html||'<div style="padding:16px;color:var(--gold-dim)">미션 데이터 없음</div>';
 }
 
 function toggleMeCard(i){
