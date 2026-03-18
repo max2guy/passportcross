@@ -826,19 +826,22 @@ function switchMissionGroup(group,btn){
 }
 
 function loadMissionEditor(){
+  // 기본값 즉시 렌더링 (Firestore 응답 전에 먼저 보여줌)
+  editableMissions.youth=DEFAULT_MISSIONS_YOUTH.map(function(m){return Object.assign({},m)});
+  editableMissions.young=DEFAULT_MISSIONS_YOUNG.map(function(m){return Object.assign({},m)});
+  renderMissionEditor();
+  // Firestore에서 편집된 데이터 덮어쓰기 (검증 통과 시만)
   db.collection('missionData').get().then(function(snap){
-    editableMissions.youth=DEFAULT_MISSIONS_YOUTH.map(function(m){return Object.assign({},m)});
-    editableMissions.young=DEFAULT_MISSIONS_YOUNG.map(function(m){return Object.assign({},m)});
+    var updated=false;
     snap.forEach(function(doc){
       var m=doc.data().missions;
-      if(Array.isArray(m) && m.length>0){editableMissions[doc.id]=m;}
+      if(Array.isArray(m) && m.length>0 && m[0] && m[0].name && m[0].content && m[0].howto){
+        editableMissions[doc.id]=m;
+        updated=true;
+      }
     });
-    renderMissionEditor();
-  }).catch(function(){
-    editableMissions.youth=DEFAULT_MISSIONS_YOUTH.map(function(m){return Object.assign({},m)});
-    editableMissions.young=DEFAULT_MISSIONS_YOUNG.map(function(m){return Object.assign({},m)});
-    renderMissionEditor();
-  });
+    if(updated)renderMissionEditor();
+  }).catch(function(){});
 }
 
 function renderMissionEditor(){
