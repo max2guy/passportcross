@@ -218,7 +218,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
       <div class="acc-inner">
         <ul class="feat-list">
           <li>매일매일 그날의 <strong>묵상 말씀이 담긴 고화질 배경화면</strong>이 해금됩니다.</li>
-          <li>꾹 눌러서(또는 클릭하여) 스마트폰 <strong>잠금화면으로 설정</strong>해 보세요.</li>
+          <li><strong>아이폰</strong>: 저장 버튼 탭 → 앱 내 이미지 뷰어에서 <strong>꾹 눌러 사진 저장</strong> 후 잠금화면으로 설정하세요.</li>
+          <li><strong>안드로이드 / PC</strong>: 저장 버튼 탭 → 갤러리/다운로드 폴더에 <strong>자동 저장</strong>됩니다.</li>
           <li>원본 해상도 그대로 저장되어 선명한 화질을 보장합니다.</li>
         </ul>
         <div class="wp-preview">
@@ -338,10 +339,22 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
         <ul class="feat-list">
           <li>일반 학생과 <strong>동일한 링크</strong>로 접속합니다.</li>
           <li><strong>[더보기] 탭</strong>에서 교사 이메일/비밀번호로 로그인하면 하단 탭바에 <strong>[관리자] 탭</strong>이 자동으로 표시됩니다.</li>
-          <li>관리자 탭을 탭하거나, 화면 오른쪽 끝에서 <strong>왼쪽으로 스와이프</strong>하면 관리자 패널이 열립니다.</li>
-          <li>모든 관리자 기능이 <strong>별도 페이지 이동 없이 즉시 슬라이드 전환</strong>으로 이동합니다(SPA).</li>
+          <li>관리자 탭을 탭하면 관리자 패널이 열립니다. 상단에 <strong>6개 버튼</strong>이 한 줄로 표시됩니다.</li>
+          <li>모든 관리자 기능이 <strong>별도 페이지 이동 없이 즉시 전환</strong>됩니다. 현재 활성 버튼만 골드색으로 표시됩니다.</li>
+          <li>로그아웃 시 토스트 메시지가 표시되고 <strong>학생 앱 메인 화면으로 자동 이동</strong>합니다.</li>
           <li>계정이 없다면 <strong>초대 코드 입력</strong>으로 교사 계정이 자동 등록됩니다.</li>
         </ul>
+        <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:12px 14px;margin-top:14px;font-size:12px;color:var(--text-dim);letter-spacing:.3px">
+          <div style="font-size:10px;color:var(--gold-dim);letter-spacing:2px;margin-bottom:8px">관리자 버튼 구성</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--text-dim)">홈</span>
+            <span style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--text-dim)">제출목록</span>
+            <span style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--text-dim)">계정관리</span>
+            <span style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--text-dim)">완료자</span>
+            <span style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--text-dim)">🔒잠금</span>
+            <span style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--text-dim)">미션편집</span>
+          </div>
+        </div>
         <div class="hcard">
           <div class="hcard-icon">🔑</div>
           <div class="hcard-body">
@@ -385,7 +398,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
   <div class="card">
     <div class="acc-head" onclick="toggle(this)" aria-expanded="false">
       <div class="acc-num">3</div>
-      <div class="acc-title">미션 잠금 및 편집</div>
+      <div class="acc-title">미션 잠금 (🔒잠금 버튼)</div>
       <div class="acc-arrow">▼</div>
     </div>
     <div class="acc-body">
@@ -393,7 +406,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
         <ul class="feat-list">
           <li>날짜에 상관없이 강제로 미션을 <strong>열거나 잠글</strong> 수 있습니다.</li>
           <li>예: 주말에 밀린 미션 허용, 특정 미션 일시 잠금</li>
-          <li>앱 내에서 직접 <strong>미션 내용과 인증 방식</strong>을 수정할 수 있습니다.</li>
+          <li>설정은 전체 학생에게 즉시 반영됩니다.</li>
         </ul>
         <div class="badge-row" style="margin-top:14px">
           <span class="badge gold">⚙ 자동 (날짜 기반)</span>
@@ -407,6 +420,39 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
   <div class="card">
     <div class="acc-head" onclick="toggle(this)" aria-expanded="false">
       <div class="acc-num">4</div>
+      <div class="acc-title">미션 편집 (미션편집 버튼)</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="acc-inner">
+        <ul class="feat-list">
+          <li>앱 내에서 직접 <strong>미션 제목, 내용, 인증 방식</strong>을 수정할 수 있습니다.</li>
+          <li>중고등부 · 청년부 탭을 각각 선택해 별도로 편집합니다.</li>
+          <li>저장 시 모든 학생 화면에 <strong>즉시 반영</strong>됩니다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="acc-head" onclick="toggle(this)" aria-expanded="false">
+      <div class="acc-num">5</div>
+      <div class="acc-title">완료자 목록 (완료자 버튼)</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="acc-inner">
+        <ul class="feat-list">
+          <li>6일 미션을 모두 완료하고 <strong>수료 선물을 신청한 학생</strong> 목록을 확인합니다.</li>
+          <li>이름, 학년/그룹, 신청 일시가 표시됩니다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="acc-head" onclick="toggle(this)" aria-expanded="false">
+      <div class="acc-num">6</div>
       <div class="acc-title">최고 관리자 전용 (마스터 계정)</div>
       <div class="acc-arrow">▼</div>
     </div>
