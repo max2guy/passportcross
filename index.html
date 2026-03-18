@@ -1066,7 +1066,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.8.6</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.8.7</div>
       </div>
     </div>
   </div>
@@ -1750,7 +1750,11 @@ function closeAdminPanel(){
   if(_adminPanelPushed){_adminPanelPushed=false;history.back();}
 }
 
-function apDoLogout(){auth.signOut();}
+function apDoLogout(){
+  if(apUnsubscribe){apUnsubscribe();apUnsubscribe=null;}
+  if(apUnsubCompletions){apUnsubCompletions();apUnsubCompletions=null;}
+  auth.signOut();
+}
 
 /* ===== 관리자 패널 JS ===== */
 var apAllSubmissions=[],apCurrentFilter='pending',apUnsubscribe=null,apUnsubCompletions=null;
