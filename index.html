@@ -1068,7 +1068,7 @@ html,body{
       <div style="text-align:center;padding:32px 0 16px">
         <div style="font-family:var(--font-display);font-size:16px;color:var(--gold);letter-spacing:2px">THE CROSS PASSPORT</div>
         <div style="font-size:11px;color:var(--text-dim);margin-top:4px">연천장로교회 · 2026 고난주간</div>
-        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.9.5</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px;opacity:.5">v2.9.6</div>
       </div>
     </div>
   </div>
@@ -1211,6 +1211,9 @@ html,body{
         <div class="reset-btns">
           <button class="btn-danger" onclick="apResetApproved()">승인 내역 삭제<br><small style="opacity:.6;font-size:10px">승인 제출 삭제 + 미션 초기화</small></button>
           <button class="btn-danger" onclick="apResetAll()">전체 미션 리셋<br><small style="opacity:.6;font-size:10px">전체 삭제 + 학생 초기화</small></button>
+        </div>
+        <div class="reset-btns" style="margin-top:10px">
+          <button class="btn-danger" style="background:rgba(100,60,200,.25);border-color:rgba(150,100,255,.4);color:#c8b4ff" onclick="apSendBroadcastUpdate()">⚡ 전체 강제 업데이트<br><small style="opacity:.6;font-size:10px">모든 기기 앱 캐시 갱신 신호 발송</small></button>
         </div>
       </div>
       <div class="stats-bar" id="apStatsBar">
@@ -1782,6 +1785,37 @@ function apDoLogout(){
   auth.signOut();
   closeAdminPanel();
   toast('로그아웃 되었습니다');
+}
+
+/**
+ * 전체 강제 업데이트 신호 발송 (MASTER_EMAIL 전용)
+ * 1. missionData/config.requiredVersion 을 현재 버전으로 갱신
+ *    → 구버전 클라이언트가 onSnapshot으로 감지해 자동 forceRefresh() 호출
+ * 2. broadcasts 컬렉션에 도큐 생성
+ *    → Cloud Function이 감지하여 전체 FCM 푸시 발송
+ */
+function apSendBroadcastUpdate(){
+  var user=auth.currentUser;
+  if(!user||user.email!==MASTER_EMAIL)return;
+  if(!confirm('모든 사용자 기기에 강제 업데이트 신호를 발송하시겠습니까?\n\n현재 앱 버전 v'+CURRENT_VERSION+' 설치를 요구합니다.'))return;
+  var batch=db.batch();
+  // 1) requiredVersion 갱신 → 앱 켜있는 클라이언트 즉시 반응
+  batch.set(db.collection('missionData').doc('config'),
+    {requiredVersion:CURRENT_VERSION},
+    {merge:true}
+  );
+  // 2) broadcasts 도큐 생성 → Cloud Function이 FCM 푸시 발송
+  batch.set(db.collection('broadcasts').doc(),{
+    type:'forceUpdate',
+    requiredVersion:CURRENT_VERSION,
+    triggeredBy:user.email,
+    triggeredAt:firebase.firestore.FieldValue.serverTimestamp()
+  });
+  batch.commit().then(function(){
+    toast('⚡ 강제 업데이트 신호 발송 완료 (v'+CURRENT_VERSION+')');
+  }).catch(function(e){
+    toast('발송 실패: '+e.message);
+  });
 }
 
 /* ===== 관리자 패널 JS ===== */
@@ -2397,13 +2431,36 @@ function bootApp(){
 var _swReg=null, _pendingWorker=null, _refreshing=false;
 // 미션 잠금 오버라이드 (관리자 설정): 0=자동, 1=강제열림, -1=강제잠금
 var _missionOverrides=[0,0,0,0,0,0];
-// Firestore missionData/config 실시간 구독
+
+/* ── 현재 앱 버전 (강제 업데이트 비교용) ── */
+var CURRENT_VERSION='2.9.6';
+
+/* ── 버전 비교: a < b → -1, a === b → 0, a > b → 1 ── */
+function compareVersions(a,b){
+  var pa=a.split('.').map(Number), pb=b.split('.').map(Number);
+  for(var i=0;i<3;i++){
+    if((pa[i]||0)<(pb[i]||0))return -1;
+    if((pa[i]||0)>(pb[i]||0))return 1;
+  }
+  return 0;
+}
+
+// Firestore missionData/config 실시간 구독 (잠금 오버라이드 + 강제 업데이트 버전 체크)
 (function(){
   db.collection('missionData').doc('config').onSnapshot(function(doc){
-    if(doc.exists && Array.isArray(doc.data().overrides)){
-      _missionOverrides=doc.data().overrides;
+    if(!doc.exists)return;
+    var data=doc.data();
+    // 미션 잠금 오버라이드
+    if(Array.isArray(data.overrides)){
+      _missionOverrides=data.overrides;
     } else {
       _missionOverrides=[0,0,0,0,0,0];
+    }
+    // 강제 업데이트 버전 체크
+    var required=data.requiredVersion;
+    if(required && compareVersions(CURRENT_VERSION,required)<0){
+      console.log('강제 업데이트: 현재='+CURRENT_VERSION+', 필요='+required);
+      forceRefresh();
     }
   },function(){});
 })();

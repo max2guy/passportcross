@@ -320,3 +320,78 @@ exports.eveningPush = functions
     );
     return null;
   });
+
+/* ─────────────────────────────────────────────
+ * Trigger 5: 강제 업데이트 브로드캐스트
+ * broadcasts 컬렉션 새 문서 생성 시 → 전체 학생 + 관리자에게 FCM 푸시
+ * 클라이언트(onSnapshot)가 requiredVersion 감지해 forceRefresh() 호출하는 것과 병행:
+ * FCM은 앱이 꺼진 기기까지 커버
+ * ───────────────────────────────────────────── */
+exports.onBroadcastUpdate = functions
+  .region('asia-northeast3')
+  .firestore
+  .document('broadcasts/{broadcastId}')
+  .onCreate(async function(snap) {
+    const data = snap.data();
+    if (data.type !== 'forceUpdate') return null;
+
+    const version = data.requiredVersion || '';
+    const title = '⚡ 앱 업데이트 알림';
+    const body = version
+      ? `새 버전(v${version})이 배포되었습니다. 앱을 열면 자동으로 업데이트됩니다.`
+      : '새 버전이 배포되었습니다. 앱을 열면 자동으로 업데이트됩니다.';
+
+    // 학생 + 관리자 토큰 전부 수집
+    const [userResult, adminsSnap] = await Promise.all([
+      getAllUserTokens(),
+      db.collection('admins').get()
+    ]);
+
+    const allTokens = [...userResult.tokens];
+    const tokenToCollection = {}; // token → { col, id } (만료 정리용)
+
+    userResult.tokens.forEach(function(t) {
+      tokenToCollection[t] = { col: 'users', id: userResult.tokenToUid[t] };
+    });
+    adminsSnap.forEach(function(doc) {
+      extractTokens(doc.data()).forEach(function(t) {
+        if (!tokenToCollection[t]) {
+          tokenToCollection[t] = { col: 'admins', id: doc.id };
+          allTokens.push(t);
+        }
+      });
+    });
+
+    if (!allTokens.length) {
+      console.log('브로드캐스트: 등록된 토큰 없음');
+      return null;
+    }
+
+    let res;
+    try {
+      res = await messaging.sendEachForMulticast({ data: { title, body }, tokens: allTokens });
+    } catch (err) {
+      console.error('브로드캐스트 전체 실패:', err.message);
+      return null;
+    }
+
+    console.log(`브로드캐스트 발송 성공:${res.successCount}, 실패:${res.failureCount}`);
+
+    // 만료 토큰 정리
+    const deletes = [];
+    res.responses.forEach(function(r, i) {
+      if (!r.success && r.error && EXPIRED_CODES.includes(r.error.code)) {
+        const info = tokenToCollection[allTokens[i]];
+        if (info) {
+          deletes.push(
+            db.collection(info.col).doc(info.id)
+              .update({ fcmTokens: admin.firestore.FieldValue.arrayRemove(allTokens[i]) })
+              .catch(function() {})
+          );
+        }
+      }
+    });
+    await Promise.all(deletes);
+
+    return null;
+  });
