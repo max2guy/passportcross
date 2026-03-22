@@ -281,7 +281,6 @@ html,body{
 .feed-text{font-size:14px;color:var(--text);line-height:1.8;word-break:keep-all;white-space:pre-wrap;margin-bottom:2px}
 .feed-photo{width:100%;max-height:300px;object-fit:cover;display:block;border-radius:var(--radius-sm);margin-top:10px}
 .feed-empty{text-align:center;padding:60px 20px;color:var(--text-dim);font-size:14px;line-height:2.2}
-.feed-card-footer{padding:6px 16px 12px;display:flex;align-items:center;justify-content:flex-end;gap:6px}
 .like-btn{display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;padding:5px 10px;border-radius:20px;font-size:13px;color:var(--text-dim);transition:background .15s,color .15s;-webkit-tap-highlight-color:transparent}
 .like-btn:active{background:rgba(197,165,90,.08)}
 .like-btn.liked{color:#e05a7a}
@@ -2700,12 +2699,10 @@ function renderFeed(docs){
     var liked=likedBy.indexOf(myUid)>-1;
     var likeCount=likedBy.length;
     var heartSvg='<svg viewBox="0 0 24 24" fill="'+(liked?'#e05a7a':'none')+'" stroke="'+(liked?'#e05a7a':'currentColor')+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
-    var footerHtml='<div class="feed-card-footer">'
-      +'<button class="like-btn'+(liked?' liked':'')+'" onclick="toggleLike(\''+sid+'\')" aria-label="좋아요">'
-        +heartSvg
-        +'<span class="like-count">'+(likeCount>0?likeCount:'')+'</span>'
-      +'</button>'
-    +'</div>';
+    var likeBtn='<button class="like-btn'+(liked?' liked':'')+'" onclick="toggleLike(\''+sid+'\')" aria-label="좋아요">'
+      +heartSvg
+      +'<span class="like-count">'+(likeCount>0?likeCount:'')+'</span>'
+    +'</button>';
     html+='<div class="feed-card">'
       +'<div class="feed-card-header">'
         +'<div class="feed-avatar">🙏</div>'
@@ -2713,9 +2710,9 @@ function renderFeed(docs){
           +'<div class="feed-name">'+name+' <span style="font-size:11px;color:var(--text-dim);font-weight:400">'+escFeed(gl)+'</span></div>'
           +'<div class="feed-day">'+escFeed(dayLabel)+missionName+'</div>'
         +'</div>'
+        +likeBtn
       +'</div>'
       +'<div class="feed-card-body">'+bodyHtml+'</div>'
-      +footerHtml
     +'</div>';
   });
   list.innerHTML=html;
