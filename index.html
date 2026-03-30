@@ -231,6 +231,15 @@ html,body{
   flex-shrink:0;border-bottom:1px solid rgba(197,165,90,.08);
 }
 .h-spacer{flex:1}
+.h-notice-btn{flex:1;display:flex;align-items:center;justify-content:flex-start}
+.h-notice-btn button{padding:5px 10px;background:transparent;border:1px solid rgba(74,144,217,.4);border-radius:20px;color:#4a90d9;font-size:11px;cursor:pointer;-webkit-appearance:none;appearance:none;white-space:nowrap}
+/* 공지 배너 */
+.notice-banner{display:none;margin:0;padding:12px 16px;background:rgba(74,144,217,.12);border-bottom:1px solid rgba(74,144,217,.2);animation:noticeFadeIn .3s ease}
+.notice-banner.show{display:block}
+@keyframes noticeFadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.notice-banner-title{font-size:13px;font-weight:700;color:#4a90d9;margin-bottom:4px}
+.notice-banner-body{font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap;word-break:keep-all}
+.notice-banner-close{display:block;margin-top:10px;width:100%;padding:8px;background:rgba(74,144,217,.15);border:1px solid rgba(74,144,217,.3);border-radius:8px;color:#4a90d9;font-size:13px;font-weight:600;cursor:pointer;text-align:center}
 .header-brand{text-align:center;flex-shrink:0}
 .header-left .h-name{font-size:13px;color:var(--text-dim)}
 .header-left .h-name span{color:var(--gold);font-weight:700}
@@ -995,7 +1004,9 @@ html,body{
 
 <div id="app">
   <div class="header">
-    <div class="h-spacer"></div>
+    <div class="h-notice-btn">
+      <button id="noticeBannerBtn" onclick="openNoticeBanner()" style="display:none">📢 공지</button>
+    </div>
     <div class="header-brand">
       <div class="header-cross">THE CROSS</div>
       <div class="header-brand-sub">PASSPORT · 고난주간</div>
@@ -1010,6 +1021,11 @@ html,body{
         <span id="headerAvIcon">👤</span>
       </div>
     </div>
+  </div>
+  <div class="notice-banner" id="noticeBannerEl">
+    <div class="notice-banner-title" id="noticeBannerTitle"></div>
+    <div class="notice-banner-body" id="noticeBannerBody"></div>
+    <button class="notice-banner-close" onclick="closeNoticeBanner()">확인</button>
   </div>
   <div class="tab-content">
     <div class="tab-page active" id="tabPassport">
@@ -2609,26 +2625,45 @@ function compareVersions(a,b){
 })();
 
 // 공지 구독
+var _noticeData=null;
 (function(){
   db.collection('missionData').doc('notice').onSnapshot(function(doc){
-    if(!doc.exists)return;
+    if(!doc.exists){document.getElementById('noticeBannerBtn').style.display='none';return;}
     var d=doc.data();
-    if(!d.visible){document.getElementById('noticeOverlay').classList.remove('show');return;}
+    _noticeData=d;
+    if(!d.visible){
+      document.getElementById('noticeBannerBtn').style.display='none';
+      document.getElementById('noticeBannerEl').classList.remove('show');
+      return;
+    }
+    // 공지 버튼 항상 표시
+    document.getElementById('noticeBannerBtn').style.display='';
+    // 새 공지(세션에서 아직 안 본 것)면 자동으로 배너 열기
     var key='noticeSeen_'+(d.updatedAt?d.updatedAt.seconds:'0');
-    if(sessionStorage.getItem(key))return;
-    document.getElementById('noticeTitle').textContent=d.title||'';
-    document.getElementById('noticeBody').textContent=d.body||'';
-    document.getElementById('noticeOverlay').dataset.key=key;
-    document.getElementById('noticeOverlay').classList.add('show');
+    if(!sessionStorage.getItem(key)){
+      document.getElementById('noticeBannerEl').dataset.key=key;
+      document.getElementById('noticeBannerTitle').textContent=d.title||'';
+      document.getElementById('noticeBannerBody').textContent=d.body||'';
+      document.getElementById('noticeBannerEl').classList.add('show');
+    }
   },function(){});
 })();
 
-function closeNotice(){
-  var el=document.getElementById('noticeOverlay');
-  var key=el.dataset.key;
-  if(key)sessionStorage.setItem(key,'1');
+function openNoticeBanner(){
+  if(!_noticeData||!_noticeData.visible)return;
+  document.getElementById('noticeBannerTitle').textContent=_noticeData.title||'';
+  document.getElementById('noticeBannerBody').textContent=_noticeData.body||'';
+  document.getElementById('noticeBannerEl').classList.add('show');
+}
+
+function closeNoticeBanner(){
+  var el=document.getElementById('noticeBannerEl');
+  var key=el.dataset.key||('' + (_noticeData&&_noticeData.updatedAt?_noticeData.updatedAt.seconds:'0'));
+  sessionStorage.setItem('noticeSeen_'+key,'1');
   el.classList.remove('show');
 }
+
+function closeNotice(){closeNoticeBanner();}
 
 function showUpdatePrompt(){ document.getElementById('update-prompt').classList.add('show'); }
 function applyUpdate(){
