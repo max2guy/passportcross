@@ -294,11 +294,11 @@ body{
 <div class="app-wrap" id="appWrap">
   <div class="topbar">
     <div class="topbar-row1">
-      <div class="topbar-left">
+      <button class="topbar-btn" onclick="toggleNoticeEditor()" id="noticeBtn" style="border-color:#4a90d9;color:#4a90d9;flex-shrink:0">📢 공지</button>
+      <div class="topbar-left" style="flex:1;min-width:0">
         <div class="topbar-title">관리자 패널</div>
         <div class="topbar-email" id="adminEmail"></div>
       </div>
-      <button class="topbar-btn" onclick="toggleNoticeEditor()" id="noticeBtn" style="margin-right:auto;border-color:#4a90d9;color:#4a90d9">📢 공지</button>
       <button class="topbar-btn danger" onclick="doLogout()">로그아웃</button>
     </div>
     <div class="topbar-right">
