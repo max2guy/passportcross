@@ -691,6 +691,7 @@ html,body{
 #adminPanel .topbar-head{
   width:100%;display:flex;align-items:center;justify-content:center;position:relative;
 }
+#adminPanel .ap-notice-corner{position:absolute;left:0;top:50%;transform:translateY(-50%);border-color:#4a90d9!important;color:#4a90d9!important}
 #adminPanel .topbar-title{font-size:15px;font-weight:700;color:var(--gold);letter-spacing:1px;white-space:nowrap;text-align:center}
 #adminPanel .ap-logout-corner{position:absolute;right:0;top:50%;transform:translateY(-50%)}
 #adminPanel .topbar-email{font-size:11px;color:var(--text-dim);white-space:nowrap;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis}
@@ -1261,6 +1262,7 @@ html,body{
 <div id="adminPanel">
   <div class="topbar">
     <div class="topbar-head">
+      <button class="topbar-btn ap-notice-corner" id="apNoticeBtn" onclick="apToggleNotice()">📢 공지</button>
       <div class="topbar-title">관리자 패널</div>
       <button class="topbar-btn danger ap-logout-corner" onclick="apDoLogout()">로그아웃</button>
     </div>
@@ -1276,6 +1278,15 @@ html,body{
   </div>
   <div class="ap-scroll">
     <div class="main-content">
+      <div id="apNoticeEditor" style="display:none;padding:14px 16px;background:var(--bg2);border-bottom:1px solid rgba(74,144,217,.15)">
+        <div style="font-size:11px;color:#4a90d9;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;font-weight:700">📢 공지 관리</div>
+        <input type="text" id="apNoticeTitleInput" placeholder="공지 제목" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid rgba(74,144,217,.3);border-radius:8px;color:var(--text);font-size:13px;margin-bottom:8px;box-sizing:border-box">
+        <textarea id="apNoticeBodyInput" placeholder="공지 내용" style="width:100%;height:80px;padding:10px 12px;background:var(--bg3);border:1px solid rgba(74,144,217,.3);border-radius:8px;color:var(--text);font-size:13px;resize:vertical;box-sizing:border-box;margin-bottom:10px;font-family:inherit"></textarea>
+        <div style="display:flex;gap:8px">
+          <button id="apNoticeToggleBtn" onclick="apToggleNoticeVisible()" style="flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;-webkit-appearance:none;border:1px solid rgba(224,85,85,.4);color:#e05555;background:rgba(224,85,85,.1)">숨김</button>
+          <button onclick="apSaveNotice()" style="flex:1;padding:10px;background:rgba(74,144,217,.15);border:1px solid rgba(74,144,217,.4);border-radius:8px;color:#4a90d9;font-size:13px;font-weight:600;cursor:pointer;-webkit-appearance:none">저장</button>
+        </div>
+      </div>
       <div class="reset-section" id="apResetSection">
         <div class="reset-title">데이터 관리</div>
         <div class="reset-btns">
@@ -1869,6 +1880,45 @@ function closeAdminPanel(){
   document.getElementById('apCompletionsPanel').classList.remove('show');
   document.getElementById('apAccountsPanel').classList.remove('show');
   if(_adminPanelPushed){_adminPanelPushed=false;history.back();}
+}
+
+/* ── 관리자 공지 관리 ── */
+var _apNoticeEditorOpen=false;
+var _apNoticeVisible=false;
+function apToggleNotice(){
+  _apNoticeEditorOpen=!_apNoticeEditorOpen;
+  var el=document.getElementById('apNoticeEditor');
+  var btn=document.getElementById('apNoticeBtn');
+  el.style.display=_apNoticeEditorOpen?'block':'none';
+  btn.style.borderColor=_apNoticeEditorOpen?'#2272c3':'#4a90d9';
+  btn.style.color=_apNoticeEditorOpen?'#2272c3':'#4a90d9';
+  if(_apNoticeEditorOpen){
+    db.collection('missionData').doc('notice').get().then(function(doc){
+      if(!doc.exists)return;
+      var d=doc.data();
+      document.getElementById('apNoticeTitleInput').value=d.title||'';
+      document.getElementById('apNoticeBodyInput').value=d.body||'';
+      _apNoticeVisible=!!d.visible;
+      apUpdateNoticeBtn();
+    });
+  }
+}
+function apUpdateNoticeBtn(){
+  var btn=document.getElementById('apNoticeToggleBtn');
+  btn.textContent=_apNoticeVisible?'표시 중':'숨김';
+  btn.style.borderColor=_apNoticeVisible?'rgba(74,144,217,.4)':'rgba(224,85,85,.4)';
+  btn.style.color=_apNoticeVisible?'#4a90d9':'#e05555';
+  btn.style.background=_apNoticeVisible?'rgba(74,144,217,.1)':'rgba(224,85,85,.1)';
+}
+function apToggleNoticeVisible(){_apNoticeVisible=!_apNoticeVisible;apUpdateNoticeBtn();}
+function apSaveNotice(){
+  var title=document.getElementById('apNoticeTitleInput').value.trim();
+  var body=document.getElementById('apNoticeBodyInput').value.trim();
+  db.collection('missionData').doc('notice').set({
+    title:title,body:body,visible:_apNoticeVisible,
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){toast(_apNoticeVisible?'공지가 표시됩니다':'공지가 저장됐습니다 (숨김)')})
+  .catch(function(e){toast('저장 실패: '+e.message)});
 }
 
 function apDoLogout(){
