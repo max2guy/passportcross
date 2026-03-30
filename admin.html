@@ -302,7 +302,7 @@ body{
     </div>
     <div class="topbar-right">
       <button class="topbar-btn" id="accountsBtn" style="display:none" onclick="location.href='admin-accounts.html'">계정 관리</button>
-      <button class="topbar-btn" onclick="toggleNoticeEditor()" id="noticeBtn">📢 공지</button>
+      <button class="topbar-btn" onclick="toggleNoticeEditor()" id="noticeBtn" style="display:none">📢 공지</button>
       <button class="topbar-btn" onclick="toggleCompletions()" id="completionsBtn">완료자</button>
       <button class="topbar-btn" onclick="toggleLockPanel()" id="lockBtn">🔒 잠금</button>
       <button class="topbar-btn" onclick="toggleMissionEdit()" id="missionEditBtn">미션 편집</button>
@@ -480,6 +480,7 @@ function showAdminApp(user){
   document.getElementById('adminEmail').textContent=user.email;
   startListener();
   // 최고 관리자 전용 기능 노출
+  document.getElementById('noticeBtn').style.display='';
   if(user.email===MASTER_EMAIL){
     document.getElementById('resetSection').classList.add('show');
     document.getElementById('accountsBtn').style.display='';
