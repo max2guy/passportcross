@@ -298,7 +298,7 @@ body{
         <div class="topbar-title">관리자 패널</div>
         <div class="topbar-email" id="adminEmail"></div>
       </div>
-      <button class="topbar-btn" onclick="toggleNoticeEditor()" id="noticeBtn" style="display:none;margin-right:auto;border-color:#4a90d9;color:#4a90d9">📢 공지</button>
+      <button class="topbar-btn" onclick="toggleNoticeEditor()" id="noticeBtn" style="margin-right:auto;border-color:#4a90d9;color:#4a90d9">📢 공지</button>
       <button class="topbar-btn danger" onclick="doLogout()">로그아웃</button>
     </div>
     <div class="topbar-right">
@@ -480,7 +480,6 @@ function showAdminApp(user){
   document.getElementById('adminEmail').textContent=user.email;
   startListener();
   // 최고 관리자 전용 기능 노출
-  document.getElementById('noticeBtn').style.display='';
   if(user.email===MASTER_EMAIL){
     document.getElementById('resetSection').classList.add('show');
     document.getElementById('accountsBtn').style.display='';
