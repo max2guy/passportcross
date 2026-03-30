@@ -2592,7 +2592,19 @@ var _missionOverrides=[0,0,0,0,0,0];
 
 /* ── 현재 앱 버전 (강제 업데이트 비교용 + 화면 표시) ── */
 var CURRENT_VERSION='3.0.2';
-document.getElementById('appVersionDisplay').textContent='v'+CURRENT_VERSION;
+var SW_VERSION='v154'; // sw.js의 CACHE_NAME과 항상 맞춰서 수정
+(function(){
+  var el=document.getElementById('appVersionDisplay');
+  function updateDisplay(swv){el.textContent='v'+CURRENT_VERSION+(swv?' (SW '+swv+')':'');}
+  updateDisplay(SW_VERSION);
+  // 실제 활성화된 SW 캐시명에서 버전 읽기
+  if(navigator.serviceWorker&&navigator.serviceWorker.controller){
+    navigator.serviceWorker.controller.postMessage({type:'GET_VERSION'});
+    navigator.serviceWorker.addEventListener('message',function(e){
+      if(e.data&&e.data.type==='VERSION')updateDisplay(e.data.version);
+    });
+  }
+})();
 
 /* ── 버전 비교: a < b → -1, a === b → 0, a > b → 1 ── */
 function compareVersions(a,b){
