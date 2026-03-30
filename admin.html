@@ -297,12 +297,16 @@ body{
 <div class="app-wrap" id="appWrap">
   <div class="topbar">
     <div class="topbar-row1">
-      <button class="topbar-btn" onclick="toggleNoticeEditor()" id="noticeBtn" style="border-color:#4a90d9;color:#4a90d9;flex-shrink:0">📢 공지</button>
-      <div class="topbar-left" style="flex:1;min-width:0">
+      <div style="flex:1;display:flex;justify-content:flex-start">
+        <button class="topbar-btn" onclick="toggleNoticeEditor()" id="noticeBtn" style="border-color:#4a90d9;color:#4a90d9">📢 공지</button>
+      </div>
+      <div class="topbar-left" style="text-align:center;flex-shrink:0">
         <div class="topbar-title">관리자 패널</div>
         <div class="topbar-email" id="adminEmail"></div>
       </div>
-      <button class="topbar-btn danger" onclick="doLogout()">로그아웃</button>
+      <div style="flex:1;display:flex;justify-content:flex-end">
+        <button class="topbar-btn danger" onclick="doLogout()">로그아웃</button>
+      </div>
     </div>
     <div class="topbar-right">
       <button class="topbar-btn" id="accountsBtn" style="display:none" onclick="location.href='admin-accounts.html'">계정 관리</button>
