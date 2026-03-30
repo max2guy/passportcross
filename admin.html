@@ -631,7 +631,8 @@ function resetApproved(){
 
 function resetAll(){
   if(!confirm('⚠️ 전체 초기화\n\n모든 제출 내역 삭제 + 전 학생 미션 초기화\n\n이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?'))return;
-  if(!confirm('정말로 전체 초기화 하시겠습니까?'))return;
+  var typed=prompt('정말로 전체 초기화 하려면\n아래 입력창에  전체초기화  를 정확히 입력하세요.');
+  if(typed!=='전체초기화'){alert('취소되었습니다.');return;}
   // 모든 제출 삭제
   var subPromises=allSubmissions.map(function(s){return db.collection('submissions').doc(s.id).delete()});
   // 모든 완료자 삭제
