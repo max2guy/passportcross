@@ -298,11 +298,11 @@ body{
         <div class="topbar-title">관리자 패널</div>
         <div class="topbar-email" id="adminEmail"></div>
       </div>
+      <button class="topbar-btn" onclick="toggleNoticeEditor()" id="noticeBtn" style="display:none;margin-right:auto;border-color:#4a90d9;color:#4a90d9">📢 공지</button>
       <button class="topbar-btn danger" onclick="doLogout()">로그아웃</button>
     </div>
     <div class="topbar-right">
       <button class="topbar-btn" id="accountsBtn" style="display:none" onclick="location.href='admin-accounts.html'">계정 관리</button>
-      <button class="topbar-btn" onclick="toggleNoticeEditor()" id="noticeBtn" style="display:none">📢 공지</button>
       <button class="topbar-btn" onclick="toggleCompletions()" id="completionsBtn">완료자</button>
       <button class="topbar-btn" onclick="toggleLockPanel()" id="lockBtn">🔒 잠금</button>
       <button class="topbar-btn" onclick="toggleMissionEdit()" id="missionEditBtn">미션 편집</button>
