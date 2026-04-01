@@ -1131,6 +1131,16 @@ html,body{
         <div class="profile-hero-group" id="profileHeroGroup"></div>
         <input type="file" accept="image/*" id="profilePhotoInput" style="display:none" onchange="handleProfilePhoto(this)">
       </div>
+      <!-- 부활주일 다시보기 — 4/5 04:30 KST 이후 노출 -->
+      <div id="easterReplaySection" style="display:none">
+        <div class="more-section-title">✝ 부활주일</div>
+        <div class="more-list">
+          <div class="more-item" onclick="showEasterOverlay()" style="background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2)">
+            <div class="mi-left"><span class="mi-icon">🌅</span><span class="mi-text" style="color:var(--gold)">사셨네 — 다시보기</span></div>
+            <span class="mi-arrow" style="color:var(--gold)">›</span>
+          </div>
+        </div>
+      </div>
       <div class="more-section-title">나의 기록</div>
       <div class="more-list">
         <div class="more-item" id="certMoreItem" style="border-radius:var(--radius)" onclick="showCertificate()">
@@ -2626,7 +2636,7 @@ var _missionOverrides=[0,0,0,0,0,0];
 
 /* ── 현재 앱 버전 (강제 업데이트 비교용 + 화면 표시) ── */
 var CURRENT_VERSION='3.0.2';
-var SW_VERSION='v157'; // sw.js의 CACHE_NAME과 항상 맞춰서 수정
+var SW_VERSION='v158'; // sw.js의 CACHE_NAME과 항상 맞춰서 수정
 (function(){
   var el=document.getElementById('appVersionDisplay');
   function updateDisplay(swv){el.textContent='v'+CURRENT_VERSION+(swv?' (SW '+swv+')':'');}
@@ -3664,33 +3674,44 @@ function handleProfilePhoto(input){
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
 
 /* ===== 부활주일 기믹 ===== */
-function checkEasterDay(){
-  // KST 기준 날짜 확인
+// 4/5 04:30 KST 이후인지 확인
+function _isAfterEasterUnlock(){
   var kst=new Date(Date.now()+9*3600*1000);
-  var dateStr=kst.toISOString().slice(0,10);
-  if(dateStr!=='2026-04-05')return;
+  var d=kst.toISOString();
+  // 2026-04-05T04:30 이후
+  return d>='2026-04-05T04:30';
+}
+function checkEasterDay(){
+  if(!_isAfterEasterUnlock())return;
+  // 다시보기 섹션 잠금 해제
+  var sec=document.getElementById('easterReplaySection');
+  if(sec)sec.style.display='';
+  // 하루에 처음 열 때 한 번만 자동 표시
   var key='easterShown_2026';
-  // 하루에 처음 열 때 한 번만 표시
   if(localStorage.getItem(key))return;
   localStorage.setItem(key,'1');
   setTimeout(showEasterOverlay, 1400);
 }
+var _easterParticlesCreated=false;
 function showEasterOverlay(){
   var ov=document.getElementById('easterOverlay');
   if(!ov)return;
-  // 파티클 생성
-  var pc=ov.querySelector('.easter-particles');
-  for(var i=0;i<22;i++){
-    (function(idx){
-      var p=document.createElement('div');
-      p.className='easter-particle';
-      var sz=(2+Math.random()*4);
-      p.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(5+Math.random()*90)+'%;'
-        +'animation-duration:'+(4+Math.random()*5)+'s;'
-        +'animation-delay:'+(Math.random()*6)+'s;'
-        +'opacity:0;';
-      pc.appendChild(p);
-    })(i);
+  // 파티클은 처음 한 번만 생성
+  if(!_easterParticlesCreated){
+    _easterParticlesCreated=true;
+    var pc=ov.querySelector('.easter-particles');
+    for(var i=0;i<22;i++){
+      (function(){
+        var p=document.createElement('div');
+        p.className='easter-particle';
+        var sz=(2+Math.random()*4);
+        p.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(5+Math.random()*90)+'%;'
+          +'animation-duration:'+(4+Math.random()*5)+'s;'
+          +'animation-delay:'+(Math.random()*6)+'s;'
+          +'opacity:0;';
+        pc.appendChild(p);
+      })();
+    }
   }
   ov.classList.add('show');
 }

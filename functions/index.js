@@ -403,3 +403,70 @@ exports.onBroadcastUpdate = functions
 
     return null;
   });
+
+/* ─────────────────────────────────────────────
+ * Schedule 6: 부활주일 새벽 4:30 KST (4/5)
+ * 전체 학생 + 관리자에게 부활 새벽기도회 알림
+ * ───────────────────────────────────────────── */
+exports.easterDawnPush = functions
+  .region('asia-northeast3')
+  .pubsub.schedule('30 4 5 4 *')
+  .timeZone('Asia/Seoul')
+  .onRun(async function() {
+    const title = '🌅 예수님께서 부활하셨습니다!';
+    const body = '부활주일 특별새벽기도회는 5시 시작 (4시 50분 찬양). 함께 참여하여 부활의 기쁨을 누립시다! ✝';
+
+    const [userResult, adminsSnap] = await Promise.all([
+      getAllUserTokens(),
+      db.collection('admins').get()
+    ]);
+
+    const allTokens = [...userResult.tokens];
+    const tokenToCollection = {};
+    userResult.tokens.forEach(function(t) {
+      tokenToCollection[t] = { col: 'users', id: userResult.tokenToUid[t] };
+    });
+    adminsSnap.forEach(function(doc) {
+      extractTokens(doc.data()).forEach(function(t) {
+        if (!tokenToCollection[t]) {
+          tokenToCollection[t] = { col: 'admins', id: doc.id };
+          allTokens.push(t);
+        }
+      });
+    });
+
+    if (!allTokens.length) {
+      console.log('부활 새벽 알림: 등록된 토큰 없음');
+      return null;
+    }
+
+    let res;
+    try {
+      res = await messaging.sendEachForMulticast({
+        notification: { title, body },
+        data: { title, body, targetUrl: 'easter' },
+        tokens: allTokens
+      });
+    } catch (err) {
+      console.error('부활 새벽 알림 전체 실패:', err.message);
+      return null;
+    }
+
+    console.log(`부활 새벽 알림 성공:${res.successCount}, 실패:${res.failureCount}`);
+
+    const deletes = [];
+    res.responses.forEach(function(r, i) {
+      if (!r.success && r.error && EXPIRED_CODES.includes(r.error.code)) {
+        const info = tokenToCollection[allTokens[i]];
+        if (info) {
+          deletes.push(
+            db.collection(info.col).doc(info.id)
+              .update({ fcmTokens: admin.firestore.FieldValue.arrayRemove(allTokens[i]) })
+              .catch(function() {})
+          );
+        }
+      }
+    });
+    await Promise.all(deletes);
+    return null;
+  });
