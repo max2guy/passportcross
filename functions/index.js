@@ -113,7 +113,7 @@ async function sendToUsers(tokens, tokenToUid, title, body) {
 
   let res;
   try {
-    res = await messaging.sendEachForMulticast({ notification: { title, body }, data: { title, body }, tokens });
+    res = await messaging.sendEachForMulticast({ data: { title, body }, tokens });
   } catch (err) {
     console.error('sendEachForMulticast 전체 실패 (users):', err.message);
     return;
@@ -205,10 +205,6 @@ exports.notifyAdminOnSubmission = functions
     }
 
     const messagePayload = {
-      notification: {
-        title: '새 미션 제출 ✝',
-        body: `${studentName}님이 [${missionName}]을 제출했습니다. 확인해주세요!`
-      },
       data: {
         title: '새 미션 제출 ✝',
         body: `${studentName}님이 [${missionName}]을 제출했습니다. 확인해주세요!`,
@@ -253,10 +249,6 @@ exports.notifyStudentOnApproval = functions
 
     const missionName = after.missionName || '미션';
     const messagePayload = {
-      notification: {
-        title: '미션 승인! ✝',
-        body: `[${missionName}] 승인되었습니다. 여권에서 도장을 확인하세요!`
-      },
       data: {
         title: '미션 승인! ✝',
         body: `[${missionName}] 승인되었습니다. 여권에서 도장을 확인하세요!`
@@ -443,7 +435,6 @@ exports.easterDawnPush = functions
     let res;
     try {
       res = await messaging.sendEachForMulticast({
-        notification: { title, body },
         data: { title, body, targetUrl: 'easter' },
         tokens: allTokens
       });
