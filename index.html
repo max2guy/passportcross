@@ -586,6 +586,35 @@ html,body{
 .name-edit-box{background:var(--bg2);border-radius:var(--radius);padding:28px 24px;width:90%;max-width:320px}
 .name-edit-box h3{font-size:16px;color:var(--gold);margin-bottom:16px;text-align:center}
 .name-edit-box input{width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--bg3);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:15px;outline:none;margin-bottom:16px}
+/* ===== 부활주일 오버레이 ===== */
+.easter-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;overflow:hidden;opacity:0;visibility:hidden;transition:opacity .8s ease,visibility .8s ease}
+.easter-overlay.show{opacity:1;visibility:visible}
+.easter-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(201,168,76,.18) 0%,rgba(14,9,2,.97) 70%,#080408 100%)}
+.easter-rays{position:absolute;inset:-50%;width:200%;height:200%;background:conic-gradient(from 0deg at 50% 50%,transparent 0deg,rgba(201,168,76,.06) 8deg,transparent 16deg,rgba(201,168,76,.04) 24deg,transparent 32deg,rgba(201,168,76,.07) 40deg,transparent 48deg,rgba(201,168,76,.03) 56deg,transparent 64deg,rgba(201,168,76,.06) 72deg,transparent 80deg,rgba(201,168,76,.04) 88deg,transparent 96deg,rgba(201,168,76,.07) 104deg,transparent 112deg,rgba(201,168,76,.05) 120deg,transparent 128deg,rgba(201,168,76,.04) 136deg,transparent 144deg,rgba(201,168,76,.06) 152deg,transparent 160deg,rgba(201,168,76,.03) 168deg,transparent 176deg,rgba(201,168,76,.06) 184deg,transparent 192deg,rgba(201,168,76,.04) 200deg,transparent 208deg,rgba(201,168,76,.07) 216deg,transparent 224deg,rgba(201,168,76,.03) 232deg,transparent 240deg,rgba(201,168,76,.06) 248deg,transparent 256deg,rgba(201,168,76,.04) 264deg,transparent 272deg,rgba(201,168,76,.07) 280deg,transparent 288deg,rgba(201,168,76,.05) 296deg,transparent 304deg,rgba(201,168,76,.04) 312deg,transparent 320deg,rgba(201,168,76,.06) 328deg,transparent 336deg,rgba(201,168,76,.03) 344deg,transparent 352deg,rgba(201,168,76,.06) 360deg);animation:easterRaysRot 30s linear infinite}
+@keyframes easterRaysRot{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.easter-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:40px 24px;gap:0}
+.easter-cross-wrap{position:relative;margin-bottom:20px}
+.easter-cross{font-size:72px;color:var(--gold);display:block;filter:drop-shadow(0 0 24px rgba(201,168,76,.8));animation:easterCrossGlow 3s ease-in-out infinite;opacity:0;transform:scale(.6)}
+.easter-overlay.show .easter-cross{animation:easterCrossIn .9s cubic-bezier(.22,1,.36,1) .2s forwards,easterCrossGlow 3s ease-in-out 1.1s infinite}
+@keyframes easterCrossIn{to{opacity:1;transform:scale(1)}}
+@keyframes easterCrossGlow{0%,100%{filter:drop-shadow(0 0 20px rgba(201,168,76,.7))}50%{filter:drop-shadow(0 0 40px rgba(232,210,130,1))}}
+.easter-risen{font-family:'Cinzel',var(--font-display);font-size:11px;letter-spacing:4px;color:rgba(201,168,76,.6);text-transform:uppercase;opacity:0;transform:translateY(10px);margin-bottom:24px}
+.easter-overlay.show .easter-risen{animation:easterFadeUp .7s ease .9s forwards}
+.easter-word{display:block;font-family:'Playfair Display',var(--font-serif);font-weight:900;color:var(--gold-bright);text-shadow:0 0 30px rgba(201,168,76,.6);opacity:0;transform:translateY(24px) scale(.95)}
+.easter-word-sm{font-size:clamp(36px,10vw,52px)}
+.easter-word-lg{font-size:clamp(28px,7.5vw,42px);color:var(--gold);margin-top:6px}
+.easter-overlay.show .easter-word:nth-child(1){animation:easterFadeUp .6s cubic-bezier(.22,1,.36,1) 1.2s forwards}
+.easter-overlay.show .easter-word:nth-child(2){animation:easterFadeUp .6s cubic-bezier(.22,1,.36,1) 1.7s forwards}
+.easter-overlay.show .easter-word:nth-child(3){animation:easterFadeUp .7s cubic-bezier(.22,1,.36,1) 2.2s forwards}
+.easter-sub{font-family:var(--font-serif);font-size:clamp(15px,4.2vw,19px);color:var(--text);opacity:0;transform:translateY(16px);margin-top:18px;line-height:1.6;word-break:keep-all}
+.easter-overlay.show .easter-sub{animation:easterFadeUp .7s ease 3.0s forwards}
+.easter-btn{margin-top:32px;padding:14px 40px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.5);border-radius:30px;color:var(--gold);font-size:15px;font-weight:700;letter-spacing:2px;cursor:pointer;font-family:var(--font-body);opacity:0;transform:translateY(12px);transition:background .2s,border-color .2s}
+.easter-btn:active{background:rgba(201,168,76,.28)}
+.easter-overlay.show .easter-btn{animation:easterFadeUp .6s ease 3.7s forwards}
+@keyframes easterFadeUp{to{opacity:1;transform:translateY(0) scale(1)}}
+/* 상승 파티클 */
+.easter-particle{position:absolute;bottom:-10px;border-radius:50%;background:var(--gold);pointer-events:none;animation:easterRise linear infinite;opacity:0}
+@keyframes easterRise{0%{opacity:0;transform:translateY(0) scale(1)}20%{opacity:.7}80%{opacity:.4}100%{opacity:0;transform:translateY(-100vh) scale(.3)}}
 .name-edit-box .ne-btns{display:flex;gap:8px}
 .name-edit-box .ne-btns button{flex:1;padding:12px;border:none;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:14px;cursor:pointer}
 *{scrollbar-width:none}
@@ -2597,7 +2626,7 @@ var _missionOverrides=[0,0,0,0,0,0];
 
 /* ── 현재 앱 버전 (강제 업데이트 비교용 + 화면 표시) ── */
 var CURRENT_VERSION='3.0.2';
-var SW_VERSION='v156'; // sw.js의 CACHE_NAME과 항상 맞춰서 수정
+var SW_VERSION='v157'; // sw.js의 CACHE_NAME과 항상 맞춰서 수정
 (function(){
   var el=document.getElementById('appVersionDisplay');
   function updateDisplay(swv){el.textContent='v'+CURRENT_VERSION+(swv?' (SW '+swv+')':'');}
@@ -2780,6 +2809,8 @@ function showApp(data){
   startFeedListener();
   // SW 등록 완료 후 FCM 초기화 (학생 토큰 발급 + 포그라운드 수신)
   initFCM();
+  // 부활주일 기믹 (4/5 당일만 표시)
+  checkEasterDay();
 }
 
 function switchTab(tabId,btn,dir){
@@ -2872,6 +2903,7 @@ function _updateBoostBadge(){
   var b=document.getElementById('thermoBoost');
   if(!b)return;
   var dow=new Date().getDay(); // 0=일,1=월...4=목,5=금,6=토
+  // 부스트 표시는 당일에만 공개
   if(dow===4){
     b.innerHTML='⚡ 오늘 ×3 부스트 중!';
     b.className='thermo-boost live';b.style.display='flex';
@@ -2881,9 +2913,6 @@ function _updateBoostBadge(){
   } else if(dow===6){
     b.innerHTML='⚡ 오늘 ×5 부스트 중!';
     b.className='thermo-boost live';b.style.display='flex';
-  } else if(dow>=1&&dow<=3){
-    b.innerHTML='✨ 목×3 · 금×4 · 토×5 부스트 예정';
-    b.className='thermo-boost upcoming';b.style.display='flex';
   } else {
     b.style.display='none';
   }
@@ -3633,6 +3662,62 @@ function handleProfilePhoto(input){
 }
 
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
+
+/* ===== 부활주일 기믹 ===== */
+function checkEasterDay(){
+  // KST 기준 날짜 확인
+  var kst=new Date(Date.now()+9*3600*1000);
+  var dateStr=kst.toISOString().slice(0,10);
+  if(dateStr!=='2026-04-05')return;
+  var key='easterShown_2026';
+  // 하루에 처음 열 때 한 번만 표시
+  if(localStorage.getItem(key))return;
+  localStorage.setItem(key,'1');
+  setTimeout(showEasterOverlay, 1400);
+}
+function showEasterOverlay(){
+  var ov=document.getElementById('easterOverlay');
+  if(!ov)return;
+  // 파티클 생성
+  var pc=ov.querySelector('.easter-particles');
+  for(var i=0;i<22;i++){
+    (function(idx){
+      var p=document.createElement('div');
+      p.className='easter-particle';
+      var sz=(2+Math.random()*4);
+      p.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(5+Math.random()*90)+'%;'
+        +'animation-duration:'+(4+Math.random()*5)+'s;'
+        +'animation-delay:'+(Math.random()*6)+'s;'
+        +'opacity:0;';
+      pc.appendChild(p);
+    })(i);
+  }
+  ov.classList.add('show');
+}
+function closeEasterOverlay(){
+  var ov=document.getElementById('easterOverlay');
+  if(ov){ov.style.transition='opacity .6s ease,visibility .6s ease';ov.classList.remove('show');}
+}
 </script>
+
+<!-- 부활주일 오버레이 -->
+<div id="easterOverlay" class="easter-overlay">
+  <div class="easter-bg"></div>
+  <div class="easter-rays"></div>
+  <div class="easter-content">
+    <div class="easter-cross-wrap">
+      <span class="easter-cross">✝</span>
+    </div>
+    <div class="easter-risen">He is Risen · 2026. 4. 5</div>
+    <div>
+      <span class="easter-word easter-word-sm">사셨네</span>
+      <span class="easter-word easter-word-sm">사셨네</span>
+      <span class="easter-word easter-word-lg">예수 다시 사셨네</span>
+    </div>
+    <div class="easter-sub">예수님께서 부활하셨습니다!! 🌅</div>
+    <button class="easter-btn" onclick="closeEasterOverlay()">할렐루야 · 아멘</button>
+  </div>
+  <div class="easter-particles"></div>
+</div>
 </body>
 </html>
