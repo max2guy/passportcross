@@ -267,7 +267,7 @@ html,body{
 
 /* COMMUNITY THERMO */
 .community-thermo{background:var(--bg2);border:1px solid rgba(197,165,90,.15);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;position:relative;overflow:hidden}
-.community-thermo::before{content:'✝';position:absolute;right:14px;bottom:10px;font-size:56px;opacity:.04;pointer-events:none;transition:opacity .6s;line-height:1}
+.community-thermo::before{content:'✝';position:absolute;right:14px;bottom:68px;font-size:52px;opacity:.04;pointer-events:none;transition:opacity .6s;line-height:1}
 .community-thermo.blessed::before{opacity:.18}
 .thermo-label{font-size:10px;color:var(--gold-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
 .thermo-count-row{display:flex;align-items:baseline;gap:6px;margin-bottom:10px}
@@ -2631,7 +2631,7 @@ var _missionOverrides=[0,0,0,0,0,0];
 
 /* ── 현재 앱 버전 (강제 업데이트 비교용 + 화면 표시) ── */
 var CURRENT_VERSION='3.0.2';
-var SW_VERSION='v159'; // sw.js의 CACHE_NAME과 항상 맞춰서 수정
+var SW_VERSION='v160'; // sw.js의 CACHE_NAME과 항상 맞춰서 수정
 (function(){
   var el=document.getElementById('appVersionDisplay');
   function updateDisplay(swv){el.textContent='v'+CURRENT_VERSION+(swv?' (SW '+swv+')':'');}
