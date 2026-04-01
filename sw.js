@@ -35,17 +35,25 @@ messaging.onBackgroundMessage(function(payload) {
 // 알림 탭 → 앱 열기 (관리자 알림이면 admin.html 우선 탐색)
 self.addEventListener('notificationclick', function(e) {
   e.notification.close();
-  const notifData = e.notification.data || {};
-  const target = notifData.url || self.location.origin;
+  const rawData = e.notification.data || {};
+  // Firebase 자동 표시 알림: data가 { notification:{}, data:{...our fields} } 형태로 래핑됨
+  // 수동 showNotification (onBackgroundMessage): data가 { url, submissionId, targetUrl } 형태
+  const notifData = rawData.data || rawData;
+
   const subId = notifData.submissionId || '';
   const isAdmin = notifData.targetUrl === 'admin';
+  const base = self.location.origin + '/';
+  // url 필드 있으면 우선 사용, 없으면 targetUrl/submissionId로 재조합
+  const target = notifData.url || (isAdmin
+    ? base + 'index.html' + (subId ? '?sub=' + subId : '')
+    : base + 'index.html');
 
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(list) {
       if (isAdmin) {
-        // admin.html 또는 index.html 탭에 포커스 + postMessage로 카드 하이라이트
+        // index.html(관리자 패널 포함) 탭에 포커스 + postMessage로 카드 하이라이트
         for (var i = 0; i < list.length; i++) {
-          if ((list[i].url.includes('admin.html') || list[i].url.includes('index.html') || list[i].url === self.location.origin + '/') && 'focus' in list[i]) {
+          if ((list[i].url.includes('index.html') || list[i].url === self.location.origin + '/') && 'focus' in list[i]) {
             list[i].focus();
             if (subId) list[i].postMessage({ type: 'HIGHLIGHT_SUBMISSION', subId: subId });
             return;
@@ -66,7 +74,7 @@ self.addEventListener('notificationclick', function(e) {
 });
 
 /* ===== 캐시 전략 ===== */
-const CACHE_NAME = 'passport-cross-v154';
+const CACHE_NAME = 'passport-cross-v155';
 const ASSETS = [
   './',
   './index.html',
