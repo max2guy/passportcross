@@ -22,7 +22,7 @@ messaging.onBackgroundMessage(function(payload) {
   // 관리자 대상 알림이면 admin.html?sub=submissionId 딥링크
   let targetUrl = base;
   if (d.targetUrl === 'admin') {
-    targetUrl = base + 'admin.html' + (d.submissionId ? '?sub=' + d.submissionId : '');
+    targetUrl = base + 'index.html' + (d.submissionId ? '?sub=' + d.submissionId : '');
   }
   self.registration.showNotification(d.title || 'THE CROSS PASSPORT', {
     body: d.body || '',
@@ -43,10 +43,10 @@ self.addEventListener('notificationclick', function(e) {
   const subId = notifData.submissionId || '';
   const isAdmin = notifData.targetUrl === 'admin';
   const base = self.location.origin + '/';
-  // url 필드 있으면 우선 사용, 없으면 targetUrl/submissionId로 재조합
-  const target = notifData.url || (isAdmin
+  // 관리자 알림은 항상 index.html (admin panel 포함), 일반 알림은 url 필드 또는 index.html
+  const target = isAdmin
     ? base + 'index.html' + (subId ? '?sub=' + subId : '')
-    : base + 'index.html');
+    : (notifData.url || base + 'index.html');
 
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(list) {
@@ -74,7 +74,7 @@ self.addEventListener('notificationclick', function(e) {
 });
 
 /* ===== 캐시 전략 ===== */
-const CACHE_NAME = 'passport-cross-v161';
+const CACHE_NAME = 'passport-cross-v162';
 const ASSETS = [
   './',
   './index.html',
