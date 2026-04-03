@@ -42,7 +42,7 @@ self.addEventListener('notificationclick', function(e) {
 
   const subId = notifData.submissionId || '';
   const isAdmin = notifData.targetUrl === 'admin';
-  const base = self.location.origin + '/';
+  const base = self.location.origin + self.location.pathname.replace(/sw\.js$/, '');
   // 관리자 알림은 항상 index.html (admin panel 포함), 일반 알림은 url 필드 또는 index.html
   const target = isAdmin
     ? base + 'index.html' + (subId ? '?sub=' + subId : '')
@@ -74,7 +74,7 @@ self.addEventListener('notificationclick', function(e) {
 });
 
 /* ===== 캐시 전략 ===== */
-const CACHE_NAME = 'passport-cross-v162';
+const CACHE_NAME = 'passport-cross-v163';
 const ASSETS = [
   './',
   './index.html',
