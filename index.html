@@ -267,7 +267,7 @@ html,body{
 
 /* COMMUNITY THERMO */
 .community-thermo{background:var(--bg2);border:1px solid rgba(197,165,90,.15);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;position:relative;overflow:hidden}
-.community-thermo::before{content:'✝';position:absolute;right:14px;bottom:90px;font-size:52px;opacity:.04;pointer-events:none;transition:opacity .6s;line-height:1}
+.community-thermo::before{content:'✝';position:absolute;right:26px;bottom:62px;font-size:52px;opacity:.04;pointer-events:none;transition:opacity .6s;line-height:1}
 .community-thermo.blessed::before{opacity:.18}
 .thermo-label{font-size:10px;color:var(--gold-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
 .thermo-count-row{display:flex;align-items:baseline;gap:6px;margin-bottom:10px}
@@ -280,7 +280,7 @@ html,body{
 .thermo-boost.upcoming{background:rgba(197,165,90,.07)}
 .thermo-boost.live{background:rgba(197,165,90,.18);border-color:var(--gold);animation:boostPulse 2s ease-in-out infinite}
 @keyframes boostPulse{0%,100%{box-shadow:0 0 0 0 rgba(197,165,90,.5)}60%{box-shadow:0 0 0 7px rgba(197,165,90,0)}}
-/* 300+ 별 */
+/* 280+ 별 */
 .cross-star{position:absolute;pointer-events:none;color:var(--gold);font-size:14px;opacity:0;animation:starTwinkle 0s ease-in-out infinite}
 @keyframes starTwinkle{0%,100%{opacity:.9;transform:scale(1) rotate(0deg)}50%{opacity:.3;transform:scale(1.4) rotate(20deg)}}
 
@@ -2630,8 +2630,8 @@ var _swReg=null, _pendingWorker=null, _refreshing=false;
 var _missionOverrides=[0,0,0,0,0,0];
 
 /* ── 현재 앱 버전 (강제 업데이트 비교용 + 화면 표시) ── */
-var CURRENT_VERSION='3.0.2';
-var SW_VERSION='v163'; // sw.js의 CACHE_NAME과 항상 맞춰서 수정
+var CURRENT_VERSION='3.0.3';
+var SW_VERSION='v164'; // sw.js의 CACHE_NAME과 항상 맞춰서 수정
 (function(){
   var el=document.getElementById('appVersionDisplay');
   function updateDisplay(swv){el.textContent='v'+CURRENT_VERSION+(swv?' (SW '+swv+')':'');}
@@ -2868,11 +2868,11 @@ function updateThermo(count){
   el.style.display='';
   document.getElementById('thermoCount').textContent=count;
   document.getElementById('thermoDesc').textContent='함께 걸어간 십자가의 길';
-  // 진행 바: 300 기준 (최대값은 표시 안 함)
-  var pct=Math.min(100,Math.round(count/300*100));
+  // 진행 바: 280 기준 (최대값은 표시 안 함)
+  var pct=Math.min(100,Math.round(count/280*100));
   document.getElementById('thermoFill').style.width=pct+'%';
-  // 300+ 별 효과
-  if(count>=300){
+  // 280+ 별 효과
+  if(count>=280){
     el.classList.add('blessed');
     _showCrossStars(el);
   }
