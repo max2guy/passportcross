@@ -74,7 +74,7 @@ self.addEventListener('notificationclick', function(e) {
 });
 
 /* ===== 캐시 전략 ===== */
-const CACHE_NAME = 'passport-cross-v165';
+const CACHE_NAME = 'passport-cross-v166';
 const ASSETS = [
   './',
   './index.html',
@@ -109,6 +109,26 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
+
+  // ── CDN 스크립트: Cache-First (Chrome 148 HTTP 캐시 파티셔닝 우회) ──
+  const CDN_HOSTS = [
+    'www.gstatic.com', // Firebase SDK
+  ];
+  if (CDN_HOSTS.includes(url.hostname)) {
+    e.respondWith(
+      caches.match(e.request).then(cached => {
+        if (cached) return cached;
+        return fetch(e.request).then(res => {
+          if (res && res.status === 200) {
+            caches.open(CACHE_NAME).then(c => c.put(e.request, res.clone()));
+          }
+          return res;
+        });
+      })
+    );
+    return;
+  }
+
   // 외부 도메인(Firebase, Google API, CDN 등)은 SW 개입 없이 그대로 통과
   if (url.origin !== self.location.origin) return;
 
