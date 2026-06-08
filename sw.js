@@ -74,7 +74,7 @@ self.addEventListener('notificationclick', function(e) {
 });
 
 /* ===== 캐시 전략 ===== */
-const CACHE_NAME = 'passport-cross-v166';
+const CACHE_NAME = 'passport-cross-v167';
 const ASSETS = [
   './',
   './index.html',
@@ -118,12 +118,14 @@ self.addEventListener('fetch', e => {
     e.respondWith(
       caches.match(e.request).then(cached => {
         if (cached) return cached;
-        return fetch(e.request).then(res => {
+        // CORS mode fetch: no-cors 요청은 opaque response(status 0)라 캐시 불가.
+        // CORS 요청으로 투명한 응답을 받아 CacheStorage에 저장한다.
+        return fetch(new Request(e.request, {mode: 'cors', credentials: 'omit'})).then(res => {
           if (res && res.status === 200) {
             caches.open(CACHE_NAME).then(c => c.put(e.request, res.clone()));
           }
           return res;
-        });
+        }).catch(() => fetch(e.request)); // CORS 실패 시 원본 요청 폴백
       })
     );
     return;
